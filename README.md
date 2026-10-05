@@ -9,6 +9,6 @@ categories Way Back When, Favorites, Who's in the Picture?, Then & Now · join =
 squares = mix (family places, everyone's homes, town spots) · fines = Forgot to call your mom (pays Mom!), dishes, thank you, last piece of pie ·
 rewards = winner's picture becomes a square, trophies, bragging rights · her piece = 🧁 · sign-up trivia = birthday, nickname, favorite food, something nobody knows.
 
-v1 (this folder, web/index.html): one-phone pass-and-play, 2–8 players, computer players (Granny Bot / Uncle Ace / Shark), Pop Bucks, Free Pass, Pie Pot, Time Out,
+v1 (this folder, docs/index.html): one-phone pass-and-play, 2–8 players, computer players (Granny Bot / Uncle Ace / Shark), Pop Bucks, Free Pass, Pie Pot, Time Out,
 Family Book (add memories + photos → questions), Bragging rights board. Data lives on the device (localStorage).
 Next: phase 2 = shared family space online (accounts, Mom approves joins, chat, feed, share to Facebook), phone-to-phone play, all games inside.

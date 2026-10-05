@@ -17,6 +17,20 @@ const today = () => new Date().toISOString().slice(0, 10);
 // Daily Pop Bucks caps so the bank stays meaningful
 const EARN_CAPS = { "word-popper": 300, "pic-pop": 600, "story": 60, "challenge": 200 };
 const SHOP = { pass: 300, square: 600, piece: 150 };
+const MONTHS = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+// "June 10", "Jun 10th", "6/10", "06-10" -> [6,10]
+function parseBday(s) {
+  s = String(s || "").toLowerCase().trim(); if (!s) return null;
+  let m = s.match(/^(\d{1,2})\s*[\/\-.]\s*(\d{1,2})/); if (m) return [+m[1], +m[2]];
+  const mm = s.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/); if (!mm) return null; const mi = MONTHS.indexOf(mm[1]);
+  m = s.match(/(\d{1,2})/); return m ? [mi + 1, +m[1]] : null;
+}
+function centralToday(offsetDays = 0) {
+  const d = new Date(Date.now() + offsetDays * 864e5);
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "numeric", day: "numeric" }).formatToParts(d).map(x => [x.type, x.value]));
+  return [+p.month, +p.day, +p.year];
+}
+const BDAY_BUCKS = 250;
 const PROFILE_FIELDS = ["name", "piece", "birthday", "nick", "food", "secret", "chatTrivia", "mom"];
 
 export default {
@@ -122,6 +136,8 @@ export class Family extends DurableObject {
     return {
       meta: { name: d.meta.name, approval: d.meta.approval, fid: d.meta.fid, code: d.meta.code },
       me: this.publicMember(me, true),
+      today: (() => { const t = centralToday(), n = centralToday(1); const on = d => Object.values(this.d.members).filter(m => m.status === "member" && (b => b && b[0] === d[0] && b[1] === d[1])(parseBday(m.birthday))).map(m => m.id);
+        return { birthdays: on(t), tomorrow: on(n) }; })(),
       members: members.map(m => this.publicMember(m, m.status === "member")),
       chat: d.chat.filter(c => myRooms(c.room)).slice(-300),
       feed: d.feed.slice(-80),
@@ -175,6 +191,7 @@ export class Family extends DurableObject {
 
     const me = await this.who(req, url);
     if (!me) return fail("Please join the family first", 401);
+    await this.birthdays();
 
     if (path === "/ws") {
       if (req.headers.get("Upgrade") !== "websocket") return fail("Expected websocket");
@@ -360,6 +377,17 @@ export class Family extends DurableObject {
       }
       default: return fail("Unknown action");
     }
+  }
+  async birthdays() {
+    const [mo, da, yr] = centralToday(); let changed = false;
+    for (const m of Object.values(this.d.members)) {
+      if (m.status !== "member") continue;
+      const b = parseBday(m.birthday);
+      if (!b || b[0] !== mo || b[1] !== da || m.bdayYear === yr) continue;
+      m.bdayYear = yr; m.bucks += BDAY_BUCKS; m.passes += 1; changed = true;
+      this.d.feed.push({ id: rid(10), from: "system", kind: "birthday", about: m.id, text: `🎂 Happy Birthday, ${m.piece} ${m.name}! The family bank gave you ${BDAY_BUCKS} Pop Bucks and a Free Pass. Leave a birthday wish!`, ts: Date.now(), likes: [], comments: [] });
+    }
+    if (changed) { await this.save("members", "feed"); this.broadcast("feed", null); this.broadcast("members", null); }
   }
   prune() { const gs = Object.values(this.d.games).sort((a, b) => b.updated - a.updated); for (const g of gs.slice(30)) delete this.d.games[g.id]; }
   post(text) { this.d.feed.push({ id: rid(10), from: "system", text, ts: Date.now(), likes: [], comments: [] }); }

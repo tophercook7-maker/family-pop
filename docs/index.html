@@ -75,6 +75,11 @@ label.f small{color:var(--dim);font-weight:700}
 /* feed */
 .compose{display:flex;flex-direction:column;gap:8px}
 .post{background:var(--card);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.bday{background:linear-gradient(135deg,#ff5d9e,#ffc23d);color:#2b1747;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.bday b{font-size:22px}
+.bday .row{justify-content:center}
+.bday .btn{background:#2b1747;color:#fff}
+.soon{background:rgba(255,194,61,.15);border:2px dashed var(--sun);border-radius:14px;padding:10px 12px;font-weight:800;text-align:center}
 .post.sys{background:rgba(255,255,255,.06);font-weight:800;color:var(--dim);font-size:15px}
 .who{display:flex;align-items:center;gap:8px;font-weight:900}
 .who .pc{font-size:24px}
@@ -212,6 +217,7 @@ label.f small{color:var(--dim);font-weight:700}
     <img id="postPrev" class="sqphoto" hidden alt="">
     <div class="row"><button class="btn small ghost" id="postPhoto">📷 Photo</button><span style="flex:1"></span><button class="btn small" id="postGo">Post</button></div>
   </div>
+  <div id="bdayBox" class="list"></div>
   <div id="feed" class="list"></div>
 </div></section>
 
@@ -470,8 +476,18 @@ let postPhoto=null;
 $("#postPhoto").onclick=async()=>{postPhoto=await pickPhoto();if(postPhoto){$("#postPrev").src=postPhoto;$("#postPrev").hidden=false}};
 $("#postGo").onclick=()=>busy($("#postGo"),async()=>{const text=$("#postText").value.trim();if(!text&&!postPhoto)return toast("Write something or add a photo");
   await act("post",{text,photo:postPhoto});$("#postText").value="";postPhoto=null;$("#postPrev").hidden=true;buzz(20);refresh()});
+function renderBirthdays(){
+  const t=(S.today||{birthdays:[],tomorrow:[]});const box=$("#bdayBox");if(!box)return;
+  const today=t.birthdays.map(mem).filter(Boolean),soon=t.tomorrow.map(mem).filter(Boolean);
+  box.innerHTML=today.map(m=>m.id===meId()
+      ?`<div class="bday"><div class="bigmoji">🎂</div><b>Happy Birthday, ${esc(m.name)}!</b><div>The family bank gave you 250 Pop Bucks and a Free Pass. Today's game questions about you pay double!</div></div>`
+      :`<div class="bday"><div class="bigmoji">🎂</div><b>Today is ${esc(m.name)}'s birthday!</b><div>Questions about ${esc(m.name)} pay double in today's games.</div><div class="row"><button class="btn small" data-bgift="${m.id}">🎁 Send a gift</button><button class="btn small" data-bwish="${m.id}">💬 Say happy birthday</button></div></div>`).join("")
+    +soon.filter(m=>m.id!==meId()).map(m=>`<div class="soon">🎈 Tomorrow is ${m.piece} ${esc(m.name)}'s birthday!</div>`).join("");
+  $$("[data-bgift]").forEach(b=>b.onclick=()=>giveSheet(b.dataset.bgift));
+  $$("[data-bwish]").forEach(b=>b.onclick=()=>{ROOM="all";tab("chat");$("#chatText").value=`Happy Birthday, ${mem(b.dataset.bwish).name}! 🎂🎉`;$("#chatText").focus()});
+}
 function renderFeed(){
-  if(!S)return;const f=S.feed.slice().reverse();
+  if(!S)return;renderBirthdays();const f=S.feed.slice().reverse();
   $("#feed").innerHTML=f.length?f.map(p=>{if(p.from==="system")return `<div class="post sys">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span></div>`;
     const a=mem(p.from)||{name:"Someone",piece:"🫧"};const liked=p.likes.includes(meId());
     return `<div class="post"><div class="who"><span class="pc">${a.piece}</span><span>${esc(a.name)}<br><small>${ago(p.ts)}</small></span></div>
@@ -629,7 +645,7 @@ function famQuestions(){
   ppl.forEach(p=>{
     if(p.food)qs.push({cat:"Favorites",about:p.id,q:`What's ${p.name}'s favorite food?`,a:p.food,pool:ppl.filter(x=>x.food&&x.id!==p.id).map(x=>x.food).concat(FOODS)});
     if(p.birthday){qs.push({cat:"Way Back When",about:p.id,q:`Whose birthday is ${p.birthday}?`,a:p.name,pool:names});
-      const m=MONTHS.find(m=>p.birthday.toLowerCase().startsWith(m.toLowerCase().slice(0,3)));if(m)qs.push({cat:"Favorites",about:p.id,q:`What month is ${p.name}'s birthday?`,a:m,pool:MONTHS})}
+      const bl=p.birthday.toLowerCase(),nm=bl.match(/^(\d{1,2})\s*[\/\-.]/);const m=nm?MONTHS[+nm[1]-1]:MONTHS.find(m=>new RegExp('\\b'+m.toLowerCase().slice(0,3)).test(bl));if(m)qs.push({cat:"Favorites",about:p.id,q:`What month is ${p.name}'s birthday?`,a:m,pool:MONTHS})}
     if(p.nick)qs.push({cat:"Way Back When",about:p.id,q:`Who goes by the nickname "${p.nick}"?`,a:p.name,pool:names});
     if(p.secret)qs.push({cat:"Way Back When",about:p.id,q:`Something nobody knew… whose secret is this? "${p.secret}"`,a:p.name,pool:names});
   });
@@ -644,11 +660,13 @@ function makeQuestion(p,size){
   let pool=fam.filter(q=>!QUSED.has(q.q));
   if(!pool.length||Math.random()<.25)pool=pool.concat(starters.filter(q=>!QUSED.has(q.q)));
   if(!pool.length){QUSED.clear();pool=fam.concat(starters)}
-  const q=rnd(pool);QUSED.add(q.q);const n=size===2?2:size===4?3:4;
+  const bdays=(S.today&&S.today.birthdays||[]).filter(id=>id!==p.memberId);
+  const bpool=pool.filter(q=>bdays.includes(q.about));
+  const q=bpool.length&&Math.random()<.45?rnd(bpool):rnd(pool);QUSED.add(q.q);const n=size===2?2:size===4?3:4;
   let wrong=shuffle([...new Set((q.pool||[]).filter(x=>x&&x.toLowerCase()!==q.a.toLowerCase()))]);
   const isName=S.members.some(m=>m.name===q.a);
   if(wrong.length<n-1&&!isName){const extra=q.pool===MONTHS?MONTHS:FOODS;wrong=wrong.concat(shuffle(extra.filter(x=>x!==q.a&&!wrong.includes(x))))}
-  return {cat:q.cat,q:q.q,a:q.a,photo:q.photo,opts:shuffle([q.a].concat(wrong.slice(0,n-1)))};
+  return {cat:q.cat,q:q.q,a:q.a,photo:q.photo,bday:bdays.includes(q.about),opts:shuffle([q.a].concat(wrong.slice(0,n-1)))};
 }
 
 /* ================= board game: setup ================= */
@@ -769,12 +787,13 @@ function pickBubble(p){
 }
 function askQuestion(p,q,size){return new Promise(res=>{
   if(ST().over)return res(false);const bot=BOTS.find(b=>b.id===p.bot);const timed=size===6;let iv=null,done=false;
-  sheet(`<div class="cat">${esc(q.cat)}</div>${q.photo?`<img class="qphoto" src="${photoURL(q.photo)}" alt="">`:""}<div class="qtext">${esc(q.q)}</div>${timed?'<div class="timer"><i id="tbar"></i></div>':""}
+  sheet(`<div class="cat">${q.bday?"🎂 Birthday question · pays double":esc(q.cat)}</div>${q.photo?`<img class="qphoto" src="${photoURL(q.photo)}" alt="">`:""}<div class="qtext">${esc(q.q)}</div>${timed?'<div class="timer"><i id="tbar"></i></div>':""}
    <div class="ans" id="qa">${q.opts.map(o=>`<button data-o="${esc(o)}">${esc(o)}</button>`).join("")}</div><div class="dim" id="qfoot">${bot?esc(p.name)+" is thinking…":"Move "+size+" if you're right"}</div>`);
   const finish=pick=>{if(done)return;done=true;clearInterval(iv);const ok=pick===q.a;p.asked++;if(ok){p.right++;p.streak++}else p.streak=0;
     $$("#qa button").forEach(b=>{if(b.dataset.o===q.a)b.classList.add("right");else if(b.dataset.o===pick)b.classList.add("wrong")});
-    $("#qfoot").innerHTML=ok?`<b style="color:var(--good)">Right! +20${p.streak===3?" · 🔥 3 in a row! +50 more":""}</b>`:`<b style="color:var(--bad)">${pick==null?"Time's up!":"Not quite."}</b> It's <b>${esc(q.a)}</b>.`;
-    if(ok){sfx.right();buzz(30);p.cash+=20;if(p.streak===3)p.cash+=50}else{sfx.wrong();buzz(15)}
+    const pay=q.bday?40:20;
+    $("#qfoot").innerHTML=ok?`<b style="color:var(--good)">Right! +${pay}${q.bday?" 🎂":""}${p.streak===3?" · 🔥 3 in a row! +50 more":""}</b>`:`<b style="color:var(--bad)">${pick==null?"Time's up!":"Not quite."}</b> It's <b>${esc(q.a)}</b>.`;
+    if(ok){sfx.right();buzz(30);p.cash+=pay;if(p.streak===3)p.cash+=50}else{sfx.wrong();buzz(15)}
     setTimeout(()=>{closeSheet();res(ok)},ok?1300:2200)};
   if(bot){const ok=Math.random()<bot.acc;setTimeout(()=>finish(ok?q.a:rnd(q.opts.filter(o=>o!==q.a))),1300+Math.random()*900)}
   else $$("#qa button").forEach(b=>b.onclick=()=>finish(b.dataset.o));

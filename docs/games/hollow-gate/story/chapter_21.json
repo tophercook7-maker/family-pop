@@ -1,0 +1,800 @@
+{
+  "scenes": [
+    {
+      "id": "u21_start",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The Unmaking Wood spits you out onto a shelf of black glass, and below you the city lies drowned.\n\nNot ruined. Drowned. The lost city of the living world stands whole beneath a sheet of still water, every tower and lantern-lit window intact, upside-down and shining like a memory that refuses to rot. The water does not move. Your reflection walks across its surface a half-step behind you, as if unsure it wants to follow.\n\nA causeway of pale stone leads down into it, disappearing under the waterline and continuing, somehow, dry.\n\nYou know this place. You have never been here. Both are true.",
+      "choices": [
+        {
+          "text": "Walk down the causeway, into the drowned streets.",
+          "next": "u21_causeway",
+          "do": [
+            "flag:region_sunk",
+            "journal:Reached the Sunk City — the lost city drowned whole beneath still water. The Keeper's first place."
+          ]
+        },
+        {
+          "text": "Kneel and study your reflection first.",
+          "next": "u21_reflection"
+        },
+        {
+          "text": "Call out to the empty water.",
+          "next": "u21_call"
+        }
+      ]
+    },
+    {
+      "id": "u21_reflection",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You kneel. The reflection in the black water is not quite you. It is younger. It has not yet lost anyone. It looks up at you with an expression you recognize because you wore it once, before all of this — a face that still believes doors are only doors.\n\nIt mouths a word. You cannot hear it. But you feel it land in your chest like a stone dropped down a well: begin.\n\nWhen you stand, the reflection stays kneeling a moment longer than you do, then hurries to catch up.",
+      "choices": [
+        {
+          "text": "Walk down the causeway.",
+          "next": "u21_causeway",
+          "do": [
+            "flag:region_sunk",
+            "journal:My reflection here is younger — the me before the losses. It mouthed one word: begin."
+          ]
+        },
+        {
+          "text": "Call out across the water first.",
+          "next": "u21_call"
+        }
+      ]
+    },
+    {
+      "id": "u21_call",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You cup your hands and shout into the drowned streets. The word — whatever it was — leaves you and does not echo. It sinks. You watch it go down through the water, a ring of silver widening across every window at once, until the whole city has heard you and none of it answers.\n\nThen, faint, from somewhere deep in the folded streets, a bell. One stroke. The kind rung for a death, or for a beginning. In this place they may be the same bell.",
+      "choices": [
+        {
+          "text": "Follow the bell down the causeway.",
+          "next": "u21_causeway",
+          "do": [
+            "flag:region_sunk",
+            "journal:A single bell answered from deep in the Sunk City. A death-bell, or a beginning."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_causeway",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The causeway takes you under the waterline and the water does not touch you. It hangs overhead now, a ceiling of black glass, and the city rises around you dry and lamplit and wrong. Fish move through the upper air like slow birds. Doorways stand open on rooms where the furniture is arranged for people a thousand years gone.\n\nA square opens ahead. In its center stands a well, and beside the well, a figure — small, hooded, patient. It does not turn as you approach. It is watching the well the way you watch a grave.\n\nThree streets branch off the square: one toward a great sunken cathedral, one toward a row of scribes' houses with lit windows, one toward a frozen river gleaming at the city's edge.",
+      "choices": [
+        {
+          "text": "Speak to the figure at the well.",
+          "next": "u21_wellkeeper"
+        },
+        {
+          "text": "Take the street toward the cathedral.",
+          "next": "u21_cathedral_1"
+        },
+        {
+          "text": "Take the street of the scribes' houses.",
+          "next": "u21_scribes_1"
+        },
+        {
+          "text": "Walk toward the frozen river at the edge.",
+          "next": "u21_river_1"
+        }
+      ]
+    },
+    {
+      "id": "u21_wellkeeper",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The figure is a child. Or the shape a memory of a child keeps. Under the hood its face is soft and unfinished, like a face seen through water.\n\n\"You came down,\" it says. \"They always come down. Nobody stays on the glass.\" It nods at the well. \"He drank from this. When he was small. Before he was the door. His mother sent him for water and he took too long because he was talking to a girl.\"\n\nThe child looks at you.\n\n\"You want to know his name. Everyone who reaches the Sunk City wants his name. It's the only thing worth carrying out of here. But the city hid it from itself the day it drowned. You'll have to make the city remember.\"",
+      "choices": [
+        {
+          "text": "\"Who is he? Tell me plainly.\"",
+          "next": "u21_wellkeeper_who"
+        },
+        {
+          "text": "\"How do I make a city remember?\"",
+          "next": "u21_wellkeeper_how"
+        },
+        {
+          "text": "\"Who are you?\"",
+          "next": "u21_wellkeeper_self"
+        }
+      ]
+    },
+    {
+      "id": "u21_wellkeeper_who",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "\"A boy,\" the child says. \"That's all he was. This was his city, up in the light, before the water came for it. He was nobody. A scribe's son. He wanted to be nobody forever — to marry the girl, to copy books, to grow old and be buried under a stone with a small true name on it.\"\n\nThe child trails a finger in the well's black surface.\n\n\"Then the girl went under the ice, and he went to the dark to ask for her back, and the dark said yes — come in and keep the door and I will let you look for her. And he did. And he has been looking for a thousand years, and every child he takes he thinks is her, and none of them are, and he cannot stop, because he has forgotten the one thing that would let him.\"\n\n\"Her name?\" you ask.\n\n\"His,\" says the child. \"He forgot his own name first. You can't leave a post you can't remember you took.\"",
+      "choices": [
+        {
+          "text": "\"Then I'll take his name out of here.\"",
+          "next": "u21_wellkeeper_how",
+          "do": [
+            "flag:codex_keeper",
+            "journal:CODEX — The Keeper: a scribe's son from this city. Lost a girl under the ice, went to the dark to ask her back, agreed to keep the door. Forgot his own name first."
+          ]
+        },
+        {
+          "text": "\"Who are you to know all this?\"",
+          "next": "u21_wellkeeper_self"
+        }
+      ]
+    },
+    {
+      "id": "u21_wellkeeper_self",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The child considers the question as if it has not been asked in a long time.\n\n\"I was the first one he took,\" it says. \"The very first. He was new to the door then and clumsy with the taking, and something of me stuck — here, at the well, where he used to be a boy. I'm the part of him that stayed a child when the rest of him became a hallway.\"\n\nIt smiles, and the smile is terrible in its ordinariness.\n\n\"So I know his name better than he does. But I can't say it. It isn't mine to say. Names have to be earned back from the city, one true thing at a time. Go and gather them. Come back when you've enough. I'll be here. I'm always here. I'm the part that couldn't leave.\"",
+      "choices": [
+        {
+          "text": "\"Tell me how to gather them.\"",
+          "next": "u21_wellkeeper_how"
+        },
+        {
+          "text": "Leave the well and search the city.",
+          "next": "u21_causeway_return",
+          "do": [
+            "flag:codex_keeper",
+            "journal:CODEX — The Keeper: he was a boy of this city; the well-child is the first he ever took, a piece of him left behind."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_wellkeeper_how",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "\"Three places hold pieces of him,\" the child says. \"The cathedral, where he was named as an infant — the bell there still knows the shape of his name, though the sound is gone. The scribes' houses, where he learned to write, and where he later wrote his own name a thousand times trying to keep it. And the frozen river, where the girl went under, and where he last spoke his name aloud before he gave it away.\"\n\nIt counts them on soft fingers.\n\n\"Bring me what each place gives up. When the city has remembered enough of him, the name will surface, and you may lift it out and carry it. A true name. His. The only key the Gate has ever answered to.\"",
+      "choices": [
+        {
+          "text": "\"On true names — tell me what that means.\"",
+          "next": "u21_truename_lore"
+        },
+        {
+          "text": "Go to the cathedral.",
+          "next": "u21_cathedral_1"
+        },
+        {
+          "text": "Go to the scribes' houses.",
+          "next": "u21_scribes_1"
+        },
+        {
+          "text": "Go to the frozen river.",
+          "next": "u21_river_1"
+        }
+      ]
+    },
+    {
+      "id": "u21_truename_lore",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The child's voice drops, and the drowned water overhead seems to lean closer to listen.\n\n\"Everything here has a name it has hidden even from itself. The wood. The court. The dead. You. Learn one, say it aloud true and clear, and the thing must obey you — once. Only once. The naming spends itself.\"\n\nIt taps the well.\n\n\"His true name is the door's only lock. Say it at the Hollow Throne and the Keeper is a boy again, and a boy can be led home, or laid to rest, or freed. But carry it carefully. A true name half-known is worse than none. Gather all three pieces, or you will stand before him with half a key and no door will open.\"",
+      "choices": [
+        {
+          "text": "\"I understand. I'll gather all three.\"",
+          "next": "u21_causeway_return",
+          "do": [
+            "flag:codex_truename",
+            "journal:CODEX — True Names: learn a thing's hidden name, say it true, and it must obey once. The Keeper's true name is the Gate's only lock."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_causeway_return",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You step back from the well. The child does not follow. The three streets wait, each lit differently: the cathedral street cold and blue, the scribes' street warm and yellow, the river street white and hard.\n\nSomewhere a fish drifts through the air above you and is gone.",
+      "choices": [
+        {
+          "text": "The cathedral, where he was named.",
+          "next": "u21_cathedral_1"
+        },
+        {
+          "text": "The scribes' houses, where he wrote his name.",
+          "next": "u21_scribes_1"
+        },
+        {
+          "text": "The frozen river, where he last spoke it.",
+          "next": "u21_river_1"
+        }
+      ]
+    },
+
+    {
+      "id": "u21_cathedral_1",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The cathedral has drowned with its doors open. Pews stand in ordered rows facing an altar where a font of black stone still holds water that has never frozen and never spilled. This is a naming-font; here the city christened its children, spoke their true names once over the water, and let the water keep them.\n\nHigh above, a single great bell hangs in the tower. It is cracked. Around the font, in a spiral worn into the floor by a thousand small processions, you can read the faint ghosts of names, all rubbed away but one, which the water keeps refilling and erasing, refilling and erasing, too fast to read.",
+      "choices": [
+        {
+          "text": "Look into the font and try to read the name.",
+          "next": "u21_cathedral_font"
+        },
+        {
+          "text": "Climb to the cracked bell.",
+          "next": "u21_cathedral_bell"
+        },
+        {
+          "text": "Someone is kneeling at the altar. Approach.",
+          "next": "u21_cathedral_priest"
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_priest",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "A figure kneels at the altar in the robes of a priest, but the robes are empty where a face should be — only a soft grey shape, the same unfinished shape the Keeper wears. It does not turn.\n\n\"I named him,\" it says, and its voice is the cathedral's own echo. \"I held him over the water when he was three days old and I spoke his name and the water kept it. I have knelt here since the city drowned, guarding the one name I gave that mattered. I will not surrender it to a stranger.\"\n\nThe empty face lifts toward you.\n\n\"Prove you mean him kindness, and I will let the water show you. Or take it by force, if force is what you are. But force cracks a name, and a cracked name will crack the one who bears it.\"",
+      "choices": [
+        {
+          "text": "\"I mean him rest, not ruin.\" (Trust)",
+          "next": "u21_cathedral_priest_talk",
+          "check": {
+            "stat": "trust",
+            "dc": 13,
+            "pass": "u21_cathedral_font_true",
+            "fail": "u21_cathedral_priest_doubt"
+          }
+        },
+        {
+          "text": "\"Then guard nothing. I'll take it.\"",
+          "next": "u21_cathedral_guardian_combat",
+          "do": [
+            "fear:5"
+          ]
+        },
+        {
+          "text": "Leave the priest. Try the bell instead.",
+          "next": "u21_cathedral_bell"
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_priest_talk",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The priest studies you a long moment with the face it does not have. Whatever it sees, it decides is enough.\n\n\"Kindness,\" it breathes. \"Yes. You carry it the way he used to, before the door hollowed him. Then look, and let the water name him for you.\"",
+      "choices": [
+        {
+          "text": "Look into the font.",
+          "next": "u21_cathedral_font_true"
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_priest_doubt",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The empty face turns away. \"You want the name to win with,\" it says. \"Not to mend with. The water will not open for a blade dressed as a mourner.\"\n\nIt folds back into its endless kneeling.\n\n\"The bell may be less careful than I am. Or come back when your heart has settled. The water is patient. It has all the drowned time in the world.\"",
+      "choices": [
+        {
+          "text": "Try the cracked bell instead.",
+          "next": "u21_cathedral_bell"
+        },
+        {
+          "text": "Look into the font anyway.",
+          "next": "u21_cathedral_font"
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_guardian_combat",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You reach for the font. The priest rises without standing — it simply unfolds upward, robes filling with black water, the grey shape stretching into something with too many arms and a bell-toll for a voice. The Font-Guardian does not want to hurt you. It wants only to keep the one thing it was left to keep. That makes it slow, and sad, and dangerous all the same.",
+      "combat": {
+        "enemy": "The Font-Guardian",
+        "ehp": 11,
+        "edmg": 3,
+        "win": "u21_cathedral_font_forced",
+        "lose": "u21_cathedral_drown",
+        "flee": "u21_cathedral_bell"
+      }
+    },
+    {
+      "id": "u21_cathedral_drown",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The black water closes over you and, for a moment, you are one of the taken — held so gently you forget you were going anywhere. Then a small hand knots in your collar and hauls. The well-child. It drags you gasping onto the cold cathedral floor and sits back on its heels, disappointed.\n\n\"Force cracks things,\" it says. \"I told him. I told him too, once.\" It presses a thumb to your brow and the drowning leaves you. \"Try again. Gently, this time. The city is watching how you go about this.\"",
+      "choices": [
+        {
+          "text": "Rise. Try the bell, gently.",
+          "next": "u21_cathedral_bell",
+          "do": [
+            "fear:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_font_forced",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The Guardian sinks back into the font with a sound like a bell rung underwater, mournful and forgiving. The water stills. In its black mirror a name surfaces — but the force of the fight has fractured it, and it comes up in pieces, some letters bright and some drowned dark.\n\nYou can read the shape of it, but not the whole. A cracked half of the naming. It will not be enough alone.\n\nYou draw it out anyway. It clings to your palm, cold, incomplete.",
+      "choices": [
+        {
+          "text": "Take the cracked syllable of the name.",
+          "next": "u21_cathedral_done",
+          "do": [
+            "flag:name_font",
+            "fear:5",
+            "journal:Forced the naming-font. Won a piece of the Keeper's name, but cracked — only half legible. I'll need the other pieces to make it whole."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_font",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You lean over the font. The name refills and erases too fast — you catch a first letter, lose it, catch a last, lose that. The water is not hiding the name so much as it has forgotten how to hold still long enough to be read.\n\nOn the font's rim, worn nearly smooth, are the words: SPOKEN ONCE, KEPT FOREVER. The city named its children by speaking the name a single time over the water. To read it, you would need the water calmed — and only kindness, or the bell, calms drowned water.",
+      "choices": [
+        {
+          "text": "Go and ring the cracked bell to calm the water.",
+          "next": "u21_cathedral_bell"
+        },
+        {
+          "text": "Kneel at the altar and speak to the priest.",
+          "next": "u21_cathedral_priest"
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_font_true",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The water goes still — truly still, for the first time in a thousand years. And on its black face a name floats up whole and clear, letter by letter, the first name he ever wore, spoken once over this font by the empty priest when the boy was three days old.\n\nYou cannot say it yet — you have only one third of him — but you can read it, and you fold the letters into your memory like pressing a flower in a book. The font's piece is yours, clean and uncracked.",
+      "choices": [
+        {
+          "text": "Carry the naming-piece onward.",
+          "next": "u21_cathedral_done",
+          "do": [
+            "flag:name_font",
+            "trust:5",
+            "journal:The naming-font gave up the first piece of the Keeper's true name — whole and clean, because I came gently."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_bell",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You climb the tower stair to the great cracked bell. It is enormous, green with drowned age, and along its lip runs an inscription in the old script: I TOLLED HIS NAME AND THE RIVER SWALLOWED THE SOUND.\n\nThe crack runs from lip to crown. Struck, it will not ring true — but a bell remembers the shape of every note it ever made, even the ones it can no longer sound. If you set your hand to the crack and strike it, you might feel the name it can no longer say.",
+      "choices": [
+        {
+          "text": "Set your palm to the crack and strike the bell.",
+          "next": "u21_cathedral_bell_strike"
+        },
+        {
+          "text": "Climb back down to the font.",
+          "next": "u21_cathedral_font_true",
+          "require": "flag:name_font"
+        },
+        {
+          "text": "Climb back down to the altar and the priest.",
+          "next": "u21_cathedral_priest"
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_bell_strike",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You lay your palm flat over the crack and strike the bell with your fist. No sound comes out — the crack eats it — but the note travels up through your bones, a single deep syllable of a name, felt rather than heard. Down below, in the nave, the font goes glassy and still: the phantom toll has calmed the water.\n\nYou stand with your hand on the silent bell and the shape of a syllable ringing in your marrow.",
+      "choices": [
+        {
+          "text": "Go down and read the calmed font.",
+          "next": "u21_cathedral_font_true",
+          "do": [
+            "journal:Struck the cracked cathedral bell. Its silent toll calmed the drowned font below."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_cathedral_done",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You leave the cathedral with a piece of him — the name he was given before he could choose anything. The blue-lit street curves back toward the square and the well.\n\nTwo pieces remain: the scribes' houses, and the frozen river.",
+      "choices": [
+        {
+          "text": "Go to the scribes' houses.",
+          "next": "u21_scribes_1"
+        },
+        {
+          "text": "Go to the frozen river.",
+          "next": "u21_river_1"
+        },
+        {
+          "text": "Return to the well-child.",
+          "next": "u21_forge_gate"
+        }
+      ]
+    },
+
+    {
+      "id": "u21_scribes_1",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The scribes' houses lean over a narrow street, their windows lit from within by lamps that burn without fuel. This is where he learned his letters. The tallest house has his desk still in it — you know it the way you know things here — a copyist's slope stacked with a thousand identical pages.\n\nOn every page, in the same cramped hand growing shakier line by line, is written a single name, over and over, the whole page filled edge to edge. He wrote his own name ten thousand times, trying to keep it. And on each page, always, one letter is wrong. A different letter each time. He was already forgetting even as he wrote.",
+      "choices": [
+        {
+          "text": "Enter and search the desk.",
+          "next": "u21_scribes_desk"
+        },
+        {
+          "text": "Read the shaking pages for the true spelling.",
+          "next": "u21_scribes_puzzle"
+        },
+        {
+          "text": "A scribe still sits at the far desk. Approach.",
+          "next": "u21_scribes_ghost"
+        }
+      ]
+    },
+    {
+      "id": "u21_scribes_ghost",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "At the far desk sits a young man bent over a page, quill scratching. He looks up, and he has a face — a real one, thin and ink-stained and terribly young. He is the memory the city keeps of the Keeper as a boy of sixteen, before the ice, before the door.\n\n\"I'm practicing,\" he says, shy. \"My master says a scribe must be able to write his own name a thousand times without his hand tiring. But my hand keeps — \" he frowns at the page \" — keeps putting the wrong letter. Look. Here. And here. It's like the name doesn't want to be caught.\"\n\nHe turns the page to you, hopeful.\n\n\"You've a clear eye. Can you find where I go wrong? If I could see it true, just once, I think I could hold it forever.\"",
+      "choices": [
+        {
+          "text": "\"Let me read the pages and find the true spelling.\"",
+          "next": "u21_scribes_puzzle"
+        },
+        {
+          "text": "\"Your hand isn't failing. Something is taking it.\"",
+          "next": "u21_scribes_warn"
+        }
+      ]
+    },
+    {
+      "id": "u21_scribes_warn",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The boy's quill stops. For a heartbeat something very old looks out of his young eyes, and then it is gone, and he is only a frightened boy in a drowned house.\n\n\"Taking it,\" he repeats. \"Yes. That's the word. It comes at night. It asks if I'd give up my name to have — \" he shakes his head hard \" — I mustn't say her name either. I mustn't. If I say hers I'll forget mine.\"\n\nHe presses the stack of pages into your hands.\n\n\"Take them. Read them together. Ten thousand wrong spellings, laid over each other — the letter that's right on every page but one is the true one. Find where they all agree. Please. Before I forget how to want you to.\"",
+      "choices": [
+        {
+          "text": "Take the pages and read them together.",
+          "next": "u21_scribes_puzzle",
+          "do": [
+            "trust:3",
+            "journal:The boy-scribe: something comes at night and asks him to trade his name for the girl's. He gave me his ten thousand pages."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_scribes_desk",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The desk is buried in pages. In the slope's hollow, under a drift of them, your fingers find a small locked box, water-swollen, its key long gone. Something shifts inside when you tilt it — small, hard, deliberate.\n\nYou could pry it, but the wood is soft and might tear whatever's inside. Or you could read the pages first; a scribe who wrote his name ten thousand times surely wrote where he hid his key.",
+      "choices": [
+        {
+          "text": "Read the pages for the hidden key. (skill)",
+          "next": "u21_scribes_puzzle"
+        },
+        {
+          "text": "Pry the box open by force.",
+          "next": "u21_scribes_box_force"
+        }
+      ]
+    },
+    {
+      "id": "u21_scribes_box_force",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The soft wood gives. Inside, on a bed of ruined felt, is a signet — a scribe's seal, cut with initials. But the wood tore as you opened it and took a splinter of the seal with it, so one initial is gouged away. You have most of the name-piece, but not all.\n\nStill: most of a piece is more than none. You pocket the broken seal.",
+      "choices": [
+        {
+          "text": "Take the broken seal.",
+          "next": "u21_scribes_done",
+          "do": [
+            "flag:name_scribe",
+            "journal:Forced the scribe's box. Won a seal cut with his initials — but one is gouged away. A partial piece of the name."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_scribes_puzzle",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You gather the pages into a thick stack and hold them up to a lamp so all ten thousand shine through at once, one atop the other. Where every page but one wrote the same letter, that letter blazes dark and certain through the whole sheaf. Where he faltered differently each time, the letters blur to grey.\n\nColumn by column, you trace the letters that never wavered. It is slow, exacting work — you must be sure of every one, because a scribe's true name is spelled in strokes, and one wrong stroke unmakes it.",
+      "choices": [
+        {
+          "text": "Read the true spelling from the layered pages. (skill)",
+          "next": "u21_scribes_read",
+          "check": {
+            "stat": "trust",
+            "dc": 12,
+            "pass": "u21_scribes_read",
+            "fail": "u21_scribes_reread"
+          }
+        },
+        {
+          "text": "Set the pages down and step back to breathe.",
+          "next": "u21_scribes_reread"
+        }
+      ]
+    },
+    {
+      "id": "u21_scribes_reread",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "Your eyes swim. Two columns disagree and you cannot tell which strokes are true and which are the tremor of a hand already forgetting. If you write it down now you will write it wrong, and a name written wrong is a wound.\n\nYou set the sheaf down, breathe, and steady yourself. The lamps burn on, patient. There is no hurry in a drowned city. You lift the pages to the light again.",
+      "choices": [
+        {
+          "text": "Look again, slower, more carefully.",
+          "next": "u21_scribes_read"
+        },
+        {
+          "text": "Ask the boy-scribe to hold the lamp steady with you.",
+          "next": "u21_scribes_read",
+          "do": [
+            "journal:Nearly wrote the name wrong. Slowed down. A name written wrong is a wound."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_scribes_read",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The letters that never wavered stand out at last, one clean column of certainty through ten thousand tremors. This is the name as his own hand best remembered it — the middle piece, the everyday name, the one his master called across the workroom.\n\nYou copy it onto a fresh page in your own steady hand. The boy-scribe, if he is watching, lets out a breath he has held for a thousand years.",
+      "choices": [
+        {
+          "text": "Fold the true page into your memory.",
+          "next": "u21_scribes_done",
+          "do": [
+            "flag:name_scribe",
+            "trust:3",
+            "journal:Layered his ten thousand pages to light and read the constant letters — the middle piece of his true name, clean and certain."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_scribes_done",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You leave the scribes' street with a second piece of him — the name his own hand fought to keep. The lamps dim behind you, one by one, as if the houses can finally rest.\n\nWhat remains: the cathedral, if you have not been, and the frozen river.",
+      "choices": [
+        {
+          "text": "Go to the cathedral.",
+          "next": "u21_cathedral_1",
+          "require": "flag:name_font"
+        },
+        {
+          "text": "Go to the cathedral.",
+          "next": "u21_cathedral_1"
+        },
+        {
+          "text": "Go to the frozen river.",
+          "next": "u21_river_1"
+        },
+        {
+          "text": "Return to the well-child.",
+          "next": "u21_forge_gate"
+        }
+      ]
+    },
+
+    {
+      "id": "u21_river_1",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "At the city's edge the streets give way to a river, and the river is frozen — the only cold thing in this drowned warmth. The ice is black and clear as the water overhead, and under it, faint, is a shape. A girl. Arms out, hair spread like ink, face turned up toward a surface she never reached.\n\nThis is where it began. This is the ice she went under, kept forever a heartbeat from breaking through. On the bank, half-buried in frost, lies a single skate, and a scarf, and the last words he ever spoke as a free man, frozen into the air above the spot like breath that never faded.",
+      "choices": [
+        {
+          "text": "Kneel and read the frozen words in the air.",
+          "next": "u21_river_words"
+        },
+        {
+          "text": "Lay your hand on the ice above the girl.",
+          "next": "u21_river_touch"
+        },
+        {
+          "text": "The ice is cracking outward from your steps. Something rises.",
+          "next": "u21_river_combat"
+        }
+      ]
+    },
+    {
+      "id": "u21_river_words",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The frozen breath hangs in the air like carved smoke. You lean close and read the shape of the last thing he cried out as the ice took her — his own name, screamed at the dark in the same breath as his bargain, offered up as payment: take my name, my whole name, only give her back.\n\nHere is the last piece — the surname, the family name, the part of him the dark took first as its price. It is written in the cold itself. To lift it out you must speak it back to the ice, gently, and let the ice give up what it swallowed.",
+      "choices": [
+        {
+          "text": "Speak the frozen name softly to the ice. (Trust)",
+          "next": "u21_river_thaw",
+          "check": {
+            "stat": "trust",
+            "dc": 13,
+            "pass": "u21_river_thaw",
+            "fail": "u21_river_freeze"
+          }
+        },
+        {
+          "text": "Lay your hand on the girl in the ice instead.",
+          "next": "u21_river_touch"
+        }
+      ]
+    },
+    {
+      "id": "u21_river_freeze",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You speak too quickly, or too coldly, and the frozen breath frosts over harder, sealing the name deeper. The cold climbs your arm. For a moment you feel what he felt — the pull to lie down on the ice beside her and wait, and wait, and forget you were ever warm.\n\nYou wrench yourself back. The name is still there, deeper now. It wants tenderness, not command. It is grief you are speaking to, not stone.",
+      "choices": [
+        {
+          "text": "Try again — softer, as if to someone grieving.",
+          "next": "u21_river_thaw",
+          "do": [
+            "fear:3",
+            "journal:The frozen river answers grief, not force. It nearly kept me the way it kept her."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_river_touch",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You lay your palm flat on the black ice above the drowned girl. She is not decayed. She is held — the way the taken are held, gently, forever. Under your hand her eyes shift, slowly, and find yours.\n\nShe cannot speak through the ice. But she lifts one hand toward the frozen words hanging above the bank, and points, and you understand: read those. Speak his name back to him. Free us both. The one who mistook a thousand children for me is tired, and I have been holding my breath for a thousand years, and neither of us can stop until someone remembers the name he threw away for me.",
+      "choices": [
+        {
+          "text": "Go to the frozen words and speak them.",
+          "next": "u21_river_words"
+        }
+      ]
+    },
+    {
+      "id": "u21_river_combat",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The ice cracks outward from your boots in white veins, and something climbs out of the river — not the girl, but the cold itself given shape, the Drowned Grief that guards the last piece of his name. It wears his old scarf and reaches for you with hands of black ice, not to kill but to add you to the still, held things beneath the surface.",
+      "combat": {
+        "enemy": "The Drowned Grief",
+        "ehp": 12,
+        "edmg": 4,
+        "win": "u21_river_thaw_forced",
+        "lose": "u21_river_held",
+        "flee": "u21_river_words"
+      }
+    },
+    {
+      "id": "u21_river_held",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The cold hands close and you sink toward the ice, and the world goes soft and white and painless. So this is how he lost. Not to a monster. To rest.\n\nA grey flame flares at the bank — the Lantern-child, if they walk with you, or only the well-child's borrowed light — and the warmth of it reaches you and reminds your body it is alive. You crawl back onto the bank, shivering, the last piece of the name still unspoken but the grief driven back beneath the ice.",
+      "choices": [
+        {
+          "text": "Rise. Read the frozen words, gently this time.",
+          "next": "u21_river_words",
+          "do": [
+            "fear:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_river_thaw_forced",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The Drowned Grief loosens and sinks, and where it goes down the ice thins enough to read the last of the name — but the fight has fogged the frozen breath, and the surname surfaces smudged, one syllable clear and one lost in cracked frost.\n\nA half-piece. It will have to do, unless the well can mend it with the others.",
+      "choices": [
+        {
+          "text": "Take the smudged last piece.",
+          "next": "u21_river_done",
+          "do": [
+            "flag:name_river",
+            "fear:3",
+            "journal:Fought the Drowned Grief for the last piece of the name. Won it, but smudged — one syllable lost to the cracking frost."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_river_thaw",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You kneel and speak the frozen name the way you would speak to someone at a graveside — soft, unhurried, forgiving. The frost blooms outward and melts, and the words lift out of the air whole and clear and settle in your open hands like the last cold breath of a boy who screamed his own name at the dark and never got it back.\n\nUnder the ice, the girl closes her eyes. Not gone. Only, at last, allowed to rest a while.",
+      "choices": [
+        {
+          "text": "Gather the last piece of the name.",
+          "next": "u21_river_done",
+          "do": [
+            "flag:name_river",
+            "trust:3",
+            "journal:Spoke the frozen name gently and lifted the last piece whole — the surname the dark took first, in payment for the girl."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_river_done",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You turn from the river with the third piece of him — the name he traded away, the down payment on a thousand years of grief. Behind you the ice is quiet. The girl beneath it does not point anymore. She is only waiting now, and waiting, in this city, has finally begun to feel like it might one day end.\n\nThe street winds back toward the square, and the well, and the child who is a piece of him.",
+      "choices": [
+        {
+          "text": "Return to the well-child.",
+          "next": "u21_forge_gate"
+        },
+        {
+          "text": "Go to the cathedral first, if you haven't.",
+          "next": "u21_cathedral_1",
+          "require": "flag:name_font"
+        },
+        {
+          "text": "Go to the cathedral first.",
+          "next": "u21_cathedral_1"
+        },
+        {
+          "text": "Go to the scribes' houses, if you haven't.",
+          "next": "u21_scribes_1"
+        }
+      ]
+    },
+
+    {
+      "id": "u21_forge_gate",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You come back to the well. The child is where it always is, where it can never not be.\n\n\"You've been gathering,\" it says, without turning. \"I can smell him on you. The given name, the kept name, the traded name. Show me. Lay the pieces on the water and let the well see if the city remembers enough.\"\n\nThe black surface of the well waits, flat as glass, ready to be a mirror or a mouth.",
+      "choices": [
+        {
+          "text": "Lay all three pieces on the well. (need font, scribe, river)",
+          "next": "u21_forge_full",
+          "require": "flag:name_river"
+        },
+        {
+          "text": "Lay the pieces you have on the well.",
+          "next": "u21_forge_check"
+        }
+      ]
+    },
+    {
+      "id": "u21_forge_check",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "The well drinks what you give it and shows you the answer in ripples: the name comes up broken, a face with holes in it. You have not gathered all three places yet, or the pieces you have are cracked from force.\n\n\"Not enough,\" the child says, gently. \"A true name half-known is worse than none — you'd say it at the Throne and nothing would open, and he would take you for one more of his lost. Go back. The city still holds what you're missing.\"",
+      "choices": [
+        {
+          "text": "Return to the cathedral.",
+          "next": "u21_cathedral_1"
+        },
+        {
+          "text": "Return to the scribes' houses.",
+          "next": "u21_scribes_1"
+        },
+        {
+          "text": "Return to the frozen river.",
+          "next": "u21_river_1"
+        }
+      ]
+    },
+    {
+      "id": "u21_forge_full",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You lay the three pieces on the black water — the given name from the font, the kept name from the pages, the traded name from the ice. For a moment they float apart, three strangers. Then the well pulls them together, and where they touch they knit, letter into letter, and the whole surface of the water lights from beneath with a name a thousand years unspoken.\n\nThe city sighs. Every lamp in every drowned window flickers, as if the whole place has just remembered a word on the tip of its tongue.\n\n\"There,\" the child breathes. \"There he is. That's who he was, before he was a door.\"\n\nThe name rises out of the water and hangs, whole and cold and yours to take.",
+      "choices": [
+        {
+          "text": "Lift the true name from the water.",
+          "next": "u21_forge_lift",
+          "check": {
+            "stat": "trust",
+            "dc": 11,
+            "pass": "u21_forge_lift",
+            "fail": "u21_forge_lift"
+          }
+        },
+        {
+          "text": "Reach in with both hands and take it.",
+          "next": "u21_forge_lift"
+        }
+      ]
+    },
+    {
+      "id": "u21_forge_lift",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You reach into the water and lift the name out. It weighs nothing and it weighs a thousand years. It settles into you the way a key settles into a lock it was cut for — you could not say it aloud now if you tried, and you understand that you must not, not until the Hollow Throne, not until you stand before the boy who became a hallway and can give it back to him whole.\n\nYou carry, now, the Keeper's true name.\n\nThe well-child looks up at you, and for the first time its unfinished face finishes into a small, exhausted smile.\n\n\"Take him home,\" it says. \"Or lay him down. Either is mercy. Just don't leave him the door.\"",
+      "choices": [
+        {
+          "text": "\"I'll give it back to him.\"",
+          "next": "u21_leave",
+          "do": [
+            "add_item:true_name",
+            "flag:codex_keeper",
+            "flag:codex_truename",
+            "journal:Forged the three pieces on the well and lifted the KEEPER'S TRUE NAME. I carry it now. It must be spoken at the Hollow Throne, and nowhere else."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u21_leave",
+      "chapter": "CHAPTER XXI · THE SUNK CITY",
+      "text": "You climb the causeway back toward the shelf of black glass. Below and behind you the Sunk City holds its breath — cathedral, scribes' street, frozen river, all of it lit and waiting, a thousand years closer to being allowed to end.\n\nAt the waterline your reflection is beside you again, but it is no longer younger. It has caught up to you at last: the same lines, the same weight, the same name folded cold against your heart. It nods once, as if to say — now you know what he was, go and be gentle with the door.\n\nAhead, past the glass, the ground slopes down into a dark deeper than any you have crossed. The Long Dark. And beyond it, the throne.",
+      "choices": [
+        {
+          "text": "Step off the black glass, into the Long Dark.",
+          "next": "u22_start"
+        },
+        {
+          "text": "Look back once at the drowned city, then go.",
+          "next": "u22_start",
+          "do": [
+            "journal:Left the Sunk City carrying who the Keeper was. Ahead: the Long Dark, and the throne."
+          ]
+        }
+      ]
+    }
+  ]
+}

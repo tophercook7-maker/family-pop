@@ -1,0 +1,700 @@
+{
+  "scenes": [
+    {
+      "id": "u18_start",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "The gate spits you out onto a road you have walked before — and never. It is the caravan road. The same ruts, the same milestones, the same bent thorn at the shoulder. But the sky is the colour of a snuffed wick, and the ruts are filled with grey ash instead of rain.\n\nAhead, a caravan crawls. Wagons, oxen, walkers in worn cloaks. They move at the pace of a funeral that has forgotten whose. Ash drifts from the wheels like flour from a mill.\n\nNone of them casts a shadow. None of them makes a sound.\n\nYou have crossed into the Ashen March.",
+      "choices": [
+        {
+          "text": "Fall in behind the caravan and watch.",
+          "next": "u18_follow",
+          "do": [
+            "flag:region_march",
+            "journal:Crossed into the Ashen March — a dead mirror of the caravan road, walked by the unknowing dead."
+          ]
+        },
+        {
+          "text": "Call out to the walkers.",
+          "next": "u18_call",
+          "do": [
+            "flag:region_march"
+          ]
+        },
+        {
+          "text": "Leave the road. Cut across the ash-flats.",
+          "next": "u18_flats",
+          "do": [
+            "flag:region_march"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_follow",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You walk in the caravan's wake. Up close the walkers are worse and better than you feared. A woman carries a basket with nothing in it and hums a tune with no sound. A boy leads an ox that is only the idea of an ox, grey and smooth as a river stone.\n\nWhen you draw level with them, they do not turn. Their eyes are fixed on a horizon that never gets closer. On each face is the mild, patient look of someone quite sure they will arrive somewhere lovely, soon, any moment now.\n\nThey do not know they are dead. That is the mercy and the horror of this place.\n\nAt the head of the line, small and out of step, a child walks holding a lantern. The flame in it is grey.",
+      "choices": [
+        {
+          "text": "Go to the child with the lantern.",
+          "next": "u18_lumen_meet"
+        },
+        {
+          "text": "Try to wake one of the walkers.",
+          "next": "u18_wake_1"
+        },
+        {
+          "text": "Search a stalled wagon at the roadside.",
+          "next": "u18_wagon"
+        }
+      ]
+    },
+    {
+      "id": "u18_call",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "\"Hey!\" you shout. \"You there — stop! This road goes nowhere!\"\n\nYour voice comes out flat, swallowed, as if the air here is packed with wool. Not one head turns. The nearest walker, an old man with a rake over his shoulder, keeps his patient shuffling pace, lips moving on a word you cannot hear.\n\nBut something at the head of the line does react. A small figure carrying a lantern falters, half-turns, and lifts the grey flame a little higher — the way a person raises a candle at a sound in the dark.\n\nThe flame gutters toward you like a dog catching a scent.",
+      "choices": [
+        {
+          "text": "Walk to the child with the lantern.",
+          "next": "u18_lumen_meet"
+        },
+        {
+          "text": "Grab the old man by the shoulder.",
+          "next": "u18_wake_1"
+        },
+        {
+          "text": "Stay back and watch what the flame does.",
+          "next": "u18_follow"
+        }
+      ]
+    },
+    {
+      "id": "u18_flats",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You step off the road and onto the flats. The ash is ankle-deep and colder than snow. Every footfall raises a soft grey ghost that hangs, then settles, then does not quite settle back where it was.\n\nThe caravan drifts on to your left, small now. Out here the silence has a shape to it. You begin to feel that if you keep walking straight, you will walk forever and the horizon will never once move.\n\nThe ash remembers your steps a moment too long, like it is deciding whether to let you take them back.",
+      "choices": [
+        {
+          "text": "Trust your footing and cross the flats. (Skill: nerve)",
+          "next": "u18_flats_cross",
+          "check": {
+            "stat": "fear",
+            "dc": 12,
+            "pass": "u18_flats_ok",
+            "fail": "u18_flats_lost",
+            "onFail": [
+              "fear:+5"
+            ]
+          }
+        },
+        {
+          "text": "Turn back to the road while you still can.",
+          "next": "u18_follow"
+        },
+        {
+          "text": "Kneel and dig where the ash pooled darkest.",
+          "next": "u18_flats_dig"
+        }
+      ]
+    },
+    {
+      "id": "u18_flats_dig",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You kneel and sweep the cold ash aside. Beneath it your fingers find a wagon's iron ring, and then, threaded through it, a small tin cup, and then — held tight in a hand that is only bones now — a lantern with no flame in it.\n\nWhoever fell here fell reaching for the caravan's light. You take the dark lantern. It is light in your hand, and colder than it should be, and something in it wants to be lit.",
+      "choices": [
+        {
+          "text": "Pocket the lantern and find the road again.",
+          "next": "u18_follow",
+          "do": [
+            "add_item:ash_lantern",
+            "journal:Found a cold, empty lantern in the ash, clutched by a hand of bone. It wants to be lit."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_flats_cross",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You fix your eyes on a single milestone and do not let them wander. Step. Step. Step. The ash pulls; you do not look down. The trick, you understand suddenly, is to want the far side more than the flats want to keep you.",
+      "choices": [
+        {
+          "text": "Keep walking.",
+          "next": "u18_flats_ok"
+        }
+      ]
+    },
+    {
+      "id": "u18_flats_ok",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "The flats end at a low rise, and the road climbs to meet you there, as if it had been waiting on the other side all along. You have crossed a place that swallows people whole and you have come out the far side.\n\nAt the top of the rise, the caravan winds below you. And at its head, a small figure with a grey lantern has stopped walking. It is looking up at you.",
+      "choices": [
+        {
+          "text": "Go down to the child.",
+          "next": "u18_lumen_meet"
+        }
+      ]
+    },
+    {
+      "id": "u18_flats_lost",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You look down — just once, just to check your footing — and that is the mistake. When you look up the milestone is gone. Every direction is the same grey nothing. You walk, and walk, and the walking stops meaning anything.\n\nThen: a light. Small, grey, bobbing. A lantern, carried toward you by a child who should not be able to find you and has.\n\n\"You went the wrong way,\" the child says, and the words arrive clearly, the only clear sound in this whole muffled world. \"Everyone does, the first time. Come on. Follow the flame.\"",
+      "choices": [
+        {
+          "text": "Follow the flame back.",
+          "next": "u18_lumen_meet",
+          "do": [
+            "journal:Lost on the ash-flats. A child with a grey lantern found me and led me out."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_wagon",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "A wagon has slumped at the roadside on a broken axle. Ash has drifted up its wheels like a slow tide. Inside, under a mildewed tarp, the cargo waits: bolts of grey cloth, a barrel of grey apples, a strongbox with the lid ajar.\n\nEverything in this world is the colour of the last coal in a dead fire. But the strongbox holds coin — real coin, or coin that remembers being real. It gleams faintly, the only warm thing you have seen since the gate.",
+      "choices": [
+        {
+          "text": "Take the coin.",
+          "next": "u18_wagon_take",
+          "do": [
+            "gold:+6",
+            "journal:Looted a caravan strongbox in the Ashen March. The coin remembers being warm."
+          ]
+        },
+        {
+          "text": "Leave it. The dead may want their things.",
+          "next": "u18_wagon_leave",
+          "do": [
+            "trust:+3"
+          ]
+        },
+        {
+          "text": "Just take an apple and go.",
+          "next": "u18_lumen_meet",
+          "do": [
+            "add_item:supplies"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_wagon_take",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You fill your purse. The coin is cold and then, in your hand, briefly warm, as if glad to be carried again.\n\nAs you close the strongbox, you notice the child. It has left the head of the caravan and come back down the line, and it is standing at the wagon's tail, watching you with the grey flame held between you like a question.\n\n\"You took the widow's fare,\" the child says. Not angry. Just noting it, the way children note things.",
+      "choices": [
+        {
+          "text": "\"She has no use for it now.\"",
+          "next": "u18_lumen_meet"
+        },
+        {
+          "text": "Put half of it back.",
+          "next": "u18_lumen_meet",
+          "do": [
+            "gold:-3",
+            "trust:+4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_wagon_leave",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You lower the strongbox lid. It clicks. Somewhere up the line, so faint you might have imagined it, you hear — for the first time in this whole silent country — a small sound. A child's voice, saying, \"Oh. You're one of the kind ones.\"\n\nThe lantern-flame, when you turn, is a shade less grey. A ghost of gold at its heart.",
+      "choices": [
+        {
+          "text": "Follow the sound to the child.",
+          "next": "u18_lumen_meet"
+        }
+      ]
+    },
+    {
+      "id": "u18_wake_1",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You take the old man by the shoulder and turn him to face you. His skin is dry and grey and cold. His eyes find yours slowly, the way eyes find a lamp in a dark room.\n\n\"Are we there?\" he asks. His voice is a dead leaf skating over stone. \"Is it the market? My daughter keeps the stall by the fountain. She'll have kept my supper.\"\n\nBehind his eyes something flickers — a doubt, a cold draught through a shut house. If you push, you might wake him to the truth of where he is. It would not be a kindness. But it might be the truth.",
+      "choices": [
+        {
+          "text": "Gently lie. \"Almost there. Keep walking.\"",
+          "next": "u18_wake_lie",
+          "do": [
+            "trust:+3"
+          ]
+        },
+        {
+          "text": "Tell him the truth. (Skill: will)",
+          "next": "u18_wake_truth",
+          "check": {
+            "stat": "trust",
+            "dc": 13,
+            "pass": "u18_wake_truth_ok",
+            "fail": "u18_wake_truth_bad",
+            "onFail": [
+              "fear:+6"
+            ]
+          }
+        },
+        {
+          "text": "Let him go. Step back.",
+          "next": "u18_lumen_meet"
+        }
+      ]
+    },
+    {
+      "id": "u18_wake_lie",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "\"Almost there,\" you say. \"The fountain's just past the next rise. Keep walking, old father.\"\n\nHis face eases. The doubt goes out of him like a candle pinched between two fingers. He nods, hitches the rake, and shuffles on into the grey, content, humming his soundless tune.\n\nYou have sent him back to sleep. Whether that was mercy or cowardice, you will carry the question a long time.",
+      "choices": [
+        {
+          "text": "Move on toward the lantern.",
+          "next": "u18_lumen_meet",
+          "do": [
+            "journal:Told a dead man he was almost home, and he believed me. I don't know if it was kind."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_wake_truth",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You hold his cold gaze. \"Old father,\" you say, \"you are not going to the market. You died on this road. Your daughter buried you. You have been walking a very long time.\"",
+      "choices": [
+        {
+          "text": "Say it gently, and hope it lands soft.",
+          "next": "u18_wake_truth_ok",
+          "check": {
+            "stat": "trust",
+            "dc": 13,
+            "pass": "u18_wake_truth_ok",
+            "fail": "u18_wake_truth_bad"
+          }
+        },
+        {
+          "text": "Lose your nerve at the last word and soften it.",
+          "next": "u18_wake_lie"
+        }
+      ]
+    },
+    {
+      "id": "u18_wake_truth_ok",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "The words land soft and true, and the old man does not scream. He simply stops. His eyes clear, all the way clear, and for one moment he is entirely himself.\n\n\"Ah,\" he says. \"Yes. I remember now.\" He looks at his grey hands. He looks at the grey road. He looks at you with an old man's terrible, gentle patience. \"Thank you for saying it plain. Nobody says it plain.\"\n\nAnd he sits down at the roadside, sets his rake across his knees, and is, at last, only a still grey shape in the ash — at rest. One fewer walker on the endless road.",
+      "choices": [
+        {
+          "text": "Bow to him and walk on.",
+          "next": "u18_lumen_meet",
+          "do": [
+            "trust:+5",
+            "journal:Told a dead man the truth kindly. He remembered himself, and finally rested."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_wake_truth_bad",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "The truth goes in like a blade turned the wrong way. The old man's face collapses. He remembers — not gently, but all at once: the axle breaking, the cold, the long crawl toward a fountain that was never coming.\n\nHe opens his mouth and out of it comes the first loud sound in this whole muffled world — a wail that is not grief but pure animal panic, and the walkers nearest him take it up, and take it up, a rising grey chorus of the newly-remembering dead.\n\nSomething stirs at the back of the caravan. Something that this noise has fed.",
+      "choices": [
+        {
+          "text": "Flee toward the lantern-light ahead.",
+          "next": "u18_lumen_meet",
+          "do": [
+            "journal:Told a dead man the truth too hard. His panic woke the March. Something is coming."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_meet",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "The child is small — seven, perhaps eight, though age means little here. It wears a coat too big for it and boots stuffed with rag. In both hands it grips a lantern of black iron, and inside burns a flame the colour of woodsmoke: a grey fire that gives no heat and casts no warmth, only a wan light the walkers drift toward like moths.\n\nWhen the child looks up at you, its eyes are not dead. They are frightened, and hopeful, and very much alive in a place where nothing else is.\n\n\"You have a shadow,\" the child whispers, awed. \"You're warm. You came through the door.\" It steps closer, lantern lifted. \"Are you here to take one of them home? Please say you are. I light the way but I can never make them turn off the road.\"",
+      "choices": [
+        {
+          "text": "\"Who are you? What is this place?\"",
+          "next": "u18_lumen_who"
+        },
+        {
+          "text": "\"Yes. And I could use a guide.\"",
+          "next": "u18_lumen_guide"
+        },
+        {
+          "text": "Kneel to the child's eye level and listen.",
+          "next": "u18_lumen_kneel",
+          "do": [
+            "trust:+2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_who",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "\"I'm Lumen,\" the child says. \"Or that's what the flame calls me. I don't remember my before-name. I've been carrying the light so long I forgot to keep my own.\"\n\nIt holds the lantern up between you, and the grey fire leans toward your warmth like it is starving for it.\n\n\"This is the March. Everyone here is walking to a place they think they remember. None of them get there. The road just keeps going and the light I carry keeps them from wandering off into the ash and coming apart. That's my job. I don't know who gave it to me. I just woke up doing it.\"\n\nIt lowers the lantern.\n\n\"You're the first warm thing in a long time. Please don't leave yet.\"",
+      "choices": [
+        {
+          "text": "\"Come with me, Lumen. Carry the light for me.\"",
+          "next": "u18_lumen_join"
+        },
+        {
+          "text": "\"Tell me more about the road first.\"",
+          "next": "u18_lumen_road"
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_kneel",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You go down on one knee in the cold ash. It is a small thing, but the child's whole face changes at it — the way a plant turns when you finally give it the window.\n\n\"Nobody kneels down here,\" Lumen says. \"The walkers don't see me at all. The tall thing at the back of the line sees me, but I don't like when it looks.\" A shiver. \"You look at me like I'm a real person.\"\n\n\"You are a real person,\" you tell it.\n\nThe grey flame flickers — and for a heartbeat, at its very heart, there is a thread of true gold.\n\n\"I'm Lumen,\" the child says, shy. \"Will you stay near me? The flame's braver when you're close.\"",
+      "choices": [
+        {
+          "text": "\"I'll stay near. Walk with me.\"",
+          "next": "u18_lumen_join"
+        },
+        {
+          "text": "\"What's the tall thing at the back of the line?\"",
+          "next": "u18_lumen_road"
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_guide",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "\"A guide,\" Lumen breathes, as if you have offered it a crown. \"I can guide. I'm good at guiding, I just never had anyone to guide who could actually leave.\"\n\nThe child falls in beside you at once, lantern raised, small legs working to match your stride. Then it slows, and glances back down the long grey line of the caravan, and its voice drops.\n\n\"There's a rule, though. If I come with you, the tall thing at the back — the one that keeps the herd — it'll notice the flame's gone from the front. It doesn't like losing a light. It'll come.\"\n\nIt looks up at you, jaw set with a child's fragile courage.\n\n\"Are you the kind that runs, or the kind that stands?\"",
+      "choices": [
+        {
+          "text": "\"The kind that stands. Come here, behind me.\"",
+          "next": "u18_lumen_join"
+        },
+        {
+          "text": "\"Tell me what it is before I decide.\"",
+          "next": "u18_lumen_road"
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_road",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "Lumen draws close and speaks low, the way children share the frightening truths adults pretend not to know.\n\n\"It's the Ashen Warden. The caravan's got to have a keeper same as the Gate's got to have a Keeper — something to walk the line and make sure nobody strays and nobody wakes. It used to be a person. A drover, I think. Now it's mostly the herding, wearing a drover.\"\n\nThe child glances back. Far down the line, at the very tail of the caravan, something too tall stands motionless, a smear of grey against grey.\n\n\"It eats the ones who wake up. Panic makes them bright, and bright is what it eats. So you have to be quiet, or you have to be strong. There's no third way. I've watched a long time.\"",
+      "choices": [
+        {
+          "text": "\"Then walk with me. We'll be strong together.\"",
+          "next": "u18_lumen_join",
+          "do": [
+            "flag:codex_lumen",
+            "journal:The Ashen Warden herds the dead caravan and eats those who wake. Panic makes them bright; bright is what it eats."
+          ]
+        },
+        {
+          "text": "\"Show me how you keep the flame lit.\"",
+          "next": "u18_lumen_flame"
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_flame",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "Lumen cups a hand around the glass. \"You feed it,\" the child says. \"Not with oil. With minding. You have to keep minding it, keep caring that it stays lit, or it goes out and then the walkers scatter and come apart in the ash.\"\n\nIt looks up. \"That's why I'm so tired. You can't stop minding, not ever, not to sleep. Nobody told me that when I picked it up. I didn't know it would be forever.\"\n\nIf you carry your own dark lantern, you feel it stir at your hip, hungry for the same grey fire.",
+      "choices": [
+        {
+          "text": "Light your dark lantern from Lumen's flame.",
+          "next": "u18_lumen_share",
+          "require": "ash_lantern"
+        },
+        {
+          "text": "\"Then let me help you mind it. Come with me.\"",
+          "next": "u18_lumen_join"
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_share",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You touch the wick of your dark lantern to the grey flame. It catches with a small cold whmp, and now there are two lights on the road where there was one.\n\nLumen's eyes go wide and wet. \"Two,\" it whispers. \"I never had a two before. If you carry one, I don't have to carry all of it alone.\"\n\nThe weight of forever eases off the child's small shoulders by half. It is the first time you have seen it stand up straight.",
+      "choices": [
+        {
+          "text": "\"We share it now. Come on.\"",
+          "next": "u18_lumen_join",
+          "do": [
+            "max_hp:+2",
+            "journal:Lit my lantern from Lumen's. Now we share the minding. The child stood up straight for the first time."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_join",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "Lumen steps to your side and does not leave it. Small, grey, luminous — a candle of a child in a country of snuffed wicks. The lantern's light steadies now that someone is walking with it who has a heartbeat.\n\n\"I'll guide you true,\" the child promises. \"Through the whole March. To the far edge where the road drowns and the Court begins. That's where the doors go next.\"\n\nThen it stiffens. Far down the line, the too-tall shape at the caravan's tail has turned. It has noticed the flame has left the front. It has noticed you.\n\n\"It's coming,\" Lumen whispers, and slips its cold small hand into yours. \"How do you want to be, when it gets here? Because I'll remember. I remember everything, that's the other part of the job.\"",
+      "choices": [
+        {
+          "text": "\"Get behind me. I'll keep you safe.\" (protective)",
+          "next": "u18_bond_shield",
+          "do": [
+            "companion:lumen",
+            "flag:codex_lumen",
+            "rel:lumen:+8",
+            "journal:Lumen the Lantern-child joins me — and I swore to keep the child safe. Warmth in a dead country."
+          ]
+        },
+        {
+          "text": "\"Stand beside me. You're braver than you think.\" (equal)",
+          "next": "u18_bond_equal",
+          "do": [
+            "companion:lumen",
+            "flag:codex_lumen",
+            "rel:lumen:+5",
+            "journal:Lumen the Lantern-child joins me — not to hide behind me, but to stand beside me. A small partnership in the ash."
+          ]
+        },
+        {
+          "text": "\"Light my way and stay out of reach. This is my fight.\" (distant)",
+          "next": "u18_bond_cold",
+          "do": [
+            "companion:lumen",
+            "flag:codex_lumen",
+            "rel:lumen:+2",
+            "journal:Lumen the Lantern-child joins me as a guide, kept at arm's length. The child watches me the way it watches everything — to remember."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_bond_shield",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You put the child at your back and set your feet. Lumen holds the lantern high over your shoulder so its grey light falls ahead of you, on the road, on the coming thing.\n\n\"Nobody's ever stood in front of me before,\" it says, very quietly. \"I'll remember that too.\"\n\nThe Warden comes up the line. The walkers part around it without knowing they part. It is a drover's shape ten feet tall, wound in grey rags, and where its face should be there is a coil of ash turning slowly in on itself. It carries a goad of black wood, and it points the goad at Lumen's light.",
+      "choices": [
+        {
+          "text": "Stand your ground. Draw steel.",
+          "next": "u18_warden_fight"
+        },
+        {
+          "text": "Try to speak to what it used to be first.",
+          "next": "u18_warden_talk"
+        }
+      ]
+    },
+    {
+      "id": "u18_bond_equal",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You and the child stand shoulder to shoulder — or shoulder to hip, given its size. Lumen plants its feet in a small, fierce imitation of your stance, lantern raised like a shield of light.\n\n\"Together,\" it says, testing the word. \"I like together better than behind.\"\n\nThe Warden comes up the line, parting the unknowing dead, a drover-shape ten feet tall wound in grey rags, its face a slow coil of turning ash. It levels a goad of black wood at the two lights standing where there should be one obedient one.",
+      "choices": [
+        {
+          "text": "Meet it together. Draw steel.",
+          "next": "u18_warden_fight"
+        },
+        {
+          "text": "Have Lumen raise the flame while you speak to it.",
+          "next": "u18_warden_talk"
+        }
+      ]
+    },
+    {
+      "id": "u18_bond_cold",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "\"Stay back and keep the light on it,\" you tell the child. \"Don't come close.\"\n\nLumen's face does something small and complicated — hurt, then acceptance, then the flat careful look of someone filing a thing away. \"All right,\" it says. \"I'll light. You fight. I'll remember how you did it.\"\n\nIt retreats a few paces and holds the lantern out at arm's length. Its grey glow falls on the road ahead, where the Warden is coming up the line: a drover-shape ten feet tall, rag-wound, its face a coil of turning ash, a black goad in its fist.",
+      "choices": [
+        {
+          "text": "Face it alone. Draw steel.",
+          "next": "u18_warden_fight"
+        },
+        {
+          "text": "Try words before blades.",
+          "next": "u18_warden_talk"
+        }
+      ]
+    },
+    {
+      "id": "u18_warden_talk",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "\"Drover,\" you say. \"You were a drover once. You had a name. You kept a herd because you loved them, not because you fed on them. Do you remember?\"\n\nThe coil of ash where its face should be slows. Slows. For a moment something almost surfaces in it — a broad kind face, sunburnt, a whistle between the teeth for a good dog.\n\nThen it clenches shut again, and the goad comes up, and the moment is gone. It has kept this herd too long. It is mostly keeping now, and only a little drover.",
+      "choices": [
+        {
+          "text": "Press the memory harder. (Skill: conviction)",
+          "next": "u18_warden_talk_check",
+          "check": {
+            "stat": "trust",
+            "dc": 14,
+            "pass": "u18_warden_talk_win",
+            "fail": "u18_warden_fight",
+            "onFail": [
+              "fear:+4"
+            ]
+          }
+        },
+        {
+          "text": "Words failed. Draw steel.",
+          "next": "u18_warden_fight"
+        }
+      ]
+    },
+    {
+      "id": "u18_warden_talk_check",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "\"Your dog,\" you say. \"You had a dog. Grey-muzzled, one ear down. You whistled it and it came. You are still the one who whistles, drover, not the one who herds the dead.\"",
+      "choices": [
+        {
+          "text": "Hold its gaze and wait.",
+          "next": "u18_warden_talk_win",
+          "check": {
+            "stat": "trust",
+            "dc": 14,
+            "pass": "u18_warden_talk_win",
+            "fail": "u18_warden_fight"
+          }
+        },
+        {
+          "text": "The coil shuts. Abandon words and draw steel.",
+          "next": "u18_warden_fight"
+        }
+      ]
+    },
+    {
+      "id": "u18_warden_talk_win",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "The goad lowers. The coil of ash unwinds, and for the space of three breaths there is a face there — broad, sunburnt, unbearably tired.\n\n\"...Rell,\" the drover says, in a voice like a cart on gravel. \"My name was Rell. And the dog was Ban.\" It looks down the endless line of the caravan it has walked for a hundred years. \"I kept telling them we were almost there. I kept telling myself.\"\n\nIt sets the black goad down in the ash. \"Take the little light with you. It was never mine to keep. Nothing here was ever anyone's to keep.\" And the drover Rell walks off the road, into the flats, and lets the ash take him gently — the way he never let it take his herd.\n\nLumen watches, wide-eyed. \"You didn't hit it. You un-made it. With saying-its-name.\"",
+      "choices": [
+        {
+          "text": "\"Names matter here. Remember that.\" Walk on.",
+          "next": "u18_after_warden",
+          "do": [
+            "trust:+6",
+            "rel:lumen:+4",
+            "add_item:true_name",
+            "flag:warden_freed",
+            "journal:Freed the Ashen Warden — the drover Rell — by saying his name. Names un-make things here."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_warden_fight",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "The Warden lunges. The black goad whips out faster than a thing that size should move, trailing ash like smoke. There is no more talking now. There is only the goad, and your steel, and Lumen's small grey light throwing your shadow huge across the road.\n\n\"Hit it where the ash turns!\" the child cries. \"The face-place! That's where the keeping lives!\"\n\nThis is your first real fight beyond the Gate. Make it count.",
+      "choices": [],
+      "combat": {
+        "enemy": "The Ashen Warden",
+        "ehp": 12,
+        "edmg": 3,
+        "win": "u18_warden_beaten",
+        "lose": "u18_warden_lose",
+        "flee": "u18_warden_flee"
+      }
+    },
+    {
+      "id": "u18_warden_beaten",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "Your blade finds the turning coil where a face should be, and the Warden comes apart — not with a scream but with a long exhaled sigh, rags and ash unspooling into the grey air until there is nothing standing on the road but a black wooden goad, and then not even that.\n\nThe caravan, leaderless, simply stops. The unknowing dead stand where they are, patient as ever, waiting for a march that will not resume.\n\nLumen lets out a breath it has clearly been holding for a hundred years. \"It's gone,\" the child says, disbelieving. \"You made it gone. I watched. I'll always remember you made it gone.\"",
+      "choices": [
+        {
+          "text": "\"It's over. Are you all right?\"",
+          "next": "u18_after_warden",
+          "do": [
+            "trust:+4",
+            "rel:lumen:+3",
+            "flag:warden_slain",
+            "journal:Killed the Ashen Warden in the first real fight beyond the Gate. The dead caravan stands still now, waiting forever."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_warden_flee",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You break off and run, hauling Lumen with you, the goad hissing through the ash a hand's-breadth behind. The child holds the lantern out ahead, and its grey light shows you a gap in the caravan, a gully, a way off the road.\n\nYou tumble down into the gully and lie still. Above, on the road, the Warden casts about — patient, herding — and then, finding its herd intact and its front-light merely misplaced, it turns back to the line and resumes its slow endless walk.\n\n\"It won't follow off the road,\" Lumen pants. \"The road's all it is. We got away. But it'll be waiting if we go back that way.\"",
+      "choices": [
+        {
+          "text": "\"Then we go on, off the road. Guide me.\"",
+          "next": "u18_after_warden",
+          "do": [
+            "fear:+3",
+            "rel:lumen:+2",
+            "flag:warden_fled",
+            "journal:Fled the Ashen Warden into a gully. It won't leave the road — but the road behind us belongs to it now."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_warden_lose",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "The goad catches you across the chest and the world goes white, then grey, then very far away. You go down in the cold ash. The last thing you see is Lumen's small face above you, and the lantern lowered close, its grey fire pressed almost to your skin.\n\n\"No,\" the child is saying. \"No, no, you're warm, you have to stay warm — here, take some of the light, take it, I've got enough for two —\"\n\nThe grey flame pours into you, cold and then somehow not, and it pushes the dark back out of your eyes. You are not dead. Not yet. Lumen spent some of its own forever to keep you.",
+      "choices": [
+        {
+          "text": "Drag yourself up. The Warden has moved on down the line.",
+          "next": "u18_after_warden",
+          "do": [
+            "hp:+6",
+            "fear:+6",
+            "rel:lumen:+6",
+            "flag:warden_survived",
+            "journal:The Warden nearly killed me. Lumen poured some of its own light into me to keep me warm. I owe the child my life."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_after_warden",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "Whatever the Warden was, it walks the line no longer. Lumen tugs your sleeve and points ahead, past the stalled caravan, to where the road tips downward and the grey ash gives way to grey water. A tide-line of drowned wagons. A far shore lost in mist. Towers, maybe, beyond it — the black spires of a court that sits in the water like a crown dropped in a well.\n\n\"That's the edge of the March,\" the child says. \"Where the road drowns and the Court begins. It's not far now. But you should catch your breath first. There won't be anywhere to breathe over there.\"",
+      "choices": [
+        {
+          "text": "Rest a moment with Lumen at the tide-line.",
+          "next": "u18_rest"
+        },
+        {
+          "text": "Ask Lumen what waits in the Court.",
+          "next": "u18_lumen_court"
+        },
+        {
+          "text": "Don't stop. Walk down to the drowned road now.",
+          "next": "u18_edge"
+        }
+      ]
+    },
+    {
+      "id": "u18_rest",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You sit at the tide-line. The grey water does not move. Lumen sets its lantern between you like a small hearth and, for the first time, sits down beside it instead of standing guard over it.\n\n\"I forgot sitting felt like this,\" the child murmurs. It leans, just slightly, against your arm. Cold, but present. \"When we're done — if there's a done — do you think I could have a before-name again? A real one? You could pick it. I wouldn't mind if you picked it.\"",
+      "choices": [
+        {
+          "text": "\"When we're done, we'll find your true name together.\"",
+          "next": "u18_edge",
+          "do": [
+            "rel:lumen:+5",
+            "journal:Promised Lumen we'd find the child's true name when this is over. It leaned against my arm and let me feel it."
+          ]
+        },
+        {
+          "text": "\"One thing at a time. On your feet.\"",
+          "next": "u18_edge",
+          "do": [
+            "trust:+1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_lumen_court",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "\"The Court,\" Lumen says, and its small face goes careful. \"There's a king in it. He's not a real king. He drowned a long time ago and the water made him one because the water thought a court needed a king, the way the road thought it needed a Warden.\"\n\nThe child looks up at you.\n\n\"He'll be polite. That's the trap. The Warden was easy — it just wanted to eat you. The false king wants you to sit down and stay for supper and forget you were ever going anywhere. Don't sit down. Whatever else you do over there, don't sit down at his table.\"",
+      "choices": [
+        {
+          "text": "\"I won't sit. Thank you, Lumen.\"",
+          "next": "u18_edge",
+          "do": [
+            "rel:lumen:+3",
+            "flag:court_warned",
+            "journal:Lumen's warning about the Drowned Court: the false king will be polite. Don't sit at his table."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u18_edge",
+      "chapter": "CHAPTER XVIII · THE ASHEN MARCH",
+      "text": "You come down to where the road drowns. The last dry milestone stands knee-deep in grey water, its carving worn to a suggestion. Beyond it the caravan road continues on beneath the surface, visible for a little way as a pale ribbon, then lost.\n\nLumen wades in ahead of you without hesitation, lantern held high, and the grey flame throws a wobbling road of light across the water — a path that holds, so long as the light does.\n\n\"Stay in the light,\" the child says. \"Step where I step. The Court's just past the mist. And whatever it looks like when we get there — remember it's already dead. Same as everything back here. Same as I'm not.\"\n\nIt looks back at you, small and grey and warm-eyed, holding the only light in a drowned world.\n\n\"Ready? The doors go on from here.\"",
+      "choices": [
+        {
+          "text": "Take the child's light and step onto the drowned road.",
+          "next": "u19_start"
+        }
+      ]
+    }
+  ]
+}

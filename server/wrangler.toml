@@ -1,0 +1,15 @@
+name = "family-pop"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[[durable_objects.bindings]]
+name = "FAMILY"
+class_name = "Family"
+
+[[durable_objects.bindings]]
+name = "DIR"
+class_name = "Directory"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Family", "Directory"]

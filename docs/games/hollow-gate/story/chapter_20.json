@@ -1,0 +1,566 @@
+{
+  "scenes": [
+    {
+      "id": "u20_start",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The Drowned Court falls away behind you, and the ground softens into loam that remembers being water.\n\nA wood begins. Not a border you cross — a decision the land makes about you. One step there is open marsh; the next, trees close overhead like ribs.\n\nBut they are wrong, these trees. Their bark peels into pages. Their branches end in fingers, in antlers, in the shapes of things that were not trees. One leans low across the path, and where a knot should be there is the smooth blind hollow of a face, mid-forgetting.\n\nThe silence here is a listening silence. You know it now.",
+      "choices": [
+        {
+          "text": "Set foot on the path. Name where you are.",
+          "next": "u20_enter",
+          "do": [
+            "flag:region_uwood",
+            "journal:Entered the Unmaking Wood — trees that are forgetting they were ever trees.",
+            "fear:+4"
+          ]
+        },
+        {
+          "text": "Skirt the treeline, looking for a way around.",
+          "next": "u20_enter",
+          "do": [
+            "flag:region_uwood",
+            "journal:There is no way around the Unmaking Wood — the treeline loops back to the same first tree. Only through.",
+            "fear:+3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_enter",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "Inside, the light is grey and comes from nowhere. The path is a suggestion, marked here and there by white stones that turn out, when you look, to be teeth.\n\nA sound reaches you — low, rhythmic, a scraping. Metal on bark. Someone is here, and they are working at something with a patience that does not belong to the living.\n\nAhead, the trees thin around a clearing. In its center, a figure in dull armour kneels before a great tree, scraping at the trunk with the edge of a broken sword. Trying, you realise, to carve a name into wood that keeps smoothing itself blank.",
+      "choices": [
+        {
+          "text": "Approach the kneeling figure openly.",
+          "next": "u20_knight_meet"
+        },
+        {
+          "text": "Circle the clearing and watch first.",
+          "next": "u20_watch"
+        },
+        {
+          "text": "Call out from where you stand.",
+          "next": "u20_callout"
+        }
+      ]
+    },
+    {
+      "id": "u20_watch",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You keep to the trees and watch.\n\nThe knight carves. The wood forgets. Carves. Forgets. Each stroke lays down a letter; each letter fades before the next is done, the grain closing over it like water over a stone.\n\nThe armour is old and grand and utterly tarnished — a courtly make, worn to grey. Where the visor should show a face there is only a polished plate, and in that plate, faintly, you can see your own reflection watching back.\n\nThe knight has no face of their own. Only a mirror where one should be.",
+      "choices": [
+        {
+          "text": "Step out. Let them see you approach.",
+          "next": "u20_knight_meet",
+          "do": [
+            "journal:The kneeling knight has a mirror for a face."
+          ]
+        },
+        {
+          "text": "Study the tree they are carving. (Perception)",
+          "next": "u20_watch_tree",
+          "check": {
+            "stat": "trust",
+            "dc": 12,
+            "pass": "u20_watch_tree_pass",
+            "fail": "u20_watch_tree"
+          }
+        }
+      ]
+    },
+    {
+      "id": "u20_watch_tree_pass",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You watch the carving long enough to read the shape of what the knight keeps trying to write. It is not a warning. It is not a curse.\n\nIt is a name. The same name, over and over, half-formed and lost — the knight's own, you would wager, being carved so it cannot be forgotten, and forgotten anyway, faster than any hand can cut.\n\nThis is a creature fighting its own unmaking with a broken blade. That is worth knowing before you speak.",
+      "choices": [
+        {
+          "text": "Step out. Approach with care.",
+          "next": "u20_knight_meet",
+          "do": [
+            "trust:+3",
+            "journal:The mirror-knight carves their own name into a tree, over and over, to keep from forgetting it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_watch_tree",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The carving means nothing you can parse from here — marks that fill and fade, fill and fade. Whatever the knight is writing, the wood eats it before it can be read.\n\nYou have watched long enough. Waiting is its own kind of forgetting, in a place like this.",
+      "choices": [
+        {
+          "text": "Step out. Approach the knight.",
+          "next": "u20_knight_meet"
+        }
+      ]
+    },
+    {
+      "id": "u20_callout",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "\"You there —\" your voice cracks across the clearing, and the wood flinches. Leaves that were faces turn toward the sound.\n\nThe knight stops carving. Slowly, the grey helm lifts. Where the face should be, a mirror catches the grey light and throws back a warped image of you.\n\n\"A voice,\" the knight says. The words come out rusted, unused. \"You still have a voice. Then you are not long here.\" They set the broken sword across their knee. \"Come. Stand where I can see you, before the wood decides you were never speaking at all.\"",
+      "choices": [
+        {
+          "text": "Come forward.",
+          "next": "u20_knight_meet"
+        }
+      ]
+    },
+    {
+      "id": "u20_knight_meet",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You cross the clearing. The knight rises — tall, deliberate, armour whispering like turned pages. The mirror-face holds your reflection and nothing else.\n\n\"I was a knight of the Drowned Court,\" the mirror says. Its voice arrives a half-beat after its stillness, as if reflected. \"Before it drowned. I am called Gloam now, because I have forgotten what I was called then. The wood took my face and gave me this instead — so that I might always see what I am, and never who.\"\n\nGloam tilts the mirror toward you.\n\n\"I am bound by the Mirror Law. I cannot lie to a reflection, and to me, everything is one. So I will tell you true: this wood unmakes. It has been unmaking me for a hundred years. What brings a thing with a voice into a place that eats them?\"",
+      "choices": [
+        {
+          "text": "\"I follow the Keeper. To end the Gate.\"",
+          "next": "u20_knight_purpose"
+        },
+        {
+          "text": "\"I'm looking for {missing_name}. {missing_pron} was taken.\"",
+          "next": "u20_knight_purpose"
+        },
+        {
+          "text": "\"What is the Mirror Law?\"",
+          "next": "u20_knight_law"
+        }
+      ]
+    },
+    {
+      "id": "u20_knight_law",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "\"The Mirror Law.\" Gloam turns the polished face slowly, and the clearing bends around it. \"In the Underland a reflection can be truer than the thing it reflects. Whatever a mirror holds, it holds truly. Break a mirror and you free what it kept — or you loose it upon the world. There is no telling which until the glass is already in pieces.\"\n\n\"I am bound to it. I cannot pass a mirror without stopping. I cannot break one without asking leave. And I cannot lie — not to you, not to the trees, not to the last true thing I have, which is my own reflection.\"\n\nGloam looks at you. \"You will need the Law before you leave this wood. Remember it.\"",
+      "choices": [
+        {
+          "text": "\"Then let me tell you true why I'm here.\"",
+          "next": "u20_knight_purpose",
+          "do": [
+            "flag:codex_mirror",
+            "journal:The Mirror Law: a reflection can be truer than its source. Break a mirror to free — or loose — what it holds."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_knight_purpose",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You tell Gloam what you carry: the Keeper's trail, the lost child, the road that only goes deeper.\n\nThe mirror is quiet a long moment. In it, your reflection stands straighter than you feel.\n\n\"Then we are pointed the same way,\" Gloam says. \"The Keeper made this wood, in a fashion. Every place the Underland forgets, it forgets a little more like him. He is a man unmaking himself so slowly he has mistaken it for eternity. To reach him, you must pass through what he is becoming.\"\n\nGloam lifts the broken sword. \"I would walk with you. But the wood will test whether I am still knight enough to be worth the walking. And so will you.\"",
+      "choices": [
+        {
+          "text": "\"Prove it, then. Walk with me.\"",
+          "next": "u20_test_intro"
+        },
+        {
+          "text": "\"Why would a forgotten thing help me remember?\"",
+          "next": "u20_knight_why"
+        }
+      ]
+    },
+    {
+      "id": "u20_knight_why",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "\"Because you have a voice, and I have a mirror,\" Gloam says. \"Between us we are almost a whole person. Because if the Gate ends, the wood ends, and the wood is the hand that is erasing me. And because —\"\n\nThe mirror-face dims, as if a cloud crossed the grey light.\n\n\"— because a hundred years ago a child came through the Gate, and I swore to a king I no longer remember that I would bring her home. I have forgotten her name. I have forgotten the king. But the oath is the last thing the wood cannot chew through. An oath is a name a soul gives itself.\"\n\nGloam straightens. \"So. I keep it. Even blind. Especially blind.\"",
+      "choices": [
+        {
+          "text": "\"Then keep it beside me.\"",
+          "next": "u20_test_intro",
+          "do": [
+            "trust:+4",
+            "journal:Gloam swore a hundred years ago to bring a lost child home. It is the last thing the wood cannot erase."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_test_intro",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "Gloam leads you deeper, and the wood grows worse.\n\nThe trees here are further gone. One has forgotten it is standing and lies across the path breathing slowly. Another has forgotten up from down and grows into the grey ground, roots in the air like a drowned man's hands.\n\n\"The wood asks a question of everything that enters,\" Gloam says. \"Whether you are still yourself. It asks with hunger, but it is a fair question. Steady your mind. Here it comes.\"\n\nAhead, the path forks. Down the left, a warm light and the smell of home. Down the right, the cold grey continues. There was no fork a moment ago.",
+      "choices": [
+        {
+          "text": "The warm light. Follow it. (Resolve)",
+          "next": "u20_lure_fail",
+          "check": {
+            "stat": "fear",
+            "dc": 13,
+            "pass": "u20_lure_pass",
+            "fail": "u20_lure_fail",
+            "onFail": [
+              "fear:+6"
+            ]
+          }
+        },
+        {
+          "text": "The cold grey road. Keep to the true path.",
+          "next": "u20_true_path",
+          "do": [
+            "trust:+2"
+          ]
+        },
+        {
+          "text": "Ask Gloam which is real.",
+          "next": "u20_ask_gloam_fork"
+        }
+      ]
+    },
+    {
+      "id": "u20_ask_gloam_fork",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "\"Which is real?\" you ask.\n\nGloam turns the mirror down both roads in turn. In the glass, the warm light shows as a mouth. The cold grey shows as a mouth too — but a smaller one.\n\n\"Neither is safe,\" the knight says. \"But the warm one is the wood pretending to be your mother. The cold one is merely the wood. When something offers you home in a place like this, it wants the shape of you that goes soft at the word.\"\n\nGloam steps onto the cold grey path. \"Come. Be hard a little longer.\"",
+      "choices": [
+        {
+          "text": "Follow Gloam onto the cold road.",
+          "next": "u20_true_path",
+          "do": [
+            "trust:+3",
+            "journal:In the Unmaking Wood, warmth is a lure. Home is the shape the wood wants to eat."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_lure_pass",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You walk toward the warm light — and stop, three steps in, because the smell is wrong.\n\nIt is bread, and hearthsmoke, and someone's arms. It is everything you left behind. And it is coming from a hollow in a tree where a face is trying to grow, working the memory out of you to wear as bait.\n\nYou name it aloud: \"You are not home. You are the wood, wearing home.\"\n\nThe light goes out like a snuffed wick. The hollow closes, sullen. Gloam is beside you, mirror bright with something like approval.\n\n\"Good,\" the knight says. \"You are still yourself. That is rarer here than you know.\"",
+      "choices": [
+        {
+          "text": "Rejoin the true path.",
+          "next": "u20_true_path",
+          "do": [
+            "trust:+3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_lure_fail",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You walk into the warmth and it closes over you.\n\nFor a moment you are small again, and safe, and someone is calling you in for supper in a voice you would follow off a cliff. You take another step. Another. The path behind you forgets it was ever a path.\n\nThen a hand of cold metal closes on your shoulder and hauls you back. Gloam's mirror is inches from your face, and in it you see yourself already half-erased — features smoothing, mouth going blank.\n\n\"Look,\" Gloam commands. \"Look at what it was making of you.\"\n\nYou look. The horror of it snaps you back into your own skin.",
+      "choices": [
+        {
+          "text": "Stagger back onto the true path.",
+          "next": "u20_true_path",
+          "do": [
+            "fear:+4",
+            "journal:The wood nearly wore me as bait. Gloam's mirror showed me my own face going blank."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_true_path",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The cold grey road holds. It is not kind, but it is honest, and honesty is the only footing this wood offers.\n\nGloam walks at your side now, matched to your pace. The knight has stopped carving. Whatever the wood tried to make of you back there, passing the test seems to have steadied Gloam too — as if your remembering fed some of theirs.\n\n\"Stay,\" you say. \"Walk with me the rest of the way.\"\n\nThe mirror inclines, a bow made of light.\n\n\"I will,\" Gloam says. \"Reflection to reflection. Where you go, I go.\"",
+      "choices": [
+        {
+          "text": "Take the Mirror-Knight into your company.",
+          "next": "u20_gloam_joins",
+          "do": [
+            "companion:gloam",
+            "flag:codex_mirror",
+            "rel:gloam:+5",
+            "journal:Gloam, the Mirror-Knight, joined me — bound by the Mirror Law, sworn to a child whose name the wood ate."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_gloam_joins",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "Gloam falls in beside you, and the wood grows quieter, as if wary of a thing that has stopped forgetting.\n\n\"There is a place ahead,\" the knight says. \"The heart of the wood. It is where I was carving, before you came — or a truer version of it. A tree that remembers everything, because everything the wood forgets is carried there and hung.\"\n\n\"The Hollow Oak. It wears the faces the trees have lost. And it guards a thing you will want: a shard of the first mirror, from which all the Underland's reflections were cut. With it, the Mirror Law is yours to spend — once.\"\n\nGloam's voice lowers. \"But the Oak does not give. The Oak keeps. We will have to take.\"",
+      "choices": [
+        {
+          "text": "\"Lead me to the Hollow Oak.\"",
+          "next": "u20_oak_approach"
+        },
+        {
+          "text": "\"Tell me how the Oak fights first.\"",
+          "next": "u20_oak_lore"
+        }
+      ]
+    },
+    {
+      "id": "u20_oak_lore",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "\"It does not move,\" Gloam says. \"It does not need to. It reaches with what it has stolen. The faces on its bark will speak in voices you love — your king, your dead, the child you seek. They will beg you to stop, to stay, to lay down your blade and be hung among them.\"\n\n\"The Oak fights by remembering you back at yourself until you cannot tell which of you is the reflection. Do not listen to the faces. Listen to me, or to your own hand on your weapon. Those are real.\"\n\nGloam lifts the broken sword. \"When we strike, strike the trunk, not the faces. The faces are victims. The wood behind them is the thief.\"",
+      "choices": [
+        {
+          "text": "\"Then we strike the trunk. Lead on.\"",
+          "next": "u20_oak_approach",
+          "do": [
+            "trust:+2",
+            "journal:The Hollow Oak fights with stolen faces and stolen voices. Strike the trunk, not the faces."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_oak_approach",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The heart of the wood is a hollow where no other tree will grow. In its center stands the Oak.\n\nIt is vast and grey and covered, root to crown, in faces. Hundreds. Thousands. Every face a tree lost when it forgot it was a tree, and every face still moving — mouths working, eyes rolling, all of them turning toward you as one.\n\nThey begin to speak. Your name, in a hundred beloved voices. Come. Stay. Be remembered. Set it down.\n\nHalf-buried in the trunk, glinting, is a wedge of black glass — the mirror shard. Gloam sets their broken blade against the bark.\n\n\"Now,\" the knight says. \"Before it learns your face.\"",
+      "choices": [
+        {
+          "text": "Steel yourself against the voices. (Will)",
+          "next": "u20_oak_will",
+          "check": {
+            "stat": "fear",
+            "dc": 14,
+            "pass": "u20_oak_fight",
+            "fail": "u20_oak_fight_weak",
+            "onFail": [
+              "hp:-4",
+              "fear:+5"
+            ]
+          }
+        },
+        {
+          "text": "Strike the trunk at once, no hesitation.",
+          "next": "u20_oak_fight"
+        },
+        {
+          "text": "Let Gloam hold the mirror between you and the faces.",
+          "next": "u20_oak_mirror_shield"
+        }
+      ]
+    },
+    {
+      "id": "u20_oak_mirror_shield",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "\"Gloam — the mirror. Turn it on them.\"\n\nThe knight understands at once. Gloam plants themselves between you and the Oak and lifts the mirror-face to the tree. The stolen faces see themselves reflected — and falter. A thing built of other people's memories does not like to look at itself.\n\nThe voices stumble. The chorus breaks into confusion.\n\n\"Strike now,\" Gloam says through gritted light. \"I cannot hold their own faces up to them for long.\"",
+      "choices": [
+        {
+          "text": "Strike the trunk while the Oak is dazzled.",
+          "next": "u20_oak_fight",
+          "do": [
+            "rel:gloam:+3",
+            "trust:+2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_oak_will",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You let the voices come and do not answer them. Beloved as they are, you hold each one at arm's length and name it: a theft. A theft. A theft.\n\nYour own name, spoken in your mother's voice, nearly undoes you — and you turn it aside too, because your mother is not here, and would not ask you to stop.\n\nThe faces snarl, their sweetness curdling. The Oak knows now that flattery will not open you. It will have to fight.",
+      "choices": [
+        {
+          "text": "Raise your weapon. Strike the trunk.",
+          "next": "u20_oak_fight",
+          "do": [
+            "trust:+3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_oak_fight_weak",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The voices get in.\n\nFor a breath you believe them — that stopping would be rest, that being hung among the faces would be a kind of peace. Your arm lowers. The nearest branch reaches, almost tender, for your cheek.\n\nGloam's mailed hand knocks the branch aside and shoves you back a step, and the pain of it clears your head. But the Oak has your measure now, and it strikes first.",
+      "choices": [
+        {
+          "text": "Recover and fight through it.",
+          "next": "u20_oak_fight"
+        }
+      ]
+    },
+    {
+      "id": "u20_oak_fight",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You strike the trunk and the whole Oak screams with a thousand stolen mouths.\n\nBranches whip down like flails. Roots tear up out of the grey earth, groping. The faces gnash. Gloam sets their back to yours, broken sword flashing, and together you carve at the ancient wood while it tries to carve you back into nothing.\n\nStrike for the trunk. Ignore the faces. End it.",
+      "choices": [],
+      "combat": {
+        "enemy": "The Hollow Oak",
+        "ehp": 14,
+        "edmg": 4,
+        "win": "u20_oak_felled",
+        "lose": "u20_oak_lose",
+        "flee": "u20_oak_flee"
+      }
+    },
+    {
+      "id": "u20_oak_flee",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You break away, hauling Gloam with you, and crash out of the hollow while the Oak howls behind you.\n\nThe faces do not follow — they cannot. The Oak is rooted, and its reach ends where the hollow ends. You lean against a lesser tree, gasping, and Gloam's mirror finds your face.\n\n\"We can still take the shard,\" the knight says quietly. \"But not by fleeing again. It knows us now. We go back, and we finish it, or we leave this wood empty-handed and half-remembered.\"",
+      "choices": [
+        {
+          "text": "Go back. Finish the Oak.",
+          "next": "u20_oak_fight"
+        },
+        {
+          "text": "Leave the shard. Take the deep road out.",
+          "next": "u20_leave_empty"
+        }
+      ]
+    },
+    {
+      "id": "u20_oak_lose",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The Oak's branches wrap you and lift, and the faces crowd close, welcoming, and you feel your own name begin to loosen from you like a tooth.\n\nThen a mirror is thrust into the tangle — Gloam, forcing the glass against the bark, and the Oak recoils from its own reflection long enough for the knight to cut you free.\n\nYou fall. Gloam drags you clear of the hollow, armour scored, mirror cracked but whole.\n\n\"You are not lost,\" the knight insists, holding the glass to your face until you see yourself in it. \"Say your name. Say it now.\"\n\nYou say it. It holds. Barely.",
+      "choices": [
+        {
+          "text": "Rise. Take the shard by other means.",
+          "next": "u20_shard_grieve",
+          "do": [
+            "hp:+2",
+            "fear:+6",
+            "rel:gloam:+4",
+            "journal:The Oak nearly unmade me. Gloam held a mirror to my face until my own name held."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_oak_felled",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The trunk splits with a sound like a hall full of doors slamming at once.\n\nThe Oak sags. Its faces go slack, one by one, the stolen memories loosed at last — and for an instant the air is full of them, a hundred lives rising like startled birds, going wherever forgotten things go when they are finally let free.\n\nWhat remains is only a dead grey tree, and, at its heart, laid bare in the broken wood, the mirror shard: a wedge of black glass no longer than your hand, deep as a well, holding a reflection that is not the clearing.\n\nGloam kneels beside it, does not touch it. \"The Mirror Law forbids me to take it,\" the knight says. \"It is yours to lift, or leave.\"",
+      "choices": [
+        {
+          "text": "Lift the mirror shard from the ruined Oak.",
+          "next": "u20_shard_taken",
+          "do": [
+            "add_item:mirror_shard",
+            "journal:Took the mirror shard from the Hollow Oak — a piece of the first mirror. Spend the Mirror Law once.",
+            "trust:+3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_shard_grieve",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You cannot best the Oak with steel now — you are too spent. So you try what Gloam's Mirror Law suggests: you speak to it.\n\n\"You are a thief,\" you tell the tree, \"but you were something before you were a thief. You forgot, same as everything here. I am not angry at you. I am only taking back one piece of what you stole.\"\n\nThe Oak stills. Perhaps something in it, some grain of the tree it was, remembers being spoken to gently. Its grip loosens. In the crook of a lowered branch, the mirror shard glints, offered rather than guarded.\n\nGloam watches, silent, the mirror-face unreadable.",
+      "choices": [
+        {
+          "text": "Take the offered shard.",
+          "next": "u20_shard_taken",
+          "do": [
+            "add_item:mirror_shard",
+            "fear:-3",
+            "journal:I did not kill the Oak. I spoke to it, and it gave up the mirror shard.",
+            "trust:+4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_shard_taken",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The shard is cold and light and wrong to hold, the way still water is wrong to breathe. In its black surface you see not the wood but a figure standing in grey armour, faceless — Gloam, as Gloam was before the wood, when the mirror was still a face and the face still had a name.\n\nGloam sees it too. The knight goes very still.\n\n\"That is what I looked like,\" Gloam says softly. \"I had forgotten I had a chin. A brow. Eyes the colour of — I cannot say. But there. That was me.\"\n\nThe knight looks at you, and the mirror-face holds your reflection and, faintly, its own.\n\n\"The shard shows the true form under the forgetting. It can free what a mirror keeps, or loose it. There is a choice here, and it is yours to make, not mine. The Law binds me to abide it either way.\"",
+      "choices": [
+        {
+          "text": "Use the shard to restore Gloam's true face.",
+          "next": "u20_shard_restore"
+        },
+        {
+          "text": "Keep the shard whole. Save its one use for the Keeper.",
+          "next": "u20_shard_keep"
+        },
+        {
+          "text": "\"What happens to you if I use it on you?\"",
+          "next": "u20_shard_ask"
+        }
+      ]
+    },
+    {
+      "id": "u20_shard_ask",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "\"If you spend it on me,\" Gloam says slowly, \"I will have a face again. My own. And with it, perhaps, some of what the wood ate — the king, the oath, the child's name I swore to carry. I would be more knight and less mirror.\"\n\n\"But the shard has one use. Spend it on me, and it is spent. It will not open the Keeper for you. It will not free the child from the last door. You would trade a weapon for a companion made whole.\"\n\nThe mirror dims. \"I will not counsel you either way. A thing bound by the Law does not get to want. Choose as if I were not listening.\"",
+      "choices": [
+        {
+          "text": "Restore Gloam's face. Spend the shard now.",
+          "next": "u20_shard_restore"
+        },
+        {
+          "text": "Keep it whole. Save it for the Keeper.",
+          "next": "u20_shard_keep"
+        }
+      ]
+    },
+    {
+      "id": "u20_shard_restore",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You raise the shard to Gloam's mirror-face and say the only true thing you have: \"Be who you were.\"\n\nThe black glass drinks the grey light and gives it back changed. The mirror ripples — and clears — and is not a mirror at all, but a face. Weathered, scarred, unmistakably human, eyes the colour of pond water in spring. A jaw set with a hundred years of stubborn oath-keeping.\n\nGloam gasps with a mouth that is now a mouth. Touches the face. Weeps, and the tears are the first thing the knight has felt in a century.\n\n\"Enna,\" Gloam breathes. \"Her name was Enna. The child I swore to bring home. I have it. I have it again.\"\n\nThe shard crumbles to black sand in your palm, spent. But Gloam is whole, and remembers, and that is a weapon of a different kind.",
+      "choices": [
+        {
+          "text": "\"Then we bring Enna home. Together.\"",
+          "next": "u20_toward_exit",
+          "do": [
+            "rem_item:mirror_shard",
+            "flag:gloam_restored",
+            "rel:gloam:+8",
+            "max_hp:+2",
+            "journal:I spent the shard to restore Gloam's face. The knight remembers now: the lost child's name is Enna."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_shard_keep",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You lower the shard. \"I'm sorry,\" you say. \"There is a door ahead that only this may open. I have to save its one use for the Keeper.\"\n\nGloam is silent. Then the mirror-face inclines — a bow, and beneath it something that would be grief if the knight could still feel it plainly.\n\n\"You choose well,\" Gloam says, and the Law makes it true even if it costs the knight to say. \"A face is a small thing beside a child's freedom. I have gone a hundred years without one. I can go a little further.\"\n\nThe knight straightens, mirror bright and unbroken. \"But keep the shard close. And if, at the end, there is a use to spare — remember I had a name, once, and would like it back before the wood takes the rest of me.\"",
+      "choices": [
+        {
+          "text": "\"If there's a use to spare, it's yours. I swear it.\"",
+          "next": "u20_toward_exit",
+          "do": [
+            "flag:gloam_bound",
+            "rel:gloam:+6",
+            "journal:I kept the mirror shard whole for the Keeper's door. Gloam still wears the mirror — and my promise to spend a spare use on them, if one comes."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_leave_empty",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You turn your back on the Oak and take the deep road out. The shard stays buried in the screaming tree.\n\nGloam follows without a word, though the mirror-face is heavy with things the knight will not say. You have left a weapon and a hope behind you in that hollow.\n\nBut the wood is no place to linger for glass, and there is a child ahead who is not made of stolen faces. You walk. The Oak's howl fades. The grey road narrows and begins, at last, to slope downward.",
+      "choices": [
+        {
+          "text": "Take the sloping road toward the wood's far edge.",
+          "next": "u20_toward_exit",
+          "do": [
+            "flag:gloam_bound",
+            "journal:Left the mirror shard in the Hollow Oak. Some weapons cost more than they are worth to take."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_toward_exit",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "The wood begins to let you go. The trees here still have their shapes; they have not yet started forgetting, or have not been forgetting as long.\n\nGloam walks easier now, whether faced or mirrored. The knight tells you, as you go, what lies beyond: \"The wood drains downward, into the roots of the realm. Water at the bottom, and a drowned city under it — the mirror of a place your kind lost long ago. The Keeper's own beginning is written there, if you can read the walls.\"\n\nAhead, the last trees part on a slope of black water and a stairway going down beneath it, lit by a single grey lantern-flame far below.",
+      "choices": [
+        {
+          "text": "Descend toward the drowned city.",
+          "next": "u20_exit"
+        },
+        {
+          "text": "\"A drowned city. Tell me what you remember of it.\"",
+          "next": "u20_exit_lore"
+        }
+      ]
+    },
+    {
+      "id": "u20_exit_lore",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "\"Little,\" Gloam admits. \"The wood took most of it. But I remember it was proud, and drowned itself rather than be taken — opened its own sea-gates when the Gate first bled through. It chose to forget rather than serve. There is a courage in that, and a cowardice, and I have never decided which weighs more.\"\n\nThe knight looks down the flooded stair. \"They say the Keeper walked those streets when he was still a man with a name. If his history is written anywhere, it is on the sunk walls. Read them, and you may learn the one word the Gate answers to.\"\n\nGloam steps onto the first stair. The black water closes over the ankle and does not wet it.",
+      "choices": [
+        {
+          "text": "Follow Gloam down into the dark water.",
+          "next": "u20_exit",
+          "do": [
+            "journal:Below the wood: a drowned city that opened its own sea-gates rather than serve the Gate. The Keeper's history is written on its walls."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u20_exit",
+      "chapter": "CHAPTER XX · THE UNMAKING WOOD",
+      "text": "You go down.\n\nThe Unmaking Wood closes behind you, and for the first time it does not follow. It has taken its measure of you and found you still yourself — barely, but still. That is the most a place of forgetting can concede.\n\nThe stair spirals into black water that parts around you like a held breath. The grey lantern-flame grows nearer below. Somewhere down there, streets that drowned rather than serve, and walls that remember a man before he was a Keeper.\n\nGloam descends at your shoulder — knight and mirror both, oath intact, name recovered or name still waiting. Whatever you chose in the hollow, you did not choose it alone.\n\nThe water rises to meet you. The Sunk City opens its drowned gate.",
+      "choices": [
+        {
+          "text": "Step into the Sunk City.",
+          "next": "u21_start"
+        }
+      ]
+    }
+  ]
+}

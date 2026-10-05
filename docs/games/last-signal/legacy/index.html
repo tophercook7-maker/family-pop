@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>THE LAST SIGNAL</title>
+  <meta name="description" content="A free cooperative text adventure for browsers. Play as one of 5 stations, read story scenes, make choices, and coordinate with other players to unlock multiple endings." />
+  <link rel="stylesheet" href="css/main.css?v=3" />
+</head>
+<body>
+  <div id="app">
+    <header id="top-bar">
+      <div id="station-id">NO STATION</div>
+      <div id="clock">--:--</div>
+      <button id="menu-btn" title="Menu">☰</button>
+    </header>
+
+    <nav id="menu" class="hidden">
+      <button data-action="mission">Mission</button>
+      <button data-action="help">How to Play</button>
+      <button data-action="save">Save</button>
+      <button data-action="load">Load</button>
+      <button data-action="restart">Restart Mission</button>
+    </nav>
+
+    <main id="screen">
+      <section id="lobby" class="view active">
+        <h1>THE LAST SIGNAL</h1>
+        <p class="subtitle">A free cooperative text adventure.</p>
+        <div class="lobby-panels">
+          <div class="panel">
+            <h2>What is this?</h2>
+            <p>A story-driven game played entirely in your browser, with no downloads or accounts.</p>
+          </div>
+          <div class="panel">
+            <h2>How to play</h2>
+            <p>1) <b>Open multiple tabs.</b> Each tab is a different research station.</p>
+            <p>2) <b>Pick a station</b> and enter a callsign.</p>
+            <p>3) <b>Read the scene</b>, then choose what to do.</p>
+            <p>4) <b>Use the Inter-Station Channel</b> to share clues with your other stations.</p>
+            <p>5) <b>Check your objectives</b> at the top.</p>
+            <p>6) <b>The ending depends on cooperation.</b> Share findings before the mission timer runs out.</p>
+          </div>
+          <div class="panel">
+            <h2>Stations</h2>
+            <p><b>AURORA-7</b> — Arctic Communications</p>
+            <p><b>PINNACLE</b> — Mountain Signal Analysis</p>
+            <p><b>MERIDIAN</b> — Desert Data Decryption</p>
+            <p><b>TRIDENT</b> — Oceanic Systems Engineering</p>
+            <p><b>HELIX</b> — Orbital Mission Coordination</p>
+          </div>
+        </div>
+        <form id="lobby-form">
+          <label>
+            Callsign
+            <input id="callsign" maxlength="12" placeholder="e.g. ROGER-9" required />
+          </label>
+          <label>
+            Station
+            <select id="station-select" required>
+              <option value="">Choose station…</option>
+              <option value="AURORA-7">AURORA-7 — Arctic Communications</option>
+              <option value="PINNACLE">PINNACLE — Mountain Signal Analysis</option>
+              <option value="MERIDIAN">MERIDIAN — Desert Data Decryption</option>
+              <option value="TRIDENT">TRIDENT — Oceanic Systems Engineering</option>
+              <option value="HELIX">HELIX — Orbital Mission Coordination</option>
+            </select>
+          </label>
+          <button type="submit" class="primary">Connect to Station</button>
+        </form>
+        <p class="note">Your progress saves automatically as you play.</p>
+      </section>
+
+      <section id="hud" class="view">
+        <div id="hud-inner">
+          <div id="mission-clock">
+            <div id="clock-label">MISSION TIME</div>
+            <div id="clock-value">06:00:00</div>
+            <div id="clock-eta">T-MINUS 6:00</div>
+          </div>
+          <div id="objectives">
+            <div id="objectives-title">OBJECTIVES</div>
+            <ul id="objectives-list"></ul>
+          </div>
+          <div id="comms">
+            <div id="comms-header">
+              <span>INTER-STATION CHANNEL</span>
+              <button id="comms-toggle" title="Toggle">▾</button>
+            </div>
+            <p class="hud-help">Broadcast here to coordinate with your other open tabs. Sharing is required for the true ending.</p>
+            <ul id="comms-log"></ul>
+            <form id="comms-form">
+              <input id="comms-input" placeholder="Broadcast to all stations…" maxlength="200" />
+              <button type="submit">Send</button>
+            </form>
+          </div>
+          <div id="station-contacts"></div>
+        </div>
+      </section>
+
+      <section id="scene" class="view">
+        <div id="scene-location"></div>
+        <div id="scene-text"></div>
+        <div id="scene-help"></div>
+        <div id="scene-choices"></div>
+        <div id="scene-status"></div>
+      </section>
+
+      <div id="modal" class="hidden">
+        <div id="modal-backdrop"></div>
+        <div id="modal-box">
+          <div id="modal-title"></div>
+          <div id="modal-body"></div>
+          <div id="modal-actions"></div>
+        </div>
+      </div>
+
+      <section id="terminal" class="view hidden">
+        <div id="terminal-header">STATION LOG</div>
+        <ul id="terminal-log"></ul>
+      </section>
+
+      <section id="settings" class="view hidden">
+        <h2>Settings</h2>
+        <label class="toggle">
+          <input type="checkbox" id="animations" checked />
+          <span>Animations</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="reduce-motion" />
+          <span>Reduce motion</span>
+        </label>
+      </section>
+
+      <section id="mission" class="view hidden">
+        <h2>Mission</h2>
+        <p>A mysterious five-station signal has appeared simultaneously around the world. You are one station in that network.</p>
+        <p>Read scenes, make choices, and share findings with your other stations through the Inter-Station Channel.</p>
+        <p>What you share—and whether your stations cooperate—determines the ending.</p>
+        <button class="primary" data-return>Return to Operations</button>
+      </section>
+
+      <section id="ending" class="view">
+        <h2 id="ending-title"></h2>
+        <div id="ending-text"></div>
+        <div id="ending-stats"></div>
+        <button id="ending-restart" class="primary">Launch New Mission</button>
+      </section>
+    </main>
+
+    <footer id="tab-bar">
+      <button data-tab="hud" class="active">HQ</button>
+      <button data-tab="scene">Ops</button>
+      <button data-tab="terminal">Logs</button>
+      <button data-tab="settings">More</button>
+    </footer>
+  </div>
+
+  <script src="game.js?v=3"></script>
+</body>
+</html>

@@ -10,69 +10,107 @@
 <title>Family Pop</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Caveat:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap">
 <style>
-/* Layout: a 7x7 square board (24 squares round the edge) with the bubble stage in the middle; players strip under it */
+/* Layout: phone app — screens above a fixed bottom tab bar; the board game is a 7x7 ring with the bubble stage in the middle */
 :root{
-  --bg:#2b1747; --bg2:#3d2266; --card:#47297a; --card2:#5a3596; --ink:#fff7ee; --dim:#cbb8ea;
+  --bg:#2b1747; --bg2:#3d2266; --card:#47297a; --card2:#5a3596; --ink:#fff7ee; --dim:#cbb8ea; --line:rgba(255,255,255,.12);
   --pop:#ff5d9e; --teal:#3fd6c6; --sun:#ffc23d; --good:#43d17a; --bad:#ff5a5a;
   --sq:#fff4e6; --sqInk:#2b1747;
   --gTownA:#4fb3ff; --gFamA:#ff8a3d; --gTownB:#8f6bff; --gFamB:#ff5d9e; --gHome:#43d17a;
-  --font:"Nunito",ui-rounded,system-ui,sans-serif; --hand:"Caveat",cursive;
-  color-scheme:dark;
+  --font:"Nunito",ui-rounded,system-ui,sans-serif; --navH:64px; color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden;-webkit-user-select:none;user-select:none}
-body{background:radial-gradient(900px 600px at 50% -10%,var(--bg2),var(--bg))}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden}
+body{background:radial-gradient(900px 600px at 50% -10%,var(--bg2),var(--bg));-webkit-user-select:none;user-select:none}
 button{font:inherit;color:inherit;border:0;cursor:pointer}
-input,textarea,select{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:12px;width:100%;font-size:17px;-webkit-user-select:text;user-select:text}
+input,textarea,select{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:2px solid var(--line);border-radius:12px;padding:12px;width:100%;font-size:17px;-webkit-user-select:text;user-select:text}
+textarea{resize:vertical;min-height:70px}
 input:focus,textarea:focus,select:focus{outline:3px solid var(--teal);outline-offset:1px}
-.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;
-  padding:max(14px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom))}
-.screen.on{display:flex;animation:fade .25s}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:max(14px,env(safe-area-inset-top)) 14px calc(var(--navH) + max(14px,env(safe-area-inset-bottom)))}
+.screen.on{display:flex}
+.screen.nonav{padding-bottom:max(16px,env(safe-area-inset-bottom))}
 .wrap{width:100%;max-width:560px;display:flex;flex-direction:column;gap:12px}
 h1,h2,h3{margin:0;line-height:1.15}
+.title{font-size:26px;font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.title small{font-size:14px;color:var(--dim);font-weight:800}
 .logo{font-size:clamp(46px,14vw,74px);font-weight:900;text-align:center;letter-spacing:-1px;margin-top:3vh}
 .logo .f{color:var(--sun)} .logo .p{color:var(--pop);display:inline-block;animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
-.tag{text-align:center;color:var(--dim);margin-top:-4px}
+.tag{text-align:center;color:var(--dim)}
 .big{width:100%;display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border-radius:18px;padding:16px 18px;font-weight:900;font-size:19px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
-.big:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
 .big .ico{font-size:30px;width:40px;text-align:center}
 .big small{display:block;font-weight:700;color:var(--dim);font-size:14px}
-.big.main{background:linear-gradient(135deg,var(--pop),#ff9a5d);color:#fff}
-.big.main small{color:#ffe9f1}
-.btn{width:100%;padding:16px;border-radius:16px;font-weight:900;font-size:18px;background:linear-gradient(135deg,var(--pop),#ff9a5d);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.big.main{background:linear-gradient(135deg,var(--pop),#ff9a5d);color:#fff} .big.main small{color:#ffe9f1}
+.btn{width:100%;padding:15px;border-radius:16px;font-weight:900;font-size:18px;background:linear-gradient(135deg,var(--pop),#ff9a5d);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
 .btn.ghost{background:var(--card);color:var(--ink)}
-.btn.small{padding:10px 14px;font-size:15px;width:auto}
-.btn:active{transform:translateY(3px)}
+.btn.small{padding:9px 14px;font-size:15px;width:auto;box-shadow:none}
+.btn:disabled{opacity:.45}
+.btn:active,.big:active{transform:translateY(2px)}
 .card{background:var(--card);border-radius:18px;padding:14px 16px}
-.card h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
-.dim{color:var(--dim)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.counts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.counts button{background:var(--card);border-radius:16px;padding:18px 0;font-size:28px;font-weight:900}
-.counts button.on{background:var(--pop);color:#fff}
-.seat{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:12px 14px}
-.seat .pc{font-size:32px;width:44px;text-align:center}
-.seat .nm{flex:1;font-weight:900;font-size:18px}
-.seat .nm small{display:block;color:var(--dim);font-weight:700;font-size:13px}
-.seat select{width:auto;max-width:52%;padding:8px}
-.pieces{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.pieces button{font-size:30px;background:rgba(0,0,0,.2);border-radius:12px;padding:8px 0;border:2px solid transparent}
-.pieces button.on{border-color:var(--sun);background:rgba(255,194,61,.18)}
-label.f{display:flex;flex-direction:column;gap:6px;font-weight:800}
+.card h3{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.dim{color:var(--dim)} .small{font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label.f{display:flex;flex-direction:column;gap:6px;font-weight:800;text-align:left}
 label.f small{color:var(--dim);font-weight:700}
-.chk{display:flex;align-items:center;gap:10px;font-weight:800}
-.chk input{width:24px;height:24px}
+.chk{display:flex;align-items:flex-start;gap:10px;font-weight:800;text-align:left}
+.chk input{width:24px;height:24px;flex:none;margin-top:2px}
+.pieces{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.pieces button{font-size:28px;background:rgba(0,0,0,.2);border-radius:12px;padding:8px 0;border:2px solid transparent;position:relative}
+.pieces button.on{border-color:var(--sun);background:rgba(255,194,61,.18)}
+.pieces button.lock{opacity:.35}
+.badge[hidden]{display:none!important}
+.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--pop);color:#fff;font-size:12px;font-weight:900}
 
-/* ---------- board ---------- */
+/* bottom tabs */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:none;background:rgba(28,15,48,.96);border-top:1px solid var(--line);
+  padding:6px 4px max(6px,env(safe-area-inset-bottom));justify-content:space-around;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.nav.on{display:flex}
+.nav button{background:none;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:11px;font-weight:900;color:var(--dim);padding:4px 6px;position:relative;min-width:52px}
+.nav button .i{font-size:22px;line-height:1.1}
+.nav button.on{color:var(--sun)}
+.nav button .badge{position:absolute;top:-2px;right:2px;height:17px;min-width:17px;font-size:11px}
+
+/* feed */
+.compose{display:flex;flex-direction:column;gap:8px}
+.post{background:var(--card);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.post.sys{background:rgba(255,255,255,.06);font-weight:800;color:var(--dim);font-size:15px}
+.who{display:flex;align-items:center;gap:8px;font-weight:900}
+.who .pc{font-size:24px}
+.who small{color:var(--dim);font-weight:700;font-size:12px}
+.post img.ph,.msg img.ph{width:100%;border-radius:14px;max-height:60vh;object-fit:cover;background:rgba(0,0,0,.2)}
+.post .text{white-space:pre-wrap;word-break:break-word;line-height:1.4;-webkit-user-select:text;user-select:text}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.acts button{background:rgba(0,0,0,.22);border-radius:99px;padding:7px 12px;font-weight:900;font-size:14px}
+.acts button.on{background:rgba(255,93,158,.3)}
+.cmts{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.cmts div{background:rgba(0,0,0,.18);border-radius:10px;padding:6px 10px}
+
+/* chat */
+#chat{padding-bottom:0}
+.rooms{display:flex;gap:6px;overflow-x:auto;width:100%;max-width:560px;padding-bottom:6px;flex:none}
+.rooms button{flex:none;background:var(--card);border-radius:99px;padding:8px 12px;font-weight:900;font-size:14px;display:flex;align-items:center;gap:6px}
+.rooms button.on{background:var(--pop);color:#fff}
+.msgs{flex:1;width:100%;max-width:560px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:6px 2px}
+.msg{max-width:82%;align-self:flex-start;display:flex;gap:6px;align-items:flex-end}
+.msg .bub2{background:var(--card);border-radius:16px 16px 16px 4px;padding:8px 12px;-webkit-user-select:text;user-select:text;word-break:break-word;white-space:pre-wrap}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .bub2{background:linear-gradient(135deg,var(--pop),#ff7a8a);border-radius:16px 16px 4px 16px}
+.msg .nm{font-size:11px;color:var(--dim);font-weight:900;margin-bottom:2px}
+.msg .pc{font-size:20px}
+.chatbar{width:100%;max-width:560px;display:flex;gap:6px;align-items:flex-end;padding:8px 0 calc(var(--navH) + max(8px,env(safe-area-inset-bottom)));flex:none}
+.chatbar textarea{min-height:44px;max-height:120px;padding:10px 12px;border-radius:22px}
+.chatbar button{flex:none;width:46px;height:46px;border-radius:50%;background:var(--card);font-size:20px}
+.chatbar button.send{background:var(--pop)}
+.tip{font-size:12px;color:var(--dim);text-align:center;padding:2px 8px}
+
+/* board */
 #game{padding-top:max(8px,env(safe-area-inset-top))}
 .hud{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
 .pill{background:var(--card);border-radius:99px;padding:7px 12px;font-weight:900;font-size:14px}
-.iconbtn{background:var(--card);border-radius:12px;width:40px;height:40px;font-size:18px;display:grid;place-items:center}
-.boardWrap{width:min(96vw,60vh,560px);aspect-ratio:1;position:relative}
+.iconbtn{background:var(--card);border-radius:12px;width:40px;height:40px;font-size:18px;display:grid;place-items:center;position:relative}
+.boardWrap{width:min(96vw,58vh,560px);aspect-ratio:1;position:relative}
 .board{position:absolute;inset:0;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(7,1fr);gap:2px;background:#1c0f30;border-radius:14px;padding:3px}
 .sq{background:var(--sq);color:var(--sqInk);border-radius:6px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;
   font-size:clamp(7px,1.9vw,10.5px);font-weight:900;text-align:center;line-height:1.05;padding:2px;cursor:pointer}
@@ -83,9 +121,9 @@ label.f small{color:var(--dim);font-weight:700}
 .sq.photo{background-size:cover;background-position:center;color:#fff;text-shadow:0 1px 3px #000,0 0 6px #000}
 .sq .own{position:absolute;bottom:2px;right:2px;font-size:clamp(9px,2.6vw,14px)}
 .sq.lit{outline:3px solid var(--sun);outline-offset:-3px;z-index:2}
-.toks{position:absolute;left:1px;bottom:0;display:flex;flex-wrap:wrap;gap:0;font-size:clamp(11px,3.4vw,19px);line-height:1;z-index:3;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.toks{position:absolute;left:1px;bottom:0;display:flex;flex-wrap:wrap;font-size:clamp(11px,3.4vw,19px);line-height:1;z-index:3;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
 .mid{grid-column:2/7;grid-row:2/7;border-radius:10px;background:radial-gradient(circle at 50% 40%,#5a3596,#2b1747);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;text-align:center;position:relative;overflow:hidden}
-.mid .who{font-size:clamp(15px,4.4vw,22px);font-weight:900}
+.mid .whoT{font-size:clamp(15px,4.4vw,22px);font-weight:900}
 .mid .hint{font-size:clamp(12px,3.2vw,15px);color:var(--dim);font-weight:800}
 .bubbles{display:flex;align-items:flex-end;justify-content:center;gap:clamp(8px,3vw,18px);margin:4px 0}
 .bub{border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;cursor:pointer;
@@ -99,181 +137,251 @@ label.f small{color:var(--dim);font-weight:700}
 .players{width:100%;max-width:560px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:8px}
 .pl{background:var(--card);border-radius:12px;padding:6px 8px;display:flex;align-items:center;gap:6px;font-weight:900;font-size:13px;border:2px solid transparent;min-width:0}
 .pl.cur{border-color:var(--sun)}
-.pl .p{font-size:22px}
-.pl .t{min-width:0;flex:1}
+.pl .p{font-size:22px} .pl .t{min-width:0;flex:1}
 .pl .t div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pl .c{color:var(--sun)}
-.pl .fp{font-size:11px;color:var(--teal)}
+.pl .c{color:var(--sun)} .pl .fp{font-size:11px;color:var(--teal)}
 .log{width:100%;max-width:560px;color:var(--dim);font-size:13px;font-weight:700;text-align:center;min-height:18px;margin-top:6px}
+.tapzone{position:relative;width:100%;height:46vh;max-height:340px;background:rgba(0,0,0,.25);border-radius:16px;overflow:hidden}
+.tapzone .tb{position:absolute;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0 12%,rgba(255,93,158,.6) 60%,rgba(255,255,255,.7));border:2px solid #fff;cursor:pointer}
 
-/* ---------- popups ---------- */
+/* popups */
 .modal{position:fixed;inset:0;background:rgba(10,4,20,.72);display:none;place-items:center;z-index:50;padding:14px}
-.modal.on{display:grid;animation:fade .2s}
-.sheet{background:var(--card2);border-radius:22px;padding:18px;width:min(100%,460px);max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.modal.on{display:grid}
+.sheet{background:var(--card2);border-radius:22px;padding:18px;width:min(100%,460px);max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .sheet h2{font-size:24px}
 .cat{display:inline-block;align-self:center;background:rgba(0,0,0,.25);border-radius:99px;padding:5px 12px;font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
 .qtext{font-size:21px;font-weight:900;line-height:1.3}
-.qphoto{max-width:100%;max-height:38vh;border-radius:14px;align-self:center}
+.qphoto{max-width:100%;max-height:36vh;border-radius:14px;align-self:center}
 .ans{display:flex;flex-direction:column;gap:8px}
 .ans button{background:var(--card);border-radius:14px;padding:14px;font-size:18px;font-weight:900;border:3px solid transparent}
 .ans button.right{border-color:var(--good);background:rgba(67,209,122,.25)}
 .ans button.wrong{border-color:var(--bad);background:rgba(255,90,90,.2)}
 .timer{height:8px;background:rgba(0,0,0,.3);border-radius:9px;overflow:hidden}
 .timer i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--pop));width:100%}
-.bigmoji{font-size:64px;line-height:1}
-.money{font-size:30px;font-weight:900;color:var(--sun)}
+.bigmoji{font-size:62px;line-height:1}
+.money{font-size:40px;font-weight:900;color:var(--sun)}
 .sqphoto{width:100%;max-height:30vh;object-fit:cover;border-radius:14px}
-.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%) translateY(140px);background:#000d;padding:12px 16px;border-radius:14px;font-weight:900;z-index:70;transition:transform .3s;max-width:92vw;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(var(--navH) + 16px);transform:translateX(-50%) translateY(200px);background:#000d;padding:12px 16px;border-radius:14px;font-weight:900;z-index:70;transition:transform .3s;max-width:92vw;text-align:center}
 .toast.on{transform:translateX(-50%) translateY(0)}
 .particle{position:fixed;width:9px;height:9px;border-radius:50%;pointer-events:none;z-index:80}
-.hof{display:flex;flex-direction:column;gap:8px}
-.hof .r{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 12px}
-.hof .r .p{font-size:28px}
-.hof .r .n{flex:1;font-weight:900}
-.hof .r .n small{display:block;color:var(--dim);font-weight:700;font-size:13px}
-.hof .r .w{font-weight:900;color:var(--sun);text-align:right}
-.book{display:flex;flex-direction:column;gap:8px}
-.book .e{background:var(--card);border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;text-align:left}
-.book .e img{width:52px;height:52px;object-fit:cover;border-radius:10px}
-.book .e .x{margin-left:auto;background:rgba(0,0,0,.25);border-radius:10px;padding:6px 10px;font-weight:900}
+.list{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 12px;text-align:left}
+.li .p{font-size:28px;flex:none}
+.li .n{flex:1;min-width:0;font-weight:900}
+.li .n small{display:block;color:var(--dim);font-weight:700;font-size:13px}
+.li img{width:52px;height:52px;object-fit:cover;border-radius:10px;flex:none}
+.shelf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.game{background:var(--card);border-radius:18px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:130px}
+.game .gi{font-size:40px}
+.game b{font-size:17px}
+.game small{color:var(--dim);font-weight:700;font-size:13px}
+.game .earn{color:var(--sun);font-weight:900;font-size:13px;margin-top:auto}
+.frame{position:fixed;inset:0;z-index:60;background:#000;display:none;flex-direction:column}
+.frame.on{display:flex}
+.frame .bar{display:flex;align-items:center;gap:10px;padding:max(8px,env(safe-area-inset-top)) 10px 8px;background:var(--bg)}
+.frame .bar b{flex:1}
+.frame iframe{flex:1;border:0;width:100%;background:#000}
+.bankbig{text-align:center;padding:18px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media (prefers-reduced-motion:reduce){.bub,.logo .p{animation:none}}
 </style>
 </head>
 <body>
 
-<!-- HOME -->
-<section class="screen on" id="home"><div class="wrap">
+<!-- WELCOME (no family on this phone yet) -->
+<section class="screen nonav" id="welcome"><div class="wrap">
   <div class="logo"><span class="f">Family</span> <span class="p">Pop</span></div>
-  <div class="tag">The board game all about us. Pick a bubble, know your family, go further.</div>
-  <button class="big main" id="bNew"><span class="ico">🎲</span><div>New game<small>Pass the phone, or play the computer</small></div></button>
-  <button class="big" id="bFamily"><span class="ico">👨‍👩‍👧</span><div>Our family<small>Add people and their trivia</small></div></button>
-  <button class="big" id="bBook"><span class="ico">📖</span><div>Family Book<small>Add memories, photos and questions</small></div></button>
-  <button class="big" id="bHof"><span class="ico">🏆</span><div>Bragging rights<small>Trophies, wins, and who knows the family best</small></div></button>
-  <button class="big" id="bHow"><span class="ico">❓</span><div>How to play</div></button>
+  <div class="tag">Our family's own private place: talk, share pictures, and play the board game all about us.</div>
+  <button class="big main" id="wStart"><span class="ico">🏡</span><div>Start our family<small>You'll get a link to invite everyone</small></div></button>
+  <button class="big" id="wJoin"><span class="ico">✉️</span><div>I got an invite<small>Paste the link or code someone sent you</small></div></button>
+  <button class="big" id="wRelink"><span class="ico">📱</span><div>I'm already in, on another phone<small>Use the code from Family → Me</small></div></button>
 </div></section>
 
-<!-- SETUP -->
-<section class="screen" id="setup"><div class="wrap">
-  <h2 style="text-align:center;margin-top:8px">How many players?</h2>
-  <div class="counts" id="counts"></div>
-  <div id="seats" class="wrap" style="gap:8px"></div>
-  <div class="card"><h3>How long?</h3><div class="row" id="rounds"></div></div>
-  <button class="btn" id="bStart">Start the game</button>
-  <button class="btn ghost" id="bSetupBack">Back</button>
+<!-- WAITING FOR APPROVAL -->
+<section class="screen nonav" id="pending"><div class="wrap" style="text-align:center;margin-top:12vh">
+  <div class="bigmoji">💐</div><h2 id="pendTitle">Almost in!</h2>
+  <div class="dim" id="pendText">Someone in the family needs to say yes first. This page will open by itself when they do.</div>
+  <button class="btn ghost" id="pendCheck">Check again</button>
+</div></section>
+
+<!-- HOME FEED -->
+<section class="screen" id="home"><div class="wrap">
+  <div class="title"><span id="famName">Our Family</span><small id="onlineDot"></small></div>
+  <div class="card compose">
+    <textarea id="postText" placeholder="Share something with the family…" maxlength="2000"></textarea>
+    <img id="postPrev" class="sqphoto" hidden alt="">
+    <div class="row"><button class="btn small ghost" id="postPhoto">📷 Photo</button><span style="flex:1"></span><button class="btn small" id="postGo">Post</button></div>
+  </div>
+  <div id="feed" class="list"></div>
+</div></section>
+
+<!-- CHAT -->
+<section class="screen" id="chat">
+  <div class="rooms" id="rooms"></div>
+  <div class="tip" id="chatTip"></div>
+  <div class="msgs" id="msgs"></div>
+  <div class="chatbar"><button id="chatPhoto" aria-label="Send a photo">📷</button><textarea id="chatText" rows="1" placeholder="Message" maxlength="1000"></textarea><button class="send" id="chatSend" aria-label="Send">➤</button></div>
+</section>
+
+<!-- PLAY -->
+<section class="screen" id="play"><div class="wrap">
+  <div class="title">🎲 Family Pop</div>
+  <button class="big main" id="pNew"><span class="ico">🫧</span><div>New game<small>On everyone's phones, or pass this phone around</small></div></button>
+  <div class="card"><h3>Your games</h3><div class="list" id="gameList"></div></div>
+  <button class="big" id="pHow"><span class="ico">❓</span><div>How to play</div></button>
+</div></section>
+
+<!-- GAMES SHELF -->
+<section class="screen" id="games"><div class="wrap">
+  <div class="title">🕹️ Games <small>Every game pays Pop Bucks</small></div>
+  <div class="shelf" id="shelf"></div>
+  <div class="dim small" style="text-align:center">Pop Bucks from games go straight into your family bank, up to a daily limit per game.</div>
+</div></section>
+
+<!-- BANK -->
+<section class="screen" id="bank"><div class="wrap">
+  <div class="title">🏦 Family Bank</div>
+  <div class="card bankbig"><div class="dim">Your Pop Bucks</div><div class="money" id="myBucks">0</div><div id="myPasses" class="dim"></div></div>
+  <div class="split"><button class="btn" id="bGive">🎁 Give</button><button class="btn ghost" id="bPic">📸 My picture square</button></div>
+  <div class="card"><h3>Spend Pop Bucks</h3><div class="list" id="shop"></div></div>
+  <div class="card"><h3>Everybody's accounts</h3><div class="list" id="accounts"></div></div>
+  <div class="card"><h3>🏆 Bragging rights</h3><div class="list" id="brag"></div></div>
 </div></section>
 
 <!-- FAMILY -->
 <section class="screen" id="family"><div class="wrap">
-  <h2 style="text-align:center;margin-top:8px">Our family</h2>
-  <div class="dim" style="text-align:center">Everyone here can be picked as a player, and their answers become trivia questions.</div>
-  <div id="famList" class="wrap" style="gap:8px"></div>
-  <button class="btn" id="bAddPerson">+ Add a person</button>
-  <button class="btn ghost" id="bFamBack">Back</button>
+  <div class="title">👨‍👩‍👧 Family</div>
+  <div id="pendingBox"></div>
+  <button class="btn" id="fInvite">✉️ Invite someone</button>
+  <div class="card"><h3>Everyone</h3><div class="list" id="memberList"></div></div>
+  <div class="card"><h3>📖 Family Book</h3><div class="dim small" style="margin-bottom:8px">Memories and photos that turn into game questions.</div><button class="btn small" id="fAddMem">+ Add a memory</button><div class="list" id="bookList" style="margin-top:10px"></div></div>
+  <div class="card"><h3>Me</h3><div class="list"><button class="li" id="fEditMe"><span class="p" id="mePiece">🫧</span><span class="n" id="meName">Me<small>Edit my piece and trivia answers</small></span>›</button>
+    <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
+  <div class="card" id="adminCard"><h3>Family settings</h3><label class="chk"><input type="checkbox" id="setApproval"> <span>New people need a yes first<br><small class="dim">From someone marked as an approver below</small></span></label>
+    <button class="btn small ghost" id="fNewCode" style="margin-top:10px">Make a new invite link (old ones stop working)</button></div>
 </div></section>
 
-<!-- BOOK -->
-<section class="screen" id="bookScr"><div class="wrap">
-  <h2 style="text-align:center;margin-top:8px">📖 Family Book</h2>
-  <div class="dim" style="text-align:center">Every memory you add here becomes a question in the game.</div>
-  <button class="btn" id="bAddMem">+ Add a memory or question</button>
-  <div class="book" id="bookList"></div>
-  <button class="btn ghost" id="bBookBack">Back</button>
-</div></section>
-
-<!-- HALL OF FAME -->
-<section class="screen" id="hofScr"><div class="wrap">
-  <h2 style="text-align:center;margin-top:8px">🏆 Bragging rights</h2>
-  <div class="hof" id="hofList"></div>
-  <div class="card"><h3>Pictures on the board</h3><div id="hofPics" class="dim">Win a game and your picture goes on a square.</div></div>
-  <button class="btn ghost" id="bHofBack">Back</button>
-</div></section>
-
-<!-- GAME -->
-<section class="screen" id="game">
+<!-- BOARD GAME -->
+<section class="screen nonav" id="game">
   <div class="hud">
-    <button class="iconbtn" id="bQuit" aria-label="Menu">☰</button>
-    <div class="pill" id="roundPill">Round 1 of 12</div>
-    <div class="pill" id="potPill">🥧 Pie Pot 0</div>
+    <button class="iconbtn" id="gMenu" aria-label="Menu">☰</button>
+    <div class="pill" id="roundPill">Round 1</div>
+    <div class="pill" id="potPill">🥧 0</div>
+    <button class="iconbtn" id="gChat" aria-label="Chat">💬<span class="badge" id="gChatBadge" style="position:absolute;top:-4px;right:-4px;display:none">!</span></button>
   </div>
   <div class="boardWrap"><div class="board" id="board"></div></div>
   <div class="players" id="players"></div>
   <div class="log" id="log"></div>
 </section>
 
+<nav class="nav" id="nav">
+  <button data-t="home" class="on"><span class="i">🏠</span>Home<span class="badge" id="nbHome" hidden></span></button>
+  <button data-t="chat"><span class="i">💬</span>Chat<span class="badge" id="nbChat" hidden></span></button>
+  <button data-t="play"><span class="i">🎲</span>Play<span class="badge" id="nbPlay" hidden></span></button>
+  <button data-t="games"><span class="i">🕹️</span>Games</button>
+  <button data-t="bank"><span class="i">🏦</span>Bank</button>
+  <button data-t="family"><span class="i">👨‍👩‍👧</span>Family<span class="badge" id="nbFam" hidden></span></button>
+</nav>
+
+<div class="frame" id="frame"><div class="bar"><button class="btn small ghost" id="frameClose">✕ Back to Family Pop</button><b id="frameTitle"></b><span class="pill" id="frameEarn">🫧 +0</span></div><iframe id="frameIf" title="Game" allow="autoplay; fullscreen"></iframe></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 (()=>{
 "use strict";
+const API="https://family-pop.henryai.workers.dev/api";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const ls={get(k,d){try{const v=localStorage.getItem("fp2_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("fp2_"+k,JSON.stringify(v))}catch(e){}}};
+const ago=ts=>{const s=(Date.now()-ts)/1000;if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+"m ago";if(s<86400)return Math.floor(s/3600)+"h ago";return new Date(ts).toLocaleDateString(undefined,{month:"short",day:"numeric"})};
 
-/* ================= saved data (on this device) ================= */
-const store={get(k,d){try{const v=localStorage.getItem("fp_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-  set(k,v){try{localStorage.setItem("fp_"+k,JSON.stringify(v));return true}catch(e){toast("This phone is out of room for pictures. Try a smaller photo.");return false}}};
-let PEOPLE=store.get("people",[]);      // {id,name,piece,mom,birthday,nick,food,secret}
-let BOOK=store.get("book",[]);          // {id,cat,q,a,wrong:[],photo,by}
-let SQPICS=store.get("sqpics",{});      // {squareIndex:{photo,caption,name,by,date}}
-let STATS=store.get("stats",{});        // {personId:{games,wins,right,asked,banked,trophies:[]}}
-const saveAll=()=>{store.set("people",PEOPLE);store.set("book",BOOK);store.set("sqpics",SQPICS);store.set("stats",STATS)};
-const uid=()=>Math.random().toString(36).slice(2,9);
+/* ================= session + server ================= */
+let SES=ls.get("session",null);   // {fid,memberId,token}
+let S=null;                        // latest family snapshot
+async function api(path,body){
+  const r=await fetch(API+path,{method:body?"POST":"GET",headers:Object.assign({"content-type":"application/json"},SES?{"x-fp-token":SES.token}:{}),body:body?JSON.stringify(body):undefined});
+  let d={};try{d=await r.json()}catch(e){}
+  if(!r.ok){const err=new Error(d.error||"Something went wrong. Check your internet.");err.status=r.status;throw err}
+  return d;
+}
+const act=(action,extra)=>api(`/f/${SES.fid}/do`,Object.assign({action},extra||{}));
+const photoURL=id=>id?`${API}/f/${SES.fid}/photo/${id}?t=${SES.token}`:"";
+const meId=()=>SES&&SES.memberId;
+const mem=id=>S&&S.members.find(m=>m.id===id);
+let refreshT=null;
+async function refresh(){
+  try{const d=await api(`/f/${SES.fid}/me`);S=d;ls.set("cache",d);
+    if(d.pending){showScreen("pending");$("#pendTitle").textContent=`Almost in, ${d.me.name}!`;return}
+    renderAll();
+  }catch(e){if(e.status===401){toast("This phone isn't in the family anymore");ls.set("session",null);SES=null;showScreen("welcome")}else if(!S)toast(e.message)}
+}
+const refreshSoon=()=>{clearTimeout(refreshT);refreshT=setTimeout(refresh,250)};
+let WS=null,wsTries=0;
+function connect(){
+  if(!SES)return;try{WS&&WS.close()}catch(e){}
+  WS=new WebSocket(API.replace("https","wss")+`/f/${SES.fid}/ws?t=${SES.token}`);
+  WS.onopen=()=>{wsTries=0;$("#onlineDot").textContent="● live"};
+  WS.onclose=()=>{$("#onlineDot").textContent="";setTimeout(connect,Math.min(30000,1000*2**(wsTries++)))};
+  WS.onmessage=e=>{if(e.data==="pong")return;let m;try{m=JSON.parse(e.data)}catch(x){return}
+    if(m.type==="chat"&&S){S.chat.push(m.data);renderChat(true);if(GAME&&$("#game").classList.contains("on")&&m.data.from!==meId())$("#gChatBadge").style.display="";if(m.data.from!==meId())buzz(10)}
+    else if(m.type==="game"){onGameEvent(m.data);refreshSoon()}
+    else if(m.type==="pending"){toast(`${m.data.piece} ${esc(m.data.name)} wants to join. Check Family.`);refreshSoon()}
+    else refreshSoon()};
+}
+setInterval(()=>{try{WS&&WS.readyState===1&&WS.send("ping")}catch(e){}},25000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&SES){refresh();if(!WS||WS.readyState>1)connect()}});
+
+/* ================= little helpers ================= */
+let AC;function tone(f,d=.08,type="sine",v=.12,when=0){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();
+  const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+when;o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);
+  g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+const sfx={pop:()=>{tone(900,.12,"sine",.3);for(let i=0;i<8;i++)tone(900+Math.random()*1400,.03,"square",.04,.08+Math.random()*.25)},step:i=>tone(420+i*30,.05,"triangle",.07),
+  right:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.14,"triangle",.12,i*.07)),wrong:()=>tone(170,.22,"sawtooth",.06),cash:()=>[1046,1318].forEach((f,i)=>tone(f,.1,"triangle",.1,i*.06)),
+  pay:()=>[392,330].forEach((f,i)=>tone(f,.12,"triangle",.08,i*.08)),fan:()=>[523,659,784,1046,784,1046,1318].forEach((f,i)=>tone(f,.2,"triangle",.12,i*.09))};
+const TAURI=window.__TAURI__&&window.__TAURI__.core;
+function buzz(n){if(TAURI){TAURI.invoke("plugin:haptics|impact_feedback",{style:n>40?"heavy":n>20?"medium":"light"}).catch(()=>{});return}if(navigator.vibrate)try{navigator.vibrate(n)}catch(e){}}
+function burst(x,y,n=24){const c=["#ffc23d","#ff5d9e","#3fd6c6","#ffffff","#8f6bff"];for(let i=0;i<n;i++){const p=document.createElement("div");p.className="particle";p.style.left=x+"px";p.style.top=y+"px";p.style.background=c[i%c.length];document.body.appendChild(p);const a=Math.random()*6.28,d=50+Math.random()*120;
+  p.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+50}px)`,opacity:0}],{duration:700+Math.random()*400,easing:"cubic-bezier(.2,.8,.4,1)"}).onfinish=()=>p.remove()}}
+let toastT;function toast(m){const t=$("#toast");t.innerHTML=m;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2800)}
+function sheet(html){$("#sheet").innerHTML=html;$("#modal").classList.add("on");$("#sheet").scrollTop=0}
+function closeSheet(){$("#modal").classList.remove("on")}
+function ask(html,buttons){return new Promise(res=>{sheet(html+'<div class="ans" id="askBtns"></div>');const box=$("#askBtns");
+  buttons.forEach(([label,val,cls])=>{const b=document.createElement("button");b.innerHTML=label;if(cls)b.className=cls;b.onclick=()=>{closeSheet();res(val)};box.appendChild(b)})})}
+function pickPhoto(max=900){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept="image/*";
+  i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return res(null);const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{
+    const s=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.78))};img.onerror=()=>res(null);img.src=r.result};r.readAsDataURL(f)};i.click()})}
+async function busy(btn,fn){if(btn)btn.disabled=true;try{return await fn()}catch(e){toast(esc(e.message))}finally{if(btn)btn.disabled=false}}
+function copyText(t){try{navigator.clipboard.writeText(t).then(()=>toast("Copied"),()=>prompt("Copy this:",t))}catch(e){prompt("Copy this:",t)}}
+async function shareOut(text,photoId){ // send a family moment out to Facebook, groups, texts… through the phone's share menu
+  try{const data={text};
+    if(photoId&&navigator.canShare){const blob=await (await fetch(photoURL(photoId))).blob();const file=new File([blob],"family-pop.jpg",{type:blob.type||"image/jpeg"});if(navigator.canShare({files:[file]}))data.files=[file]}
+    if(navigator.share){await navigator.share(data);return}
+  }catch(e){if(e.name==="AbortError")return}
+  copyText(text);toast("Copied. Paste it into Facebook or a text")}
 
 /* ================= the world ================= */
-const PIECES=["🧁","🐢","🏎️","🚜","🫧","🐉","🌹","🦋","🐈","🐕","☕","🎸","⭐","🌻","🦄","🏈","🎣","👑"];
-const BOTS=[
-  {id:"bot1",name:"Granny Bot",piece:"👵",acc:.55,brave:.15,buy:.7,say:"sweet and steady"},
-  {id:"bot2",name:"Uncle Ace",piece:"🤠",acc:.72,brave:.45,buy:.85,say:"knows a thing or two"},
-  {id:"bot3",name:"Shark",piece:"🦈",acc:.86,brave:.8,buy:.95,say:"plays to win"}];
+const BASIC_PIECES=["🧁","🐢","🏎️","🚜","🫧","🐉","🌹","🦋","🐈","🐕","☕","🎸"];
+const SHOP_PIECES=["🦄","👑","🎣","🏈","🌻","⭐","🦅","🐴","🚀","🍀","🎂","🦖"];
+const BOTS=[{id:"bot1",name:"Granny Bot",piece:"👵",acc:.55,brave:.15,buy:.7},{id:"bot2",name:"Uncle Ace",piece:"🤠",acc:.72,brave:.45,buy:.85},{id:"bot3",name:"Shark",piece:"🦈",acc:.86,brave:.8,buy:.95}];
 const CATS=["Way Back When","Favorites","Who's in the Picture?","Then & Now"];
-const GROUPS={townA:{name:"Around Town",color:"var(--gTownA)"},famA:{name:"Family Places",color:"var(--gFamA)"},
-  townB:{name:"Downtown",color:"var(--gTownB)"},famB:{name:"Family Places",color:"var(--gFamB)"},home:{name:"Homes",color:"var(--gHome)"}};
-// 24 squares, clockwise from GO in the bottom-right corner. Mom asked for "a mix of all of these".
-const BASE=[
- {t:"go",name:"GO",ic:"🫧"},
- {t:"home",slot:0,name:"House",ic:"🏡",g:"home",price:150},
- {t:"prop",name:"The Diner",ic:"🍔",g:"townA",price:100},
- {t:"fine",name:"Oops!",ic:"😬"},
- {t:"prop",name:"The Park",ic:"🌳",g:"townA",price:100},
- {t:"prop",name:"Ball Field",ic:"⚾",g:"townA",price:120},
- {t:"timeout",name:"Time Out",ic:"⏳"},
- {t:"prop",name:"Mom's Kitchen",ic:"🍳",g:"famA",price:140},
- {t:"lucky",name:"Lucky Bubble",ic:"🍀"},
- {t:"prop",name:"Grandma's Porch",ic:"🪑",g:"famA",price:140},
- {t:"prop",name:"The Back Yard",ic:"🌻",g:"famA",price:160},
- {t:"home",slot:1,name:"House",ic:"🏡",g:"home",price:150},
- {t:"pot",name:"Pie Pot",ic:"🥧"},
- {t:"prop",name:"Church",ic:"⛪",g:"townB",price:180},
- {t:"fine",name:"Oops!",ic:"😬"},
- {t:"prop",name:"The Lake",ic:"🛶",g:"townB",price:180},
- {t:"prop",name:"The Store",ic:"🛒",g:"townB",price:200},
- {t:"home",slot:2,name:"House",ic:"🏡",g:"home",price:150},
- {t:"gotimeout",name:"Go to Time Out",ic:"👉"},
- {t:"prop",name:"Race Track",ic:"🏁",g:"famB",price:220},
- {t:"lucky",name:"Lucky Bubble",ic:"🍀"},
- {t:"prop",name:"The Old House",ic:"🏚️",g:"famB",price:240},
- {t:"fine",name:"Oops!",ic:"😬"},
- {t:"home",slot:3,name:"House",ic:"🏡",g:"home",price:150}];
-const cellOf=i=>i<=6?[6,6-i]:i<=11?[6-(i-6),0]:i<=18?[0,i-12]:[i-18,6];   // [row,col]
-// Mom's four fines
-const FINES=[
- {k:"call",text:"Forgot to call your mom",sub:"Pay 50 Pop Bucks",amt:50},
- {k:"dish",text:"Left the dishes in the sink",sub:"Pay 25 into the Pie Pot",amt:25},
- {k:"thank",text:"Didn't say thank you",sub:"Pay 20 to the person before you",amt:20},
- {k:"pie",text:"Ate the last piece of pie",sub:"Pay 10 to everyone else",amt:10}];
-const LUCKY=[
- {text:"Grandma slipped you some cash",cash:100},
- {text:"You found money in the couch cushions",cash:30},
- {text:"FREE PASS! Keep it to skip a fine or get out of Time Out",pass:1},
- {text:"It's your birthday! Everyone gives you 10",bday:10},
- {text:"Bake sale. Put 30 in the Pie Pot",cash:-30,toPot:true},
- {text:"You fixed the neighbor's mower. Collect 50",cash:50},
- {text:"Ride with family. Move ahead 3 spaces",move:3},
- {text:"FREE PASS! Somebody owed you one",pass:1}];
-// Starter questions so the game works on day one (family questions take over as people add them)
+const GROUPS={townA:{name:"Around Town",color:"var(--gTownA)"},famA:{name:"Family Places",color:"var(--gFamA)"},townB:{name:"Downtown",color:"var(--gTownB)"},famB:{name:"Family Places",color:"var(--gFamB)"},home:{name:"Homes",color:"var(--gHome)"}};
+const BASE=[{t:"go",name:"GO",ic:"🫧"},{t:"home",slot:0,name:"House",ic:"🏡",g:"home",price:150},{t:"prop",name:"The Diner",ic:"🍔",g:"townA",price:100},{t:"fine",name:"Oops!",ic:"😬"},
+ {t:"prop",name:"The Park",ic:"🌳",g:"townA",price:100},{t:"prop",name:"Ball Field",ic:"⚾",g:"townA",price:120},{t:"timeout",name:"Time Out",ic:"⏳"},{t:"prop",name:"Mom's Kitchen",ic:"🍳",g:"famA",price:140},
+ {t:"lucky",name:"Lucky Bubble",ic:"🍀"},{t:"prop",name:"Grandma's Porch",ic:"🪑",g:"famA",price:140},{t:"prop",name:"The Back Yard",ic:"🌻",g:"famA",price:160},{t:"home",slot:1,name:"House",ic:"🏡",g:"home",price:150},
+ {t:"pot",name:"Pie Pot",ic:"🥧"},{t:"prop",name:"Church",ic:"⛪",g:"townB",price:180},{t:"fine",name:"Oops!",ic:"😬"},{t:"prop",name:"The Lake",ic:"🛶",g:"townB",price:180},{t:"prop",name:"The Store",ic:"🛒",g:"townB",price:200},
+ {t:"home",slot:2,name:"House",ic:"🏡",g:"home",price:150},{t:"gotimeout",name:"Go to Time Out",ic:"👉"},{t:"prop",name:"Race Track",ic:"🏁",g:"famB",price:220},{t:"challenge",name:"Challenge!",ic:"⚡"},
+ {t:"prop",name:"The Old House",ic:"🏚️",g:"famB",price:240},{t:"fine",name:"Oops!",ic:"😬"},{t:"home",slot:3,name:"House",ic:"🏡",g:"home",price:150}];
+const cellOf=i=>i<=6?[6,6-i]:i<=11?[6-(i-6),0]:i<=18?[0,i-12]:[i-18,6];
+const FINES=[{k:"call",text:"Forgot to call your mom",sub:"Pay 50 Pop Bucks to Mom",amt:50},{k:"dish",text:"Left the dishes in the sink",sub:"Pay 25 into the Pie Pot",amt:25},
+ {k:"thank",text:"Didn't say thank you",sub:"Pay 20 to the person before you",amt:20},{k:"pie",text:"Ate the last piece of pie",sub:"Pay 10 to everyone else",amt:10}];
+const LUCKY=[{text:"Grandma slipped you some cash",cash:100},{text:"You found money in the couch cushions",cash:30},{text:"FREE PASS! It goes in your bank to keep",pass:1},
+ {text:"It's your birthday! Everyone gives you 10",bday:10},{text:"Bake sale. Put 30 in the Pie Pot",cash:-30,toPot:true},{text:"You fixed the neighbor's mower. Collect 50",cash:50},
+ {text:"Ride with family. Move ahead 3 spaces",move:3},{text:"FREE PASS! Somebody owed you one",pass:1}];
 const STARTER=[
  {cat:"Way Back When",q:"What year did people first walk on the moon?",a:"1969",w:["1965","1972","1975"]},
  {cat:"Way Back When",q:"Which toy had parents fighting in store aisles in 1983?",a:"Cabbage Patch Kids",w:["Furby","Beanie Babies","Tickle Me Elmo"]},
@@ -299,356 +407,508 @@ const STARTER=[
  {cat:"Favorites",q:"What's the most popular ice cream flavor in America?",a:"Vanilla",w:["Rocky road","Mint chip","Strawberry"]}];
 const FOODS=["Fried chicken","Spaghetti","Pizza","Tacos","Meatloaf","Chicken and dumplings","Cheeseburgers","Catfish","Pot roast","Enchiladas","Lasagna","BBQ ribs"];
 const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const GAMES=[
+ {id:"word-popper",name:"Word Popper",icon:"🫧",desc:"Pop the bubble, chain the letters into words.",url:"../word-popper/",earn:"1 Pop Buck per point · up to 300 a day"},
+ {id:"pic-pop",name:"PIC POP",icon:"🖼️",desc:"Guess the word from the pictures.",url:"games/pic-pop/",earn:"25 a puzzle, combo bonuses, +100 every 10 · up to 600 a day"},
+ {id:"story",sub:"woods",name:"The Whispering Woods",icon:"🌲",desc:"A gentle story adventure in the woods.",url:"games/whispering-woods/",earn:"60 a day for playing"},
+ {id:"story",sub:"signal",name:"The Last Signal",icon:"📡",desc:"Answer the call from deep space.",url:"games/last-signal/",earn:"60 a day for playing"},
+ {id:"story",sub:"gate",name:"The Hollow Gate",icon:"🗝️",desc:"A dark-fantasy adventure. Free for family.",url:"games/hollow-gate/",earn:"60 a day for playing"}];
 
-/* ================= sound + feel ================= */
-let AC;
-function tone(f,d=.08,type="sine",v=.12,when=0){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();
-  const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+when;o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);
-  g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
-const sfx={pop:()=>{tone(900,.12,"sine",.3);for(let i=0;i<8;i++)tone(900+Math.random()*1400,.03,"square",.04,.08+Math.random()*.25)},
-  step:i=>tone(420+i*30,.05,"triangle",.07),right:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.14,"triangle",.12,i*.07)),
-  wrong:()=>tone(170,.22,"sawtooth",.06),cash:()=>[1046,1318].forEach((f,i)=>tone(f,.1,"triangle",.1,i*.06)),
-  pay:()=>[392,330].forEach((f,i)=>tone(f,.12,"triangle",.08,i*.08)),fan:()=>[523,659,784,1046,784,1046,1318].forEach((f,i)=>tone(f,.2,"triangle",.12,i*.09))};
-const TAURI=window.__TAURI__&&window.__TAURI__.core;
-function buzz(n){if(TAURI){TAURI.invoke("plugin:haptics|impact_feedback",{style:n>40?"heavy":n>20?"medium":"light"}).catch(()=>{});return}
-  if(navigator.vibrate)try{navigator.vibrate(n)}catch(e){}}
-function burst(x,y,n=24){const c=["#ffc23d","#ff5d9e","#3fd6c6","#ffffff","#8f6bff"];for(let i=0;i<n;i++){const p=document.createElement("div");p.className="particle";
-  p.style.left=x+"px";p.style.top=y+"px";p.style.background=c[i%c.length];document.body.appendChild(p);const a=Math.random()*6.28,d=50+Math.random()*120;
-  p.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+50}px)`,opacity:0}],{duration:700+Math.random()*400,easing:"cubic-bezier(.2,.8,.4,1)"}).onfinish=()=>p.remove()}}
-let toastT;function toast(m){const t=$("#toast");t.innerHTML=m;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2600)}
-function show(id){$$(".screen").forEach(s=>s.classList.toggle("on",s.id===id))}
-function sheet(html){$("#sheet").innerHTML=html;$("#modal").classList.add("on");$("#sheet").scrollTop=0}
-function closeSheet(){$("#modal").classList.remove("on")}
-function ask(html,buttons){return new Promise(res=>{sheet(html+'<div class="ans" id="askBtns"></div>');const box=$("#askBtns");
-  buttons.forEach(([label,val,cls])=>{const b=document.createElement("button");b.innerHTML=label;if(cls)b.className=cls;b.onclick=()=>{closeSheet();res(val)};box.appendChild(b)})})}
-
-/* ================= photos: shrink so they fit on the phone ================= */
-function pickPhoto(){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept="image/*";
-  i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return res(null);const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{
-    const m=520,s=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
-    c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.72))};img.onerror=()=>res(null);img.src=r.result};r.readAsDataURL(f)};i.click()})}
-
-/* ================= people ================= */
-function personForm(p,onDone){
-  p=p||{id:uid(),name:"",piece:PIECES[0],mom:false,birthday:"",nick:"",food:"",secret:""};
-  sheet(`<h2>${p.name?"Edit "+esc(p.name):"Add a person"}</h2>
-   <label class="f">Name<input id="pfName" value="${esc(p.name)}" placeholder="Like Mom, Kelsey, or Andrew" maxlength="18"></label>
-   <div style="text-align:left;font-weight:800">Game piece</div><div class="pieces" id="pfPieces">${PIECES.map(x=>`<button type="button" class="${x===p.piece?"on":""}" data-p="${x}">${x}</button>`).join("")}</div>
-   <div class="dim" style="text-align:left;font-weight:800">Quick trivia about this person. One short answer each, skip any.</div>
-   <label class="f">Birthday<small>Like June 10</small><input id="pfBday" value="${esc(p.birthday)}" placeholder="June 10"></label>
-   <label class="f">Nickname<input id="pfNick" value="${esc(p.nick)}" placeholder="What do people call them?"></label>
-   <label class="f">Favorite food<input id="pfFood" value="${esc(p.food)}" placeholder="Like chicken and dumplings"></label>
-   <label class="f">Something nobody knows about you<input id="pfSecret" value="${esc(p.secret)}" placeholder="A fun surprise fact"></label>
-   <label class="chk"><input type="checkbox" id="pfMom" ${p.mom?"checked":""}> This is Mom <span class="dim" style="font-weight:700">(she gets paid when someone forgets to call her)</span></label>
-   <button class="btn" id="pfSave">Save</button>
-   ${PEOPLE.some(x=>x.id===p.id)?'<button class="btn ghost" id="pfDel">Remove this person</button>':""}
-   <button class="btn ghost" id="pfCancel">Cancel</button>`);
-  let piece=p.piece;
-  $$("#pfPieces button").forEach(b=>b.onclick=()=>{piece=b.dataset.p;$$("#pfPieces button").forEach(x=>x.classList.toggle("on",x===b))});
-  $("#pfSave").onclick=()=>{const name=$("#pfName").value.trim();if(!name){toast("Please type a name");return}
-    Object.assign(p,{name,piece,mom:$("#pfMom").checked,birthday:$("#pfBday").value.trim(),nick:$("#pfNick").value.trim(),food:$("#pfFood").value.trim(),secret:$("#pfSecret").value.trim()});
-    if(p.mom)PEOPLE.forEach(x=>{if(x.id!==p.id)x.mom=false});
-    const i=PEOPLE.findIndex(x=>x.id===p.id);if(i>-1)PEOPLE[i]=p;else PEOPLE.push(p);saveAll();closeSheet();onDone&&onDone(p)};
-  if($("#pfDel"))$("#pfDel").onclick=()=>{PEOPLE=PEOPLE.filter(x=>x.id!==p.id);saveAll();closeSheet();onDone&&onDone(null)};
-  $("#pfCancel").onclick=()=>{closeSheet();onDone&&onDone(undefined)};
+/* ================= navigation ================= */
+let TAB="home";
+function showScreen(id){$$(".screen").forEach(s=>s.classList.toggle("on",s.id===id));$("#nav").classList.toggle("on",["home","chat","play","games","bank","family"].includes(id))}
+function tab(t){TAB=t;$$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));showScreen(t);
+  if(t==="chat"){renderChat();setTimeout(()=>{const m=$("#msgs");m.scrollTop=m.scrollHeight},30)} if(t==="home")renderFeed(); if(t==="bank")renderBank(); if(t==="family")renderFamily(); if(t==="play")renderPlay(); if(t==="games")renderShelf()}
+$$("#nav button").forEach(b=>b.onclick=()=>tab(b.dataset.t));
+function renderAll(){if(!S||S.pending)return;$("#famName").textContent=S.meta.name;
+  if(!["home","chat","play","games","bank","family","game"].some(id=>$("#"+id).classList.contains("on")))tab(TAB);
+  renderFeed();renderChat();renderPlay();renderBank();renderFamily();badges()}
+function badges(){
+  const seen=ls.get("seen",{});const unread=r=>S.chat.filter(c=>c.room===r&&c.from!==meId()&&c.ts>(seen[r]||0)).length;
+  const rooms=["all"].concat(S.members.filter(m=>m.id!==meId()&&m.status==="member").map(m=>[meId(),m.id].sort().join("~")));
+  const n=rooms.reduce((a,r)=>a+unread(r),0);const nb=$("#nbChat");nb.hidden=!n;nb.textContent=n;
+  const myTurn=S.games.filter(g=>g.status==="playing"&&g.turnMember===meId()).length;$("#nbPlay").hidden=!myTurn;$("#nbPlay").textContent=myTurn;
+  const pend=S.members.filter(m=>m.status==="pending").length;$("#nbFam").hidden=!pend;$("#nbFam").textContent=pend;
 }
-function renderFamily(){
-  $("#famList").innerHTML=PEOPLE.length?PEOPLE.map(p=>`<div class="seat"><div class="pc">${p.piece}</div><div class="nm">${esc(p.name)}${p.mom?" 💐":""}<small>${[p.birthday&&"🎂 "+esc(p.birthday),p.food&&"🍽️ "+esc(p.food)].filter(Boolean).join(" · ")||"No trivia yet"}</small></div><button class="btn small ghost" data-e="${p.id}">Edit</button></div>`).join("")
-    :'<div class="card dim" style="text-align:center">Nobody yet. Add yourself first!</div>';
-  $$("#famList [data-e]").forEach(b=>b.onclick=()=>personForm(PEOPLE.find(x=>x.id===b.dataset.e),renderFamily));
-}
-$("#bFamily").onclick=()=>{renderFamily();show("family")};
-$("#bAddPerson").onclick=()=>personForm(null,renderFamily);
-$("#bFamBack").onclick=()=>show("home");
 
-/* ================= Family Book ================= */
-function renderBook(){
-  $("#bookList").innerHTML=BOOK.length?BOOK.slice().reverse().map(e=>`<div class="e">${e.photo?`<img src="${e.photo}" alt="">`:'<div style="font-size:30px">💬</div>'}<div><div style="font-weight:900">${esc(e.q||"Who's in the picture?")}</div><div class="dim" style="font-size:14px">${esc(e.cat)} · ${esc(e.a)}</div></div><button class="x" data-d="${e.id}">✕</button></div>`).join("")
-    :'<div class="card dim" style="text-align:center">No memories yet. Add a photo of someone and the game will ask "Who\'s in the picture?"</div>';
-  $$("#bookList [data-d]").forEach(b=>b.onclick=()=>{BOOK=BOOK.filter(x=>x.id!==b.dataset.d);saveAll();renderBook()});
+/* ================= welcome / join ================= */
+function profileFields(p,opts={}){
+  p=p||{};const owned=BASIC_PIECES.concat(p.pieces||[]);
+  return `<label class="f">Your name<input id="pfName" value="${esc(p.name||"")}" placeholder="Like Mom, Kelsey, or Andrew" maxlength="18"></label>
+   <div style="text-align:left;font-weight:800">Pick your game piece</div>
+   <div class="pieces" id="pfPieces">${owned.concat(SHOP_PIECES.filter(x=>!owned.includes(x))).map(x=>`<button type="button" class="${x===(p.piece||"🧁")?"on":""} ${owned.includes(x)?"":"lock"}" data-p="${x}" ${owned.includes(x)?"":'title="Buy it in the Bank"'}>${x}</button>`).join("")}</div>
+   <div class="dim" style="text-align:left;font-weight:800">Quick trivia for the game. One short answer each. Skip any.</div>
+   <label class="f">Birthday<small>Like June 10</small><input id="pfBday" value="${esc(p.birthday||"")}" placeholder="June 10"></label>
+   <label class="f">Nickname<input id="pfNick" value="${esc(p.nick||"")}" placeholder="What do people call you?"></label>
+   <label class="f">Favorite food<input id="pfFood" value="${esc(p.food||"")}" placeholder="Like chicken and dumplings"></label>
+   <label class="f">Something nobody knows about you<input id="pfSecret" value="${esc(p.secret||"")}" placeholder="A fun surprise fact"></label>
+   <label class="chk"><input type="checkbox" id="pfChat" ${p.chatTrivia===false?"":"checked"}> <span>Things I say in the family chat can become "Who said this?" questions<br><small class="dim">You can change this anytime</small></span></label>`;
 }
-function memoryForm(){
+function readProfile(){let piece=($(".pieces button.on")||{}).dataset;piece=piece?piece.p:"🧁";
+  return {name:$("#pfName").value.trim(),piece,birthday:$("#pfBday").value.trim(),nick:$("#pfNick").value.trim(),food:$("#pfFood").value.trim(),secret:$("#pfSecret").value.trim(),chatTrivia:$("#pfChat").checked}}
+function wirePieces(){$$("#pfPieces button").forEach(b=>b.onclick=()=>{if(b.classList.contains("lock")){toast("Buy that piece in the Bank 🏦");return}$$("#pfPieces button").forEach(x=>x.classList.toggle("on",x===b))})}
+$("#wStart").onclick=()=>{sheet(`<h2>Start our family</h2><label class="f">Family name<input id="fmName" placeholder="The Cook Family" maxlength="40"></label>${profileFields()}<button class="btn" id="fmGo">Start it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);wirePieces();
+  $("#fmGo").onclick=()=>busy($("#fmGo"),async()=>{const me=readProfile();if(!me.name)return toast("Please type your name");
+    const r=await api("/create",{familyName:$("#fmName").value.trim()||"Our Family",me});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);closeSheet();
+    await refresh();connect();tab("family");setTimeout(inviteSheet,400)})};
+function parseInvite(s){s=String(s||"").trim();const m=s.match(/join=([a-z0-9]+)\.([A-Za-z0-9]+)/)||s.match(/^([a-z0-9]{8,})\.([A-Za-z0-9]{4,})$/);return m?{fid:m[1],code:m[2]}:null}
+async function joinFlow(inv){
+  let info={name:"the family"};try{info=await api(`/f/${inv.fid}/info`)}catch(e){toast("That invite link doesn't work. Ask for a new one.");return}
+  sheet(`<div class="bigmoji">✉️</div><h2>Join ${esc(info.name)}</h2>${info.approval?'<div class="dim">Someone in the family will say yes, then you\'re in.</div>':""}${profileFields()}<button class="btn" id="jGo">Join</button>`);wirePieces();
+  $("#jGo").onclick=()=>busy($("#jGo"),async()=>{const me=readProfile();if(!me.name)return toast("Please type your name");
+    const r=await api(`/f/${inv.fid}/join`,{code:inv.code,me});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);closeSheet();history.replaceState(null,"",location.pathname);
+    await refresh();connect();if(r.status==="member")tab("home")})}
+$("#wJoin").onclick=()=>{sheet(`<h2>Paste your invite</h2><label class="f">The link or code someone sent you<input id="invIn" placeholder="https://…family-pop/?join=…"></label><button class="btn" id="invGo">Next</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  $("#invGo").onclick=()=>{const inv=parseInvite($("#invIn").value);if(!inv)return toast("That doesn't look like an invite link");closeSheet();joinFlow(inv)}};
+$("#wRelink").onclick=()=>{sheet(`<h2>Already in the family?</h2><div class="dim">On your other phone, open Family Pop → Family → "Use Family Pop on another phone" to get a code.</div><label class="f">Code<input id="rlIn" maxlength="8" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-size:24px"></label><button class="btn" id="rlGo">Use this phone</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  $("#rlGo").onclick=()=>busy($("#rlGo"),async()=>{const r=await api("/relink",{code:$("#rlIn").value.trim()});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);closeSheet();await refresh();connect();tab("home")})};
+$("#pendCheck").onclick=refresh;
+setInterval(()=>{if(SES&&$("#pending").classList.contains("on"))refresh()},15000);
+
+/* ================= feed ================= */
+let postPhoto=null;
+$("#postPhoto").onclick=async()=>{postPhoto=await pickPhoto();if(postPhoto){$("#postPrev").src=postPhoto;$("#postPrev").hidden=false}};
+$("#postGo").onclick=()=>busy($("#postGo"),async()=>{const text=$("#postText").value.trim();if(!text&&!postPhoto)return toast("Write something or add a photo");
+  await act("post",{text,photo:postPhoto});$("#postText").value="";postPhoto=null;$("#postPrev").hidden=true;buzz(20);refresh()});
+function renderFeed(){
+  if(!S)return;const f=S.feed.slice().reverse();
+  $("#feed").innerHTML=f.length?f.map(p=>{if(p.from==="system")return `<div class="post sys">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span></div>`;
+    const a=mem(p.from)||{name:"Someone",piece:"🫧"};const liked=p.likes.includes(meId());
+    return `<div class="post"><div class="who"><span class="pc">${a.piece}</span><span>${esc(a.name)}<br><small>${ago(p.ts)}</small></span></div>
+      ${p.text?`<div class="text">${esc(p.text)}</div>`:""}${p.photo?`<img class="ph" loading="lazy" src="${photoURL(p.photo)}" alt="Photo from ${esc(a.name)}">`:""}
+      <div class="acts"><button class="${liked?"on":""}" data-like="${p.id}">❤️ ${p.likes.length||""}</button><button data-cm="${p.id}">💬 ${p.comments.length||""}</button>
+      <button data-share="${p.id}">📤 Share out</button><button data-q="${p.id}">💡 Make a question</button></div>
+      ${p.comments.length?`<div class="cmts">${p.comments.map(c=>{const w=mem(c.from)||{name:"Someone"};return `<div><b>${esc(w.name)}</b> ${esc(c.text)}</div>`}).join("")}</div>`:""}</div>`}).join("")
+    :'<div class="card dim" style="text-align:center">Nothing here yet. Share the first picture!</div>';
+  $$("[data-like]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("like",{postId:b.dataset.like});buzz(10);refresh()}));
+  $$("[data-cm]").forEach(b=>b.onclick=()=>{sheet(`<h2>Comment</h2><textarea id="cmIn" maxlength="500"></textarea><button class="btn" id="cmGo">Post comment</button>`);$("#cmIn").focus();
+    $("#cmGo").onclick=()=>busy($("#cmGo"),async()=>{const t=$("#cmIn").value.trim();if(!t)return;await act("comment",{postId:b.dataset.cm,text:t});closeSheet();refresh()})});
+  $$("[data-share]").forEach(b=>b.onclick=()=>{const p=S.feed.find(x=>x.id===b.dataset.share);shareOut(p.text||"From our family 💐",p.photo)});
+  $$("[data-q]").forEach(b=>b.onclick=()=>{const p=S.feed.find(x=>x.id===b.dataset.q);triviaForm({photoId:p.photo,cat:p.photo?"Who's in the Picture?":"Way Back When",q:p.photo?"":"",hint:p.text})});
+}
+
+/* ================= chat ================= */
+let ROOM="all";
+const roomKey=id=>id==="all"?"all":[meId(),id].sort().join("~");
+function renderChat(fromEvent){
+  if(!S)return;const others=S.members.filter(m=>m.id!==meId()&&m.status==="member");const seen=ls.get("seen",{});
+  const unread=r=>S.chat.filter(c=>c.room===r&&c.from!==meId()&&c.ts>(seen[r]||0)).length;
+  $("#rooms").innerHTML=[["all","👨‍👩‍👧 Everyone"]].concat(others.map(m=>[m.id,`${m.piece} ${esc(m.name)}`])).map(([id,l])=>{const n=unread(roomKey(id));return `<button class="${ROOM===id?"on":""}" data-r="${id}">${l}${n&&ROOM!==id?` <span class="badge">${n}</span>`:""}</button>`}).join("");
+  $$("#rooms button").forEach(b=>b.onclick=()=>{ROOM=b.dataset.r;renderChat();const m=$("#msgs");m.scrollTop=m.scrollHeight});
+  const rk=roomKey(ROOM);const list=S.chat.filter(c=>c.room===rk);
+  const box=$("#msgs");const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
+  box.innerHTML=list.length?list.map(c=>{const a=mem(c.from)||{name:"Someone",piece:"🫧"};const mine=c.from===meId();
+    return `<div class="msg ${mine?"me":""}"><span class="pc">${a.piece}</span><div><div class="nm">${mine?"":esc(a.name)+" · "}${ago(c.ts)}</div><div class="bub2" data-m="${c.id}">${c.text?esc(c.text):""}${c.photo?`<img class="ph" loading="lazy" src="${photoURL(c.photo)}" alt="">`:""}</div></div></div>`}).join("")
+    :`<div class="dim" style="text-align:center;margin-top:20vh">${ROOM==="all"?"Say hi to the whole family!":"Start a private conversation."}</div>`;
+  $("#chatTip").innerHTML=ROOM==="all"&&S.me.chatTrivia?'💡 Things you say here can turn into "Who said this?" game questions. Tap a message to make your own question.':"Tap a message to turn it into a game question.";
+  $$("#msgs .bub2").forEach(el=>el.onclick=()=>{const c=S.chat.find(x=>x.id===el.dataset.m);const a=mem(c.from)||{name:""};
+    triviaForm({photoId:c.photo,cat:c.photo?"Who's in the Picture?":"Way Back When",q:c.text?`Who said this? "${c.text.slice(0,120)}"`:"",a:c.text?a.name:""})});
+  if($("#chat").classList.contains("on")){seen[rk]=Date.now();ls.set("seen",seen)}
+  if(atBottom||!fromEvent)box.scrollTop=box.scrollHeight;badges();
+}
+let chatPhoto=null;
+$("#chatPhoto").onclick=async()=>{const ph=await pickPhoto();if(ph)busy(null,async()=>{await act("chat",{room:ROOM,photo:ph});refresh()})};
+async function sendChat(){const t=$("#chatText").value.trim();if(!t)return;$("#chatText").value="";await busy($("#chatSend"),async()=>{const r=await act("chat",{room:ROOM,text:t});if(!S.chat.some(c=>c.id===r.msg.id))S.chat.push(r.msg);renderChat()})}
+$("#chatSend").onclick=sendChat;
+$("#chatText").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat()}});
+
+/* ================= trivia + Family Book ================= */
+function triviaForm(pre={}){
   let photo=null;
-  sheet(`<h2>Add a memory</h2>
-   <label class="f">Kind of question<select id="mCat">${CATS.map(c=>`<option>${c}</option>`).join("")}</select></label>
-   <button class="btn ghost" id="mPhoto">📷 Add a photo (optional)</button><img id="mPrev" class="qphoto" hidden alt="">
-   <label class="f">Question<small>Leave blank with a photo to ask "Who's in the picture?"</small><input id="mQ" placeholder="Where did we go every summer?"></label>
-   <label class="f">Right answer<input id="mA" placeholder="Lake Ouachita"></label>
-   <label class="f">Wrong answers (optional)<small>Separate with commas. Leave blank and the game picks some.</small><input id="mW" placeholder="Beaver Lake, Lake Hamilton"></label>
-   <button class="btn" id="mSave">Save to the Family Book</button><button class="btn ghost" id="mCancel">Cancel</button>`);
-  $("#mPhoto").onclick=async()=>{photo=await pickPhoto();if(photo){$("#mPrev").src=photo;$("#mPrev").hidden=false;if(!$("#mQ").value)$("#mCat").value="Who's in the Picture?"}};
-  $("#mSave").onclick=()=>{const a=$("#mA").value.trim(),q=$("#mQ").value.trim();if(!a){toast("Please add the right answer");return}if(!q&&!photo){toast("Add a question or a photo");return}
-    BOOK.push({id:uid(),cat:$("#mCat").value,q:q||"Who's in the picture?",a,wrong:$("#mW").value.split(",").map(s=>s.trim()).filter(Boolean),photo});
-    if(!saveAll()){} closeSheet();renderBook();toast("Saved. It'll show up in your next game!")};
-  $("#mCancel").onclick=closeSheet;
+  sheet(`<h2>💡 Make a game question</h2>
+   <label class="f">Kind<select id="tCat">${CATS.map(c=>`<option ${c===pre.cat?"selected":""}>${c}</option>`).join("")}</select></label>
+   ${pre.photoId?`<img class="qphoto" src="${photoURL(pre.photoId)}" alt="">`:`<button class="btn ghost" id="tPhoto">📷 Add a photo (optional)</button><img id="tPrev" class="qphoto" hidden alt="">`}
+   ${pre.hint?`<div class="dim small">"${esc(pre.hint.slice(0,140))}"</div>`:""}
+   <label class="f">Question<small>Leave blank with a photo to ask "Who's in the picture?"</small><input id="tQ" value="${esc(pre.q||"")}" placeholder="Where did we go every summer?"></label>
+   <label class="f">Right answer<input id="tA" value="${esc(pre.a||"")}" placeholder="Lake Ouachita"></label>
+   <label class="f">Wrong answers (optional)<small>Separate with commas, or leave blank</small><input id="tW" placeholder="Beaver Lake, Lake Hamilton"></label>
+   <button class="btn" id="tSave">Add to the Family Book</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  if($("#tPhoto"))$("#tPhoto").onclick=async()=>{photo=await pickPhoto(700);if(photo){$("#tPrev").src=photo;$("#tPrev").hidden=false;if(!$("#tQ").value)$("#tCat").value="Who's in the Picture?"}};
+  $("#tSave").onclick=()=>busy($("#tSave"),async()=>{const a=$("#tA").value.trim(),q=$("#tQ").value.trim()||((photo||pre.photoId)?"Who's in the picture?":"");
+    if(!a||!q)return toast("Add a question (or photo) and the right answer");
+    await act("makeTrivia",{cat:$("#tCat").value,q,a,wrong:$("#tW").value.split(",").map(s=>s.trim()).filter(Boolean),photo,photoId:pre.photoId||null});closeSheet();toast("📖 Added! It'll come up in the game");refresh()});
 }
-$("#bBook").onclick=()=>{renderBook();show("bookScr")};
-$("#bAddMem").onclick=memoryForm;
-$("#bBookBack").onclick=()=>show("home");
+$("#fAddMem").onclick=()=>triviaForm({});
 
-/* ================= Bragging rights ================= */
-function st(id){return STATS[id]||(STATS[id]={games:0,wins:0,right:0,asked:0,banked:0,trophies:[]})}
-function renderHof(){
-  const rows=PEOPLE.map(p=>({p,s:st(p.id)})).sort((a,b)=>b.s.wins-a.s.wins||(b.s.right/(b.s.asked||1))-(a.s.right/(a.s.asked||1)));
-  $("#hofList").innerHTML=rows.length?rows.map(({p,s},i)=>`<div class="r"><div class="p">${p.piece}</div><div class="n">${i===0&&s.wins?"👑 ":""}${esc(p.name)}<small>🧠 Knows the family ${s.asked?Math.round(100*s.right/s.asked):0}% · 🫧 ${s.banked} Pop Bucks saved · ${s.trophies.length?s.trophies.slice(-4).join(" "):"no trophies yet"}</small></div><div class="w">${s.wins} win${s.wins===1?"":"s"}</div></div>`).join("")
-    :'<div class="card dim" style="text-align:center">Play a game to start the bragging.</div>';
-  const pics=Object.entries(SQPICS);
-  $("#hofPics").innerHTML=pics.length?pics.map(([i,v])=>`<div style="display:flex;gap:10px;align-items:center;margin:6px 0"><img src="${v.photo}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:10px"><div><b>${esc(v.name)}</b><div class="dim" style="font-size:13px">${esc(v.caption||"")} · won by ${esc(v.by)} ${esc(v.date)}</div></div></div>`).join(""):"Win a game and your picture goes on a square.";
+/* ================= family tab ================= */
+function inviteSheet(){
+  const link=`${location.origin}${location.pathname}?join=${S.meta.fid}.${S.meta.code}`;
+  sheet(`<div class="bigmoji">✉️</div><h2>Invite someone</h2><div class="dim">Send this link to family, or people who are like family.${S.meta.approval?" They'll wait for a yes from an approver.":""}</div>
+   <div class="card" style="word-break:break-all;font-size:14px;-webkit-user-select:text;user-select:text">${esc(link)}</div>
+   <button class="btn" id="invShare">📤 Send the invite</button><button class="btn ghost" id="invCopy">Copy the link</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Done</button>`);
+  $("#invShare").onclick=()=>{const t=`Come join our family on Family Pop! It's our own private place to talk, share pictures, and play the family board game: ${link}`;if(navigator.share)navigator.share({text:t}).catch(()=>{});else copyText(t)};
+  $("#invCopy").onclick=()=>copyText(link);
 }
-$("#bHof").onclick=()=>{renderHof();show("hofScr")};
-$("#bHofBack").onclick=()=>show("home");
-$("#bHow").onclick=()=>sheet(`<h2>How to play</h2><div style="text-align:left;line-height:1.55">
- 🫧 <b>Pick your bubble</b> on your turn. A <b>small</b> bubble is an easy family question and moves you <b>2</b>. <b>Medium</b> moves <b>4</b>. A <b>big</b> bubble is hard, has a timer, and moves you <b>6</b>.<br>
- ✅ Answer right and you move that far, plus 20 Pop Bucks. Wrong, and you only move 1.<br>
- 🏡 Land on a place nobody owns and you can <b>buy it</b>. When others land there, they <b>pay you rent</b>. Own a whole color and the rent doubles. Everyone's own house is theirs from the start.<br>
- 😬 <b>Oops!</b> squares are family fines, like "Forgot to call your mom."<br>
- 🍀 <b>Lucky Bubble</b> is a surprise. It might be a <b>Free Pass</b>, which skips a fine or gets you out of Time Out.<br>
- 🥧 Fines go in the <b>Pie Pot</b>. Land on the Pie Pot corner and it's all yours.<br>
- 🏆 Richest family member after the last round wins, and gets to put <b>their picture on a square</b> for good.</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Got it</button>`);
-
-/* ================= setup ================= */
-let SET={count:2,seats:[],rounds:12};
-function renderSetup(){
-  $("#counts").innerHTML=[2,3,4,5,6,7,8].map(n=>`<button class="${n===SET.count?"on":""}" data-n="${n}">${n}</button>`).join("")+`<button class="dim" style="font-size:13px" data-n="1">1 + computer</button>`;
-  $$("#counts button").forEach(b=>b.onclick=()=>{let n=+b.dataset.n;if(n===1){SET.count=2;SET.seats[1]="bot1";}else SET.count=n;sizeSeats();renderSetup()});
-  sizeSeats();
-  const opts=v=>`<option value="">Pick a person…</option>`+PEOPLE.map(p=>`<option value="${p.id}" ${v===p.id?"selected":""}>${p.piece} ${esc(p.name)}</option>`).join("")+
-    BOTS.map(b=>`<option value="${b.id}" ${v===b.id?"selected":""}>${b.piece} ${b.name} (computer)</option>`).join("")+`<option value="__new">+ Add a new person</option>`;
-  $("#seats").innerHTML=SET.seats.map((v,i)=>{const who=PEOPLE.find(p=>p.id===v)||BOTS.find(b=>b.id===v);
-    return `<div class="seat"><div class="pc">${who?who.piece:"❔"}</div><div class="nm">Player ${i+1}<small>${who?esc(who.name):"Not picked yet"}</small></div><select data-s="${i}" aria-label="Player ${i+1}">${opts(v)}</select></div>`}).join("");
-  $$("#seats select").forEach(s=>s.onchange=()=>{const i=+s.dataset.s;if(s.value==="__new"){personForm(null,p=>{if(p)SET.seats[i]=p.id;renderSetup()});return}SET.seats[i]=s.value;renderSetup()});
-  $("#rounds").innerHTML=[[8,"Quick · 8 rounds"],[12,"Regular · 12"],[16,"Long · 16"]].map(([n,l])=>`<button class="btn small ${SET.rounds===n?"":"ghost"}" data-r="${n}">${l}</button>`).join("");
-  $$("#rounds button").forEach(b=>b.onclick=()=>{SET.rounds=+b.dataset.r;renderSetup()});
+$("#fInvite").onclick=inviteSheet;
+function renderFamily(){
+  if(!S)return;const me=S.me;
+  $("#mePiece").textContent=me.piece;$("#meName").innerHTML=`${esc(me.name)}<small>Edit my piece and trivia answers</small>`;
+  const pend=S.members.filter(m=>m.status==="pending");
+  $("#pendingBox").innerHTML=pend.length&&me.approver?`<div class="card" style="border:2px solid var(--sun)"><h3>Waiting for a yes</h3><div class="list">${pend.map(m=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${esc(m.name)}<small>wants to join</small></span><button class="btn small" data-ok="${m.id}">Yes</button><button class="btn small ghost" data-no="${m.id}">No</button></div>`).join("")}</div></div>`:"";
+  $$("[data-ok]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("approve",{memberId:b.dataset.ok});sfx.fan();refresh()}));
+  $$("[data-no]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("deny",{memberId:b.dataset.no});refresh()}));
+  $("#memberList").innerHTML=S.members.filter(m=>m.status==="member").map(m=>`<button class="li" data-mem="${m.id}"><span class="p">${m.piece}</span><span class="n">${esc(m.name)}${m.mom?" 💐":""}${m.id===meId()?" (you)":""}<small>${m.approver?"✅ approves new people · ":""}${[m.birthday&&"🎂 "+esc(m.birthday),m.food&&"🍽️ "+esc(m.food)].filter(Boolean).join(" · ")||"no trivia yet"}</small></span>›</button>`).join("");
+  $$("[data-mem]").forEach(b=>b.onclick=()=>memberSheet(mem(b.dataset.mem)));
+  $("#bookList").innerHTML=S.book.length?S.book.slice().reverse().map(e=>{const by=mem(e.by);return `<div class="li">${e.photo?`<img src="${photoURL(e.photo)}" alt="">`:'<span class="p">💬</span>'}<span class="n">${esc(e.q)}<small>${esc(e.cat)} · ${esc(e.a)}${by?" · by "+esc(by.name):""}</small></span>${(e.by===meId()||me.approver)?`<button class="btn small ghost" data-bd="${e.id}">✕</button>`:""}</div>`}).join(""):'<div class="dim small">Nothing yet.</div>';
+  $$("[data-bd]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("bookDel",{id:b.dataset.bd});refresh()}));
+  $("#adminCard").style.display=me.approver?"":"none";$("#setApproval").checked=!!S.meta.approval;
 }
-function sizeSeats(){while(SET.seats.length<SET.count)SET.seats.push("");SET.seats.length=SET.count}
-$("#bNew").onclick=()=>{if(!PEOPLE.length){toast("First, add yourself to the family");personForm(null,p=>{if(p){SET.seats=[p.id];renderSetup();show("setup")}});return}
-  SET.seats=[PEOPLE[0].id];renderSetup();show("setup")};
-$("#bSetupBack").onclick=()=>show("home");
-$("#bStart").onclick=()=>{
-  const ids=SET.seats;if(ids.some(v=>!v)){toast("Pick someone for every player");return}
-  if(new Set(ids.filter(v=>!v.startsWith("bot"))).size!==ids.filter(v=>!v.startsWith("bot")).length){toast("Each person can only play once");return}
-  startGame(ids,SET.rounds)};
+function memberSheet(m){
+  const me=S.me;const isMe=m.id===meId();
+  sheet(`<div class="bigmoji">${m.piece}</div><h2>${esc(m.name)}${m.mom?" 💐":""}</h2>
+   <div class="dim">🫧 ${m.bucks} Pop Bucks · 🎟️ ${m.passes} Free Pass${m.passes===1?"":"es"} · 🏆 ${m.stats.wins} win${m.stats.wins===1?"":"s"}</div>
+   <div class="card" style="text-align:left">${[["🎂 Birthday",m.birthday],["😄 Nickname",m.nick],["🍽️ Favorite food",m.food]].map(([k,v])=>`<div>${k}: <b>${esc(v||"—")}</b></div>`).join("")}</div>
+   ${isMe?"":`<button class="btn" id="msGive">🎁 Give ${esc(m.name)} something</button><button class="btn ghost" id="msChat">💬 Message ${esc(m.name)}</button>`}
+   ${me.approver&&!isMe?`<label class="chk"><input type="checkbox" id="msAppr" ${m.approver?"checked":""}> ${esc(m.name)} approves new people</label><label class="chk"><input type="checkbox" id="msMom" ${m.mom?"checked":""}> This is Mom (she gets paid when someone forgets to call her)</label>`:""}
+   <button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
+  if($("#msGive"))$("#msGive").onclick=()=>giveSheet(m.id);
+  if($("#msChat"))$("#msChat").onclick=()=>{closeSheet();ROOM=m.id;tab("chat")};
+  if($("#msAppr"))$("#msAppr").onchange=e=>busy(null,async()=>{await act("setApprover",{memberId:m.id,on:e.target.checked});refresh()});
+  if($("#msMom"))$("#msMom").onchange=e=>busy(null,async()=>{if(e.target.checked)await act("setMom",{memberId:m.id});refresh()});
+}
+$("#fEditMe").onclick=()=>{sheet(`<h2>Me</h2>${profileFields(S.me)}<button class="btn" id="meSave">Save</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);wirePieces();
+  $("#meSave").onclick=()=>busy($("#meSave"),async()=>{const p=readProfile();if(!p.name)return toast("Please type your name");await act("profile",p);closeSheet();refresh()})};
+$("#fRelink").onclick=()=>busy(null,async()=>{const r=await act("relinkCode");sheet(`<div class="bigmoji">📱</div><h2>Your code</h2><div class="money" style="letter-spacing:6px">${r.code}</div><div class="dim">On your other phone, open Family Pop, tap "I'm already in, on another phone", and type this. It works once, for 15 minutes.</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Done</button>`)});
+$("#setApproval").onchange=e=>busy(null,async()=>{await act("settings",{approval:e.target.checked});refresh()});
+$("#fNewCode").onclick=()=>busy($("#fNewCode"),async()=>{await act("settings",{newCode:true});await refresh();inviteSheet()});
 
-/* ================= trivia: built from the family ================= */
+/* ================= bank ================= */
+function giveSheet(toId){
+  const others=S.members.filter(m=>m.status==="member"&&m.id!==meId());if(!others.length)return toast("Invite someone first");
+  sheet(`<h2>🎁 Give</h2><label class="f">To<select id="gvTo">${others.map(m=>`<option value="${m.id}" ${m.id===toId?"selected":""}>${m.piece} ${esc(m.name)}</option>`).join("")}</select></label>
+   <label class="f">Pop Bucks<small>You have ${S.me.bucks}</small><input id="gvB" type="number" inputmode="numeric" min="0" max="${S.me.bucks}" value="0"></label>
+   <label class="f">Free Passes<small>You have ${S.me.passes}</small><input id="gvP" type="number" inputmode="numeric" min="0" max="${S.me.passes}" value="${S.me.passes?1:0}"></label>
+   <label class="f">A little note (optional)<input id="gvN" maxlength="140" placeholder="Love you!"></label>
+   <button class="btn" id="gvGo">Give it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  $("#gvGo").onclick=()=>busy($("#gvGo"),async()=>{await act("give",{to:$("#gvTo").value,bucks:+$("#gvB").value||0,passes:+$("#gvP").value||0,note:$("#gvN").value});closeSheet();sfx.fan();burst(innerWidth/2,innerHeight/2,40);toast("🎁 Sent! The whole family will see it");refresh()});
+}
+$("#bGive").onclick=()=>giveSheet();
+$("#bPic").onclick=()=>squareFlow();
+function renderBank(){
+  if(!S)return;const me=S.me;
+  $("#myBucks").textContent=me.bucks.toLocaleString();$("#myPasses").innerHTML=`🎟️ ${me.passes} Free Pass${me.passes===1?"":"es"}${me.sqCredits?` · 📸 ${me.sqCredits} picture square ready to use`:""}`;
+  const items=[["pass","🎟️","A Free Pass","Skip a fine or get out of Time Out",300],["square","📸","Put your picture on a board square","It stays on the board for every family game",600]]
+    .concat(SHOP_PIECES.filter(p=>!(me.pieces||[]).includes(p)).slice(0,6).map(p=>["piece:"+p,p,"New game piece","Yours to use forever",150]));
+  $("#shop").innerHTML=items.map(([id,ic,n,d,price])=>`<div class="li"><span class="p">${ic}</span><span class="n">${n}<small>${d}</small></span><button class="btn small" data-buy="${id}" ${me.bucks<price?"disabled":""}>${price}</button></div>`).join("");
+  $$("[data-buy]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("shop",{item:b.dataset.buy});sfx.cash();toast("Bought! 🎉");await refresh();if(b.dataset.buy==="square")squareFlow()}));
+  const ms=S.members.filter(m=>m.status==="member");
+  $("#accounts").innerHTML=ms.slice().sort((a,b)=>b.bucks-a.bucks).map(m=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${esc(m.name)}<small>🎟️ ${m.passes} Free Pass${m.passes===1?"":"es"}</small></span><b style="color:var(--sun)">${m.bucks.toLocaleString()}</b></div>`).join("");
+  $("#brag").innerHTML=ms.slice().sort((a,b)=>b.stats.wins-a.stats.wins||(b.stats.right/(b.stats.asked||1))-(a.stats.right/(a.stats.asked||1))).map((m,i)=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${i===0&&m.stats.wins?"👑 ":""}${esc(m.name)}<small>🧠 knows the family ${m.stats.asked?Math.round(100*m.stats.right/m.stats.asked):0}% · ${m.stats.trophies.slice(-6).join(" ")||"no trophies yet"}</small></span><b>${m.stats.wins} 🏆</b></div>`).join("");
+}
+async function squareFlow(){
+  if(!S.me.sqCredits){toast("Win a game, or buy a picture square in the Bank (600)");return}
+  const props=BASE.map((s,i)=>Object.assign({i},s)).filter(s=>s.t==="prop");
+  const pick=await ask(`<h2>📸 Which square gets your picture?</h2><div class="dim">It stays on the board for every family game, with your name on it.</div>`,
+    props.map(s=>[`${s.ic} ${esc(S.sqpics[s.i]?S.sqpics[s.i].name+" (replace)":s.name)}`,s.i]).concat([["Not now",-1]]));
+  if(pick<0)return;const photo=await pickPhoto(700);if(!photo)return toast("No picture picked");
+  sheet(`<img class="sqphoto" src="${photo}" alt=""><label class="f">Name this square<input id="sqName" maxlength="16" value="${esc(S.sqpics[pick]?S.sqpics[pick].name:BASE[pick].name)}"></label>
+    <label class="f">A few words about the picture (optional)<input id="sqCap" maxlength="60" placeholder="Summer at the lake, 1998"></label><button class="btn" id="sqSave">Put it on the board</button>`);
+  $("#sqSave").onclick=()=>busy($("#sqSave"),async()=>{await act("square",{index:pick,photo,name:$("#sqName").value.trim()||BASE[pick].name,caption:$("#sqCap").value.trim()});closeSheet();sfx.fan();toast("📸 You're on the board for good!");refresh()});
+}
+
+/* ================= games shelf (all of Topher's games, paying Pop Bucks) ================= */
+function renderShelf(){
+  $("#shelf").innerHTML=GAMES.map((g,i)=>`<button class="game" data-g="${i}"><span class="gi">${g.icon}</span><b>${g.name}</b><small>${g.desc}</small><span class="earn">🫧 ${g.earn}</span></button>`).join("");
+  $$("#shelf .game").forEach(b=>b.onclick=()=>openGame(GAMES[+b.dataset.g]));
+}
+let FRAME=null;
+function openGame(g){FRAME={g,earned:0};$("#frameTitle").textContent=g.name;$("#frameEarn").textContent="🫧 +0";$("#frameIf").src=g.url+(g.url.includes("?")?"&":"?")+"family=1";$("#frame").classList.add("on");
+  if(g.id==="story")setTimeout(()=>earn("story",60,g.name),20000)}   // stay 20 seconds in a story game: daily play bonus
+$("#frameClose").onclick=()=>{$("#frame").classList.remove("on");$("#frameIf").src="about:blank";if(FRAME&&FRAME.earned)toast(`🫧 You earned ${FRAME.earned} Pop Bucks!`);FRAME=null;refresh()};
+async function earn(game,amount,label){
+  if(!SES||!amount)return;try{const r=await act("earn",{game,amount:Math.round(amount)});
+    if(r.earned){if(FRAME){FRAME.earned+=r.earned;$("#frameEarn").textContent="🫧 +"+FRAME.earned}sfx.cash();buzz(20);toast(`🫧 +${r.earned} Pop Bucks${label?" from "+esc(label):""}`)}
+    else if(r.capLeft===0)toast(`You've earned the most for today from ${esc(label||"this game")}. Come back tomorrow!`)}catch(e){}}
+window.addEventListener("message",e=>{const d=e.data;if(!d||d.fp!=="earn")return;
+  if(d.game==="word-popper")earn("word-popper",d.score||0,"Word Popper");
+  else if(d.game==="pic-pop")earn("pic-pop",(d.amount||25),"PIC POP")});
+
+/* ================= board game: questions from the family ================= */
 function famQuestions(){
-  const qs=[],ppl=PEOPLE;
-  const names=ppl.map(p=>p.name);
+  const qs=[],ppl=S.members.filter(m=>m.status==="member"),names=ppl.map(p=>p.name);
   ppl.forEach(p=>{
     if(p.food)qs.push({cat:"Favorites",about:p.id,q:`What's ${p.name}'s favorite food?`,a:p.food,pool:ppl.filter(x=>x.food&&x.id!==p.id).map(x=>x.food).concat(FOODS)});
-    if(p.birthday)qs.push({cat:"Way Back When",about:p.id,q:`Whose birthday is ${p.birthday}?`,a:p.name,pool:names});
+    if(p.birthday){qs.push({cat:"Way Back When",about:p.id,q:`Whose birthday is ${p.birthday}?`,a:p.name,pool:names});
+      const m=MONTHS.find(m=>p.birthday.toLowerCase().startsWith(m.toLowerCase().slice(0,3)));if(m)qs.push({cat:"Favorites",about:p.id,q:`What month is ${p.name}'s birthday?`,a:m,pool:MONTHS})}
     if(p.nick)qs.push({cat:"Way Back When",about:p.id,q:`Who goes by the nickname "${p.nick}"?`,a:p.name,pool:names});
     if(p.secret)qs.push({cat:"Way Back When",about:p.id,q:`Something nobody knew… whose secret is this? "${p.secret}"`,a:p.name,pool:names});
-    if(p.birthday){const m=MONTHS.find(m=>p.birthday.toLowerCase().startsWith(m.toLowerCase().slice(0,3)));
-      if(m)qs.push({cat:"Favorites",about:p.id,q:`What month is ${p.name}'s birthday?`,a:m,pool:MONTHS})}
   });
-  BOOK.forEach(e=>qs.push({cat:e.cat,q:e.q,a:e.a,photo:e.photo,pool:e.wrong.length?e.wrong:(names.includes(e.a)?names:null),fixed:e.wrong.length>0}));
+  (S.trivia||[]).forEach(t=>{const m=mem(t.about);if(m&&m.status==="member")qs.push({cat:t.cat,about:t.about,q:t.q,a:m.name,pool:names})});
+  S.book.forEach(e=>qs.push({cat:e.cat,q:e.q,a:e.a,photo:e.photo,pool:e.wrong.length?e.wrong:(names.includes(e.a)?names:null)}));
   return qs;
 }
 let QUSED=new Set();
-function makeQuestion(asker,size){
-  const fam=famQuestions().filter(q=>!(asker.pid&&q.about===asker.pid)&&!(asker.pid&&q.a===asker.name));
-  const starters=STARTER.map(s=>({cat:s.cat,q:s.q,a:s.a,pool:s.w,fixed:true}));
+function makeQuestion(p,size){
+  const fam=famQuestions().filter(q=>!(p.memberId&&q.about===p.memberId)&&!(p.memberId&&q.a===p.name));
+  const starters=STARTER.map(s=>({cat:s.cat,q:s.q,a:s.a,pool:s.w}));
   let pool=fam.filter(q=>!QUSED.has(q.q));
-  if(!pool.length||Math.random()<.3)pool=pool.concat(starters.filter(q=>!QUSED.has(q.q)));
+  if(!pool.length||Math.random()<.25)pool=pool.concat(starters.filter(q=>!QUSED.has(q.q)));
   if(!pool.length){QUSED.clear();pool=fam.concat(starters)}
-  const q=rnd(pool);QUSED.add(q.q);
-  const nOpts=size===2?2:size===4?3:4;
+  const q=rnd(pool);QUSED.add(q.q);const n=size===2?2:size===4?3:4;
   let wrong=shuffle([...new Set((q.pool||[]).filter(x=>x&&x.toLowerCase()!==q.a.toLowerCase()))]);
-  const isName=PEOPLE.some(p=>p.name===q.a);   // never invent family members; fewer choices is fine
-  if(wrong.length<nOpts-1&&!isName){const extra=q.pool===MONTHS?MONTHS:FOODS;wrong=wrong.concat(shuffle(extra.filter(x=>x!==q.a&&!wrong.includes(x))))}
-  return {cat:q.cat,q:q.q,a:q.a,photo:q.photo,opts:shuffle([q.a].concat(wrong.slice(0,nOpts-1)))};
+  const isName=S.members.some(m=>m.name===q.a);
+  if(wrong.length<n-1&&!isName){const extra=q.pool===MONTHS?MONTHS:FOODS;wrong=wrong.concat(shuffle(extra.filter(x=>x!==q.a&&!wrong.includes(x))))}
+  return {cat:q.cat,q:q.q,a:q.a,photo:q.photo,opts:shuffle([q.a].concat(wrong.slice(0,n-1)))};
 }
 
-/* ================= the game ================= */
-let G=null;
-function startGame(ids,rounds){
-  const players=ids.map((id,i)=>{const p=PEOPLE.find(x=>x.id===id),b=BOTS.find(x=>x.id===id);
-    return {pid:p?p.id:null,bot:b||null,name:(p||b).name,piece:(p||b).piece,mom:!!(p&&p.mom),cash:1500,pos:0,pass:0,jail:false,jailTurns:0,right:0,asked:0,rent:0,streak:0,home:i<4?i:-1}});
-  const board=BASE.map((s,i)=>{const sq=Object.assign({i},s);
-    if(s.t==="home"){const pl=players.find(p=>p.home===s.slot);sq.name=pl?pl.name+"'s House":"Neighbor's House"}
-    if(SQPICS[i]&&s.t==="prop"){sq.name=SQPICS[i].name||sq.name;sq.photo=SQPICS[i].photo}
-    return sq});
-  const owners={};board.forEach(s=>{if(s.t==="home"){const pi=players.findIndex(p=>p.home===s.slot);if(pi>-1)owners[s.i]=pi}});
-  G={players,board,owners,pot:0,round:1,rounds,turn:0,busy:false,over:false};QUSED.clear();
-  renderBoard();renderPlayers();show("game");log("Everybody starts with 1,500 Pop Bucks. Good luck!");
-  setTimeout(()=>beginTurn(true),400);
+/* ================= board game: setup ================= */
+let GAME=null;   // {mode:'local'|'online', id, rev, st:{...serializable...}}
+function renderPlay(){
+  if(!S)return;const gs=S.games.slice().sort((a,b)=>b.updated-a.updated);
+  $("#gameList").innerHTML=gs.length?gs.map(g=>{const t=mem(g.turnMember);const mine=g.turnMember===meId();const inIt=g.players.some(p=>p.memberId===meId());
+    return `<button class="li" data-gid="${g.id}"><span class="p">${g.status==="done"?"🏁":mine?"🔔":"🎲"}</span><span class="n">${g.players.map(p=>p.piece).join("")} ${esc(g.title)}<small>${g.status==="done"?"Finished":mine?"Your turn!":t?"Waiting for "+esc(t.name):"Computer's turn"} · ${ago(g.updated)}</small></span>${inIt?"›":"👀"}</button>`}).join("")
+    :'<div class="dim small">No games yet. Start one!</div>';
+  $$("[data-gid]").forEach(b=>b.onclick=()=>openOnline(b.dataset.gid));
 }
-function renderBoard(){
-  const b=$("#board");b.innerHTML="";
-  G.board.forEach(s=>{const [r,c]=cellOf(s.i),d=document.createElement("div");d.className="sq"+(["go","timeout","pot","gotimeout"].includes(s.t)?" corner":"")+(s.photo?" photo":"");
-    d.style.gridRow=r+1;d.style.gridColumn=c+1;d.dataset.i=s.i;if(s.photo)d.style.backgroundImage=`url(${s.photo})`;
+$("#pNew").onclick=async()=>{
+  const mode=await ask(`<h2>New game</h2><div class="dim">How do you want to play?</div>`,[["📱📱 Everyone on their own phone","online","btn"],["📱 Pass this phone around","local"],["Cancel",null]]);
+  if(!mode)return;
+  const counts=[2,3,4,5,6,7,8];
+  const count=await ask(`<h2>How many players?</h2><div class="dim">Count everyone, including any computer players.</div>`,counts.map(n=>[String(n),n]).concat([["Cancel",0]]));
+  if(!count)return;setupSeats(mode,count);
+};
+function setupSeats(mode,count){
+  const ppl=S.members.filter(m=>m.status==="member");
+  const seats=[meId()].concat(Array(count-1).fill(""));
+  const draw=()=>{sheet(`<h2>Who's playing?</h2>${seats.map((v,i)=>`<label class="f">Player ${i+1}<select data-s="${i}" ${i===0?"disabled":""}><option value="">Pick…</option>${ppl.map(p=>`<option value="${p.id}" ${v===p.id?"selected":""}>${p.piece} ${esc(p.name)}</option>`).join("")}${BOTS.map(b=>`<option value="${b.id}" ${v===b.id?"selected":""}>${b.piece} ${b.name} (computer)</option>`).join("")}</select></label>`).join("")}
+    <label class="f">How long?<select id="rRounds"><option value="8">Quick · 8 rounds</option><option value="12" selected>Regular · 12 rounds</option><option value="16">Long · 16 rounds</option></select></label>
+    <button class="btn" id="sGo">Start</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+    $$("[data-s]").forEach(s=>s.onchange=()=>{seats[+s.dataset.s]=s.value});
+    $("#sGo").onclick=()=>{if(seats.some(v=>!v))return toast("Pick someone for every player");const humans=seats.filter(v=>!v.startsWith("bot"));if(new Set(humans).size!==humans.length)return toast("Each person can only play once");
+      closeSheet();startNew(mode,seats,+$("#rRounds").value)}};
+  draw();
+}
+function newState(seats,rounds){
+  const players=seats.map((id,i)=>{const p=mem(id),b=BOTS.find(x=>x.id===id);
+    return {memberId:p?p.id:null,bot:b?b.id:null,name:(p||b).name,piece:(p||b).piece,mom:!!(p&&p.mom),cash:1500,pos:0,pass:p?Math.min(p.passes,3):(b?1:0),passStart:p?Math.min(p.passes,3):0,
+      jail:false,jailTurns:0,right:0,asked:0,rent:0,streak:0,home:i<4?i:-1}});
+  const owners={};BASE.forEach((s,i)=>{if(s.t==="home"&&s.slot<players.length)owners[i]=s.slot});
+  return {players,owners,pot:0,round:1,rounds,turn:0,log:"Everybody starts with 1,500. Good luck!",over:false,key:Math.random().toString(36).slice(2,10)};
+}
+async function startNew(mode,seats,rounds){
+  const st=newState(seats,rounds);
+  if(mode==="local"){GAME={mode:"local",st};openBoard();setTimeout(()=>beginTurn(),400);return}
+  await busy(null,async()=>{const players=st.players.map(p=>({memberId:p.memberId,name:p.name,piece:p.piece}));
+    const r=await act("gameCreate",{title:`${st.players.map(p=>p.name).join(" vs ")}`,players,state:st,turnMember:turnMemberOf(st)});
+    GAME={mode:"online",id:r.id,rev:1,st};openBoard();setTimeout(()=>beginTurn(),400)});
+}
+const turnMemberOf=st=>{const p=st.players[st.turn];return p.bot?null:p.memberId};
+async function openOnline(id){await busy(null,async()=>{const g=await api(`/f/${SES.fid}/game?id=${id}`);GAME={mode:"online",id:g.id,rev:g.rev,st:g.state,status:g.status};openBoard();
+  if(g.status==="done"||g.state.over){showEnd(false);return}
+  const p=g.state.players[g.state.turn];
+  if(p.memberId===meId())setTimeout(()=>beginTurn(),300);
+  else if(p.bot&&g.state.players.some(x=>x.memberId===meId()))setTimeout(()=>beginTurn(),300);   // computer's turn: whoever opens the game runs it
+  else waitingView()})}
+function onGameEvent(e){if(!GAME||GAME.mode!=="online"||GAME.id!==e.id||!$("#game").classList.contains("on"))return;
+  if(GAME.rev>=e.rev)return;api(`/f/${SES.fid}/game?id=${e.id}`).then(g=>{GAME.rev=g.rev;GAME.st=g.state;paintAll();log(e.event||GAME.st.log);
+    if(g.state.over){showEnd(false);return}const p=g.state.players[g.state.turn];if(p.memberId===meId()){toast("🔔 Your turn!");buzz(40);beginTurn()}else waitingView()}).catch(()=>{})}
+
+/* ================= board game: drawing ================= */
+const ST=()=>GAME.st;
+function boardSquares(){const st=ST();return BASE.map((s,i)=>{const sq=Object.assign({i},s);
+  if(s.t==="home"){const pl=st.players.find(p=>p.home===s.slot);sq.name=pl?pl.name+"'s House":"Neighbor's House"}
+  const pic=S.sqpics&&S.sqpics[i];if(pic&&s.t==="prop"){sq.name=pic.name||sq.name;sq.photo=photoURL(pic.photo);sq.pic=pic}return sq})}
+function openBoard(){showScreen("game");$("#gChatBadge").style.display="none";paintAll()}
+function paintAll(){
+  const b=$("#board");b.innerHTML="";const sqs=boardSquares();
+  sqs.forEach(s=>{const [r,c]=cellOf(s.i),d=document.createElement("div");d.className="sq"+(["go","timeout","pot","gotimeout"].includes(s.t)?" corner":"")+(s.photo?" photo":"");
+    d.style.gridRow=r+1;d.style.gridColumn=c+1;d.dataset.i=s.i;if(s.photo)d.style.backgroundImage=`url("${s.photo}")`;
     d.innerHTML=(s.g?`<div class="band" style="background:${GROUPS[s.g].color}"></div>`:"")+(s.photo?"":`<div class="ic">${s.ic}</div>`)+`<div class="nm">${esc(s.name)}</div><div class="own" id="own${s.i}"></div><div class="toks" id="tok${s.i}"></div>`;
     d.onclick=()=>squareInfo(s);b.appendChild(d)});
   const m=document.createElement("div");m.className="mid";m.id="mid";b.appendChild(m);
-  paintTokens();paintOwners();
+  paintTokens();paintOwners();renderPlayers();log(ST().log||"");
 }
-function paintTokens(){G.board.forEach(s=>{const t=$("#tok"+s.i);if(t)t.textContent=G.players.filter(p=>p.pos===s.i).map(p=>p.piece).join("")})}
-function paintOwners(){G.board.forEach(s=>{const o=$("#own"+s.i);if(o)o.textContent=G.owners[s.i]!=null&&s.t==="prop"?G.players[G.owners[s.i]].piece:""});
-  $("#potPill").textContent="🥧 Pie Pot "+G.pot}
-function renderPlayers(){
-  $("#players").innerHTML=G.players.map((p,i)=>`<div class="pl ${i===G.turn?"cur":""}"><div class="p">${p.piece}</div><div class="t"><div>${esc(p.name)}</div><div class="c">🫧 ${p.cash}</div>${p.pass?`<div class="fp">🎟️ Free Pass ×${p.pass}</div>`:""}${p.jail?`<div class="fp">⏳ Time Out</div>`:""}</div></div>`).join("");
-  $("#roundPill").textContent=`Round ${Math.min(G.round,G.rounds)} of ${G.rounds}`;
-}
-function log(t){$("#log").textContent=t}
+function paintTokens(){const st=ST();for(let i=0;i<24;i++){const t=$("#tok"+i);if(t)t.textContent=st.players.filter(p=>p.pos===i).map(p=>p.piece).join("")}}
+function paintOwners(){const st=ST();BASE.forEach((s,i)=>{const o=$("#own"+i);if(o)o.textContent=st.owners[i]!=null&&s.t==="prop"?st.players[st.owners[i]].piece:""});$("#potPill").textContent="🥧 "+st.pot}
+function renderPlayers(){const st=ST();
+  $("#players").innerHTML=st.players.map((p,i)=>`<div class="pl ${i===st.turn?"cur":""}"><div class="p">${p.piece}</div><div class="t"><div>${esc(p.name)}</div><div class="c">🫧 ${p.cash}</div>${p.pass?`<div class="fp">🎟️ Free Pass ×${p.pass}</div>`:""}${p.jail?`<div class="fp">⏳ Time Out</div>`:""}</div></div>`).join("");
+  $("#roundPill").textContent=`Round ${Math.min(st.round,st.rounds)} of ${st.rounds}`}
+function log(t){ST().log=t;$("#log").textContent=t}
 function squareInfo(s){
-  const own=G.owners[s.i]!=null?G.players[G.owners[s.i]]:null;
-  const info={go:"Pass GO and collect 200 Pop Bucks.",timeout:"Time Out. Get out with a Free Pass, 50 Pop Bucks, or a right answer on a big bubble.",pot:"Every fine goes in the Pie Pot. Land here and it's yours!",gotimeout:"Straight to Time Out!",fine:"A family fine. One of Mom's favorites.",lucky:"A surprise. Maybe a Free Pass!"}[s.t]||
+  if($("#modal").classList.contains("on"))return;const st=ST();const own=st.owners[s.i]!=null?st.players[st.owners[s.i]]:null;
+  const info={go:"Pass GO and collect 200.",timeout:"Time Out. Get out with a Free Pass, 50, or a right answer on a big bubble.",pot:"Every fine goes in the Pie Pot. Land here and it's yours!",gotimeout:"Straight to Time Out!",fine:"A family fine. One of Mom's favorites.",lucky:"A surprise. Maybe a Free Pass!",challenge:"A quick challenge. Win it for a pile of Pop Bucks!"}[s.t]||
     (s.t==="home"&&own?`${esc(own.name)}'s house. Land here and pay ${esc(own.name)} 40 rent.`:`${GROUPS[s.g].name}. Costs ${s.price}. Rent ${rentOf(s)}.${own?" Owned by "+esc(own.name)+".":" Nobody owns it yet."}`);
-  if(G.busy&&$("#modal").classList.contains("on"))return;
-  sheet(`${s.photo?`<img class="sqphoto" src="${s.photo}" alt="">`:`<div class="bigmoji">${s.ic}</div>`}<h2>${esc(s.name)}</h2>${SQPICS[s.i]?`<div class="dim">📸 ${esc(SQPICS[s.i].caption||"")} · won by ${esc(SQPICS[s.i].by)}</div>`:""}<div>${info}</div><button class="btn" id="okInfo">OK</button>`);
-  $("#okInfo").onclick=closeSheet;
+  sheet(`${s.photo?`<img class="sqphoto" src="${s.photo}" alt="">`:`<div class="bigmoji">${s.ic}</div>`}<h2>${esc(s.name)}</h2>${s.pic?`<div class="dim">📸 ${esc(s.pic.caption||"")} · ${esc(s.pic.by)}'s square</div>`:""}<div>${info}</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">OK</button>`);
 }
-function rentOf(s){if(s.t==="home")return 40;const base=Math.round(s.price/5),own=G.owners[s.i];if(own==null)return base;
-  const set=G.board.filter(x=>x.g===s.g&&x.t==="prop");return set.every(x=>G.owners[x.i]===own)?base*2:base}
+function rentOf(s){const st=ST();if(s.t==="home")return 40;const base=Math.round(s.price/5),own=st.owners[s.i];if(own==null)return base;
+  const set=BASE.map((x,i)=>Object.assign({i},x)).filter(x=>x.g===s.g&&x.t==="prop");return set.every(x=>st.owners[x.i]===own)?base*2:base}
+$("#gChat").onclick=()=>{$("#gChatBadge").style.display="none";const recent=S.chat.filter(c=>c.room==="all").slice(-12);
+  sheet(`<h2>💬 Family chat</h2><div class="msgs" style="max-height:45vh">${recent.map(c=>{const a=mem(c.from)||{name:"",piece:"🫧"};const mine=c.from===meId();return `<div class="msg ${mine?"me":""}"><span class="pc">${a.piece}</span><div class="bub2">${esc(c.text||"📷 photo")}</div></div>`}).join("")}</div>
+   <div class="row"><input id="gcIn" placeholder="Say something…" maxlength="300"><button class="btn small" id="gcGo">Send</button></div><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Back to the game</button>`);
+  const send=()=>busy($("#gcGo"),async()=>{const t=$("#gcIn").value.trim();if(!t)return;await act("chat",{room:"all",text:t});closeSheet();toast("Sent")});$("#gcGo").onclick=send;$("#gcIn").onkeydown=e=>{if(e.key==="Enter")send()}};
+$("#gMenu").onclick=async()=>{if(!GAME)return;const st=ST();
+  const c=await ask(`<h2>Game menu</h2>`,[["Keep playing","keep","btn"],["Back to the app (game is saved)","leave"]].concat(GAME.mode==="local"||!st.over?[["End the game now and see who won","end"]]:[]));
+  if(c==="leave"){if(GAME.mode==="local"&&!st.over){const ok=await ask(`<h2>Leave this game?</h2><div class="dim">Pass-the-phone games aren't saved.</div>`,[["Leave it","y","btn"],["Keep playing","n"]]);if(ok!=="y")return}GAME=null;tab("play")}
+  else if(c==="end"){st.round=st.rounds+1;endGame()}};
+function waitingView(){const st=ST(),p=st.players[st.turn];$("#mid").innerHTML=`<div class="whoT">${p.piece} ${esc(p.name)}'s turn</div><div class="hint">We'll tell you when it's your turn. Chat with the family while you wait! 💬</div>`;renderPlayers()}
 
-async function beginTurn(first){
-  if(G.over)return;const p=G.players[G.turn];renderPlayers();
-  // pass-the-phone hand-off between people (not before the computer, not for the very first player on their own)
-  const humans=G.players.filter(x=>!x.bot).length;
-  if(!p.bot&&humans>1){await ask(`<div class="bigmoji">${p.piece}</div><h2>Pass the phone to ${esc(p.name)}</h2><div class="dim">${G.players.length} players · round ${G.round} of ${G.rounds}</div>`,[["I'm ready",1,"btn"]])}
-  if(p.jail){await timeOutTurn(p);if(p.jail){return endTurn()}}
+/* ================= board game: turns ================= */
+let BUSY=false;
+async function beginTurn(){
+  const st=ST();if(st.over)return;renderPlayers();const p=st.players[st.turn];
+  if(GAME.mode==="online"&&!p.bot&&p.memberId!==meId())return waitingView();
+  if(GAME.mode==="local"&&!p.bot&&st.players.filter(x=>!x.bot).length>1)
+    await ask(`<div class="bigmoji">${p.piece}</div><h2>Pass the phone to ${esc(p.name)}</h2><div class="dim">${st.players.length} players · round ${st.round} of ${st.rounds}</div>`,[["I'm ready",1,"btn"]]);
+  if(p.jail){await timeOutTurn(p);if(p.jail)return endTurn()}
   pickBubble(p);
 }
 async function timeOutTurn(p){
-  p.jailTurns++;const out=()=>{p.jail=false;p.jailTurns=0};
-  if(p.bot){if(p.pass){p.pass--;out();log(`${p.name} used a Free Pass to get out of Time Out`)}
-    else if(p.cash>300||p.jailTurns>=3){pay(p,50,null);out();log(`${p.name} paid 50 to leave Time Out`)}
-    else{log(`${p.name} is waiting in Time Out`);await wait(900)}renderPlayers();return}
-  const last=p.jailTurns>=3,opts=[];
-  if(p.pass)opts.push(["🎟️ Use my Free Pass","pass","btn"]);
-  opts.push(["Pay 50 Pop Bucks and get out","pay",p.pass?"":"btn"]);
-  if(!last)opts.push(["Try a big bubble question. Right answer gets you out","try"]);
-  const c=await ask(`<div class="bigmoji">⏳</div><h2>${esc(p.name)}, you're in Time Out</h2><div class="dim">${last?"This is your 3rd turn, so it's time to get out.":"Turn "+p.jailTurns+" of 3."}</div>`,opts);
-  if(c==="pass"){p.pass--;out();toast("🎟️ Free Pass used. You're out!")}
-  else if(c==="pay"){pay(p,50,null);out()}
-  else{const q=makeQuestion(p,6);if(await askQuestion(p,q,6)){out();toast("Right! You're out of Time Out")}}
+  p.jailTurns++;const out=()=>{p.jail=false;p.jailTurns=0};const bot=BOTS.find(b=>b.id===p.bot);
+  if(bot){if(p.pass){p.pass--;out();log(`${p.name} used a Free Pass to get out of Time Out`)}else if(p.cash>300||p.jailTurns>=3){p.cash-=50;out();log(`${p.name} paid 50 to leave Time Out`)}else{log(`${p.name} is waiting in Time Out`);await wait(900)}renderPlayers();return}
+  const last=p.jailTurns>=3,opts=[];if(p.pass)opts.push(["🎟️ Use my Free Pass","pass","btn"]);opts.push(["Pay 50 and get out","pay",p.pass?"":"btn"]);if(!last)opts.push(["Try a big bubble question. Right answer gets you out","try"]);
+  const c=await ask(`<div class="bigmoji">⏳</div><h2>${esc(p.name)}, you're in Time Out</h2><div class="dim">${last?"3rd turn, time to get out.":"Turn "+p.jailTurns+" of 3."}</div>`,opts);
+  if(c==="pass"){p.pass--;out();toast("🎟️ Free Pass used!")}else if(c==="pay"){p.cash-=50;sfx.pay();out()}else if(await askQuestion(p,makeQuestion(p,6),6)){out();toast("Right! You're out")}
   renderPlayers();
 }
 function pickBubble(p){
-  G.busy=false;const mid=$("#mid");
-  mid.innerHTML=`<div class="who">${p.piece} ${esc(p.name)}'s turn</div><div class="hint">${p.bot?"thinking…":"Pick a bubble. Bigger = harder = further"}</div>
-   <div class="bubbles">${[[2,"easy",.2],[4,"medium",.27],[6,"hard",.34]].map(([n,l,s])=>`<div class="bub" data-n="${n}" style="width:calc(${s}*min(96vw,60vh,560px)*.55);height:calc(${s}*min(96vw,60vh,560px)*.55);font-size:calc(${s}*min(96vw,60vh,560px)*.2)">${n}<small>${l}</small></div>`).join("")}</div>`;
-  const go=n=>{if(G.busy)return;G.busy=true;const b=mid.querySelector(`.bub[data-n="${n}"]`);const r=b.getBoundingClientRect();b.classList.add("popped");sfx.pop();buzz(40);burst(r.left+r.width/2,r.top+r.height/2,26);
-    setTimeout(()=>playBubble(p,n),380)};
-  if(p.bot){const r=Math.random();const n=r<p.bot.brave*.6?6:r<.35+p.bot.brave*.4?4:2;setTimeout(()=>go(n),1100)}
-  else mid.querySelectorAll(".bub").forEach(b=>b.onclick=()=>go(+b.dataset.n));
+  BUSY=false;const mid=$("#mid");const bot=BOTS.find(b=>b.id===p.bot);const W="min(96vw,58vh,560px)";
+  mid.innerHTML=`<div class="whoT">${p.piece} ${esc(p.name)}'s turn</div><div class="hint">${bot?"thinking…":"Pick a bubble. Bigger = harder = further"}</div>
+   <div class="bubbles">${[[2,"easy",.2],[4,"medium",.27],[6,"hard",.34]].map(([n,l,s])=>`<div class="bub" data-n="${n}" style="width:calc(${s}*${W}*.55);height:calc(${s}*${W}*.55);font-size:calc(${s}*${W}*.2)">${n}<small>${l}</small></div>`).join("")}</div>`;
+  const go=n=>{if(BUSY)return;BUSY=true;const b=mid.querySelector(`.bub[data-n="${n}"]`);const r=b.getBoundingClientRect();b.classList.add("popped");sfx.pop();buzz(40);burst(r.left+r.width/2,r.top+r.height/2,26);setTimeout(()=>playBubble(p,n),380)};
+  if(bot){const r=Math.random();setTimeout(()=>go(r<bot.brave*.6?6:r<.35+bot.brave*.4?4:2),1100)}else mid.querySelectorAll(".bub").forEach(b=>b.onclick=()=>go(+b.dataset.n));
 }
 function askQuestion(p,q,size){return new Promise(res=>{
-  if(G.over)return res(false);
-  const timed=size===6;let left=15,iv=null,done=false;
-  sheet(`<div class="cat">${esc(q.cat)}</div>${q.photo?`<img class="qphoto" src="${q.photo}" alt="">`:""}<div class="qtext">${esc(q.q)}</div>${timed?'<div class="timer"><i id="tbar"></i></div>':""}
-   <div class="ans" id="qa">${q.opts.map(o=>`<button data-o="${esc(o)}">${esc(o)}</button>`).join("")}</div><div class="dim" id="qfoot">${p.bot?esc(p.name)+" is thinking…":"Move "+size+" if you're right"}</div>`);
+  if(ST().over)return res(false);const bot=BOTS.find(b=>b.id===p.bot);const timed=size===6;let iv=null,done=false;
+  sheet(`<div class="cat">${esc(q.cat)}</div>${q.photo?`<img class="qphoto" src="${photoURL(q.photo)}" alt="">`:""}<div class="qtext">${esc(q.q)}</div>${timed?'<div class="timer"><i id="tbar"></i></div>':""}
+   <div class="ans" id="qa">${q.opts.map(o=>`<button data-o="${esc(o)}">${esc(o)}</button>`).join("")}</div><div class="dim" id="qfoot">${bot?esc(p.name)+" is thinking…":"Move "+size+" if you're right"}</div>`);
   const finish=pick=>{if(done)return;done=true;clearInterval(iv);const ok=pick===q.a;p.asked++;if(ok){p.right++;p.streak++}else p.streak=0;
     $$("#qa button").forEach(b=>{if(b.dataset.o===q.a)b.classList.add("right");else if(b.dataset.o===pick)b.classList.add("wrong")});
-    $("#qfoot").innerHTML=ok?`<b style="color:var(--good)">Right! +20 Pop Bucks${p.streak===3?" · 🔥 3 in a row! +50 more":""}</b>`:`<b style="color:var(--bad)">${pick==null?"Time's up!":"Not quite."}</b> The answer is <b>${esc(q.a)}</b>.`;
+    $("#qfoot").innerHTML=ok?`<b style="color:var(--good)">Right! +20${p.streak===3?" · 🔥 3 in a row! +50 more":""}</b>`:`<b style="color:var(--bad)">${pick==null?"Time's up!":"Not quite."}</b> It's <b>${esc(q.a)}</b>.`;
     if(ok){sfx.right();buzz(30);p.cash+=20;if(p.streak===3)p.cash+=50}else{sfx.wrong();buzz(15)}
     setTimeout(()=>{closeSheet();res(ok)},ok?1300:2200)};
-  if(p.bot){const ok=Math.random()<p.bot.acc;setTimeout(()=>finish(ok?q.a:rnd(q.opts.filter(o=>o!==q.a))),1300+Math.random()*900)}
+  if(bot){const ok=Math.random()<bot.acc;setTimeout(()=>finish(ok?q.a:rnd(q.opts.filter(o=>o!==q.a))),1300+Math.random()*900)}
   else $$("#qa button").forEach(b=>b.onclick=()=>finish(b.dataset.o));
   if(timed){const t0=Date.now();iv=setInterval(()=>{const l=15-(Date.now()-t0)/1000;const bar=$("#tbar");if(bar)bar.style.width=Math.max(0,l/15*100)+"%";if(l<=0)finish(null)},100)}
 })}
 async function playBubble(p,size){
-  const q=makeQuestion(p,size);const ok=await askQuestion(p,q,size);if(G.over)return;
-  renderPlayers();const steps=ok?size:1;log(ok?`${p.name} got it right and moves ${steps}`:`${p.name} moves just 1`);
-  await moveBy(p,steps);await landOn(p);endTurn();
+  const ok=await askQuestion(p,makeQuestion(p,size),size);if(ST().over)return;renderPlayers();const n=ok?size:1;log(ok?`${p.name} got it right and moves ${n}`:`${p.name} moves just 1`);
+  await moveBy(p,n);await landOn(p);endTurn();
 }
-async function moveBy(p,n){
-  for(let k=0;k<n;k++){if(G.over)return;p.pos=(p.pos+1)%24;if(p.pos===0){p.cash+=200;sfx.cash();toast(`${p.piece} ${esc(p.name)} passed GO: +200`)}
-    sfx.step(k);paintTokens();$$(".sq").forEach(s=>s.classList.toggle("lit",+s.dataset.i===p.pos));await wait(220)}
-  renderPlayers();
-}
-function pay(p,amt,to){p.cash-=amt;if(to===null)G.pot+=0;else if(to==="pot")G.pot+=amt;else if(to)to.cash+=amt;sfx.pay();renderPlayers();paintOwners()}
+async function moveBy(p,n){for(let k=0;k<n;k++){if(ST().over)return;p.pos=(p.pos+1)%24;if(p.pos===0){p.cash+=200;sfx.cash();toast(`${p.piece} ${esc(p.name)} passed GO: +200`)}
+  sfx.step(k);paintTokens();$$(".sq").forEach(s=>s.classList.toggle("lit",+s.dataset.i===p.pos));await wait(220)}renderPlayers()}
+const isBot=p=>!!p.bot;
 async function landOn(p){
-  if(G.over)return;
-  const s=G.board[p.pos],idx=G.players.indexOf(p);
+  const st=ST();if(st.over)return;const s=boardSquares()[p.pos],idx=st.players.indexOf(p);const bot=BOTS.find(b=>b.id===p.bot);
   if(s.t==="prop"||s.t==="home"){
-    const o=G.owners[s.i];
-    if(o==null){
-      if(p.cash<s.price){log(`${p.name} can't afford ${s.name} yet`);return}
-      let buy;if(p.bot)buy=Math.random()<p.bot.buy&&p.cash-s.price>200;
-      else buy=await ask(`${s.photo?`<img class="sqphoto" src="${s.photo}" alt="">`:`<div class="bigmoji">${s.ic}</div>`}<h2>${esc(s.name)}</h2><div>Nobody owns it. Buy it for <b>${s.price}</b>? Anyone who lands here pays you <b>${Math.round(s.price/5)}</b>, double if you own the whole color.</div><div class="dim">You have ${p.cash}</div>`,[["Buy it for "+s.price,true,"btn"],["No thanks",false]]);
-      if(buy){p.cash-=s.price;G.owners[s.i]=idx;sfx.cash();buzz(25);log(`${p.name} bought ${s.name}!`);paintOwners();renderPlayers();
-        const set=G.board.filter(x=>x.g===s.g&&x.t==="prop");if(set.every(x=>G.owners[x.i]===idx))toast(`${p.piece} owns all of ${GROUPS[s.g].name}! Rent doubles`)}
-    }else if(o!==idx){const owner=G.players[o],r=rentOf(s);pay(p,r,owner);owner.rent+=r;log(`${p.name} paid ${owner.name} ${r} rent at ${s.name}`);
-      if(!p.bot)await ask(`<div class="bigmoji">${owner.piece}</div><h2>${esc(owner.name)}'s place!</h2><div>You pay <b>${r}</b> rent at ${esc(s.name)}.</div>`,[["OK",1,"btn"]]);else await wait(800)}
-  }else if(s.t==="fine"){await doFine(p)}
-  else if(s.t==="lucky"){await doLucky(p)}
-  else if(s.t==="pot"){const won=G.pot;p.cash+=won;G.pot=0;sfx.fan();const r=$("#mid").getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,40);
-    log(`${p.name} grabbed the Pie Pot: +${won}!`);if(!p.bot)await ask(`<div class="bigmoji">🥧</div><h2>The Pie Pot!</h2><div class="money">+${won}</div>`,[["Yum",1,"btn"]]);else await wait(900);renderPlayers();paintOwners()}
+    const o=st.owners[s.i];
+    if(o==null){if(p.cash<s.price){log(`${p.name} can't afford ${s.name} yet`);return}
+      const buy=bot?(Math.random()<bot.buy&&p.cash-s.price>200):await ask(`${s.photo?`<img class="sqphoto" src="${s.photo}" alt="">`:`<div class="bigmoji">${s.ic}</div>`}<h2>${esc(s.name)}</h2><div>Nobody owns it. Buy it for <b>${s.price}</b>? Anyone who lands here pays you <b>${Math.round(s.price/5)}</b>, double if you own the whole color.</div><div class="dim">You have ${p.cash}</div>`,[["Buy it for "+s.price,true,"btn"],["No thanks",false]]);
+      if(buy){p.cash-=s.price;st.owners[s.i]=idx;sfx.cash();buzz(25);log(`${p.name} bought ${s.name}!`);paintOwners();renderPlayers();
+        const set=BASE.map((x,i)=>Object.assign({i},x)).filter(x=>x.g===s.g&&x.t==="prop");if(set.every(x=>st.owners[x.i]===idx))toast(`${p.piece} owns all of ${GROUPS[s.g].name}! Rent doubles`)}}
+    else if(o!==idx){const owner=st.players[o],r=rentOf(s);p.cash-=r;owner.cash+=r;owner.rent+=r;sfx.pay();renderPlayers();log(`${p.name} paid ${owner.name} ${r} rent at ${s.name}`);
+      if(!bot&&(GAME.mode==="local"||p.memberId===meId()))await ask(`<div class="bigmoji">${owner.piece}</div><h2>${esc(owner.name)}'s place!</h2><div>You pay <b>${r}</b> rent at ${esc(s.name)}.</div>`,[["OK",1,"btn"]]);else await wait(800)}
+  }else if(s.t==="fine")await doFine(p);
+  else if(s.t==="lucky")await doLucky(p);
+  else if(s.t==="challenge")await doChallenge(p);
+  else if(s.t==="pot"){const won=st.pot;p.cash+=won;st.pot=0;sfx.fan();const r=$("#mid").getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,40);log(`${p.name} grabbed the Pie Pot: +${won}!`);
+    if(!bot)await ask(`<div class="bigmoji">🥧</div><h2>The Pie Pot!</h2><div class="money">+${won}</div>`,[["Yum",1,"btn"]]);else await wait(900);renderPlayers();paintOwners()}
   else if(s.t==="gotimeout"){p.jail=true;p.jailTurns=0;p.pos=6;paintTokens();log(`${p.name} went to Time Out!`);
-    if(!p.bot)await ask(`<div class="bigmoji">⏳</div><h2>Go to Time Out!</h2><div>Talked back to Mom. Your next turn starts in Time Out.</div>`,[["Aww",1,"btn"]]);else await wait(800);renderPlayers()}
+    if(!bot)await ask(`<div class="bigmoji">⏳</div><h2>Go to Time Out!</h2><div>Talked back to Mom. Your next turn starts in Time Out.</div>`,[["Aww",1,"btn"]]);else await wait(800);renderPlayers()}
 }
 async function doFine(p){
-  const f=rnd(FINES),idx=G.players.indexOf(p);
-  let useP=false;
-  if(p.pass){if(p.bot)useP=f.amt>=25;else useP=await ask(`<div class="bigmoji">😬</div><h2>${f.text}</h2><div>${f.sub}</div><div class="dim">You have a Free Pass. Use it to skip this fine?</div>`,[["🎟️ Use my Free Pass",true,"btn"],["Just pay it",false]])}
+  const st=ST(),f=rnd(FINES),idx=st.players.indexOf(p),bot=BOTS.find(b=>b.id===p.bot);let useP=false;
+  if(p.pass){if(bot)useP=f.amt>=25;else useP=await ask(`<div class="bigmoji">😬</div><h2>${f.text}</h2><div>${f.sub}</div><div class="dim">You have a Free Pass. Use it to skip this fine?</div>`,[["🎟️ Use my Free Pass",true,"btn"],["Just pay it",false]])}
   if(useP){p.pass--;log(`${p.name} used a Free Pass on "${f.text}"`);toast("🎟️ Free Pass! No fine");renderPlayers();return}
-  if(f.k==="call"){const mom=G.players.find(x=>x.mom&&x!==p);pay(p,f.amt,mom||"pot");log(`${p.name} forgot to call Mom: -50${mom?" to "+mom.name:" into the Pie Pot"}`)}
-  else if(f.k==="dish"){pay(p,f.amt,"pot");log(`${p.name} left the dishes: -25 into the Pie Pot`)}
-  else if(f.k==="thank"){const prev=G.players[(idx-1+G.players.length)%G.players.length];pay(p,f.amt,prev===p?"pot":prev);log(`${p.name} forgot to say thank you: -20 to ${prev.name}`)}
-  else{G.players.forEach(x=>{if(x!==p){p.cash-=f.amt;x.cash+=f.amt}});sfx.pay();renderPlayers();log(`${p.name} ate the last piece of pie: 10 to everyone`)}
-  if(!p.bot)await ask(`<div class="bigmoji">😬</div><h2>${f.text}</h2><div>${f.sub}</div>`,[["OK",1,"btn"]]);else await wait(900);
+  if(f.k==="call"){const mom=st.players.find(x=>x.mom&&x!==p);p.cash-=50;if(mom)mom.cash+=50;else st.pot+=50;log(`${p.name} forgot to call Mom: 50 ${mom?"to "+mom.name:"into the Pie Pot"}`)}
+  else if(f.k==="dish"){p.cash-=25;st.pot+=25;log(`${p.name} left the dishes: 25 into the Pie Pot`)}
+  else if(f.k==="thank"){const prev=st.players[(idx-1+st.players.length)%st.players.length];p.cash-=20;if(prev!==p)prev.cash+=20;else st.pot+=20;log(`${p.name} forgot to say thank you: 20 to ${prev.name}`)}
+  else{st.players.forEach(x=>{if(x!==p){p.cash-=10;x.cash+=10}});log(`${p.name} ate the last piece of pie: 10 to everyone`)}
+  sfx.pay();renderPlayers();paintOwners();
+  if(!bot)await ask(`<div class="bigmoji">😬</div><h2>${f.text}</h2><div>${f.sub}</div>`,[["OK",1,"btn"]]);else await wait(900);
 }
 async function doLucky(p){
-  const c=rnd(LUCKY);
-  if(c.cash){p.cash+=c.cash;if(c.toPot)G.pot+=-c.cash;c.cash>0?sfx.cash():sfx.pay()}
+  const st=ST(),c=rnd(LUCKY),bot=BOTS.find(b=>b.id===p.bot);
+  if(c.cash){p.cash+=c.cash;if(c.toPot)st.pot+=-c.cash;c.cash>0?sfx.cash():sfx.pay()}
   if(c.pass){p.pass++;sfx.fan();buzz(30)}
-  if(c.bday)G.players.forEach(x=>{if(x!==p){x.cash-=c.bday;p.cash+=c.bday}});
+  if(c.bday)st.players.forEach(x=>{if(x!==p){x.cash-=c.bday;p.cash+=c.bday}});
   renderPlayers();paintOwners();log(`${p.name}: ${c.text}`);
-  if(!p.bot)await ask(`<div class="bigmoji">${c.pass?"🎟️":"🍀"}</div><h2>Lucky Bubble!</h2><div>${c.text}</div>`,[["Yay",1,"btn"]]);else await wait(1000);
+  if(!bot)await ask(`<div class="bigmoji">${c.pass?"🎟️":"🍀"}</div><h2>Lucky Bubble!</h2><div>${c.text}</div>`,[["Yay",1,"btn"]]);else await wait(1000);
   if(c.move){await moveBy(p,c.move);await landOn(p)}
 }
-function endTurn(){
-  if(G.over)return;
-  $$(".sq").forEach(s=>s.classList.remove("lit"));
-  G.turn=(G.turn+1)%G.players.length;if(G.turn===0)G.round++;
-  if(G.round>G.rounds)return endGame();
+/* ⚡ Challenge square: a quick game for a big prize */
+async function doChallenge(p){
+  const bot=BOTS.find(b=>b.id===p.bot);const st=ST();
+  const names=S.members.filter(m=>m.status==="member"&&m.id!==p.memberId&&m.name.replace(/[^a-z]/gi,"").length>=4).map(m=>m.name);
+  const kind=names.length&&Math.random()<.5?"scramble":"tap";
+  if(bot){const win=Math.random()<bot.acc;await wait(1200);if(win){p.cash+=100;sfx.cash()}log(`${p.name} ${win?"won":"missed"} the ${kind==="tap"?"Bubble Tap":"Name Scramble"} challenge`);renderPlayers();return}
+  let won=false;
+  if(kind==="tap"){
+    await ask(`<div class="bigmoji">⚡</div><h2>Bubble Tap!</h2><div>Pop <b>10 bubbles in 7 seconds</b> to win <b>100</b>.</div>`,[["Go!",1,"btn"]]);
+    won=await new Promise(res=>{sheet(`<h2 id="tapLeft">10 to go</h2><div class="timer"><i id="tbar"></i></div><div class="tapzone" id="tz"></div>`);
+      const tz=$("#tz");let left=10,done=false;const t0=Date.now();
+      const spawn=()=>{const b=document.createElement("div");b.className="tb";b.style.left=Math.random()*(tz.clientWidth-56)+"px";b.style.top=Math.random()*(tz.clientHeight-56)+"px";
+        b.onpointerdown=()=>{b.remove();sfx.pop();buzz(10);left--;$("#tapLeft").textContent=left?left+" to go":"You did it!";if(left<=0)end(true);else spawn()};tz.appendChild(b)};
+      const end=w=>{if(done)return;done=true;clearInterval(iv);setTimeout(()=>{closeSheet();res(w)},600)};
+      const iv=setInterval(()=>{const l=7-(Date.now()-t0)/1000;$("#tbar").style.width=Math.max(0,l/7*100)+"%";if(l<=0)end(false)},100);spawn()});
+  }else{
+    const name=rnd(names),scr=shuffle(name.toUpperCase().replace(/[^A-Z]/g,"").split("")).join(" ");
+    const opts=shuffle([name].concat(shuffle(names.filter(n=>n!==name)).slice(0,2)));
+    await ask(`<div class="bigmoji">⚡</div><h2>Name Scramble!</h2><div>Whose name is mixed up? Answer fast to win <b>100</b>.</div>`,[["Go!",1,"btn"]]);
+    won=await new Promise(res=>{let done=false;const t0=Date.now();sheet(`<div class="qtext" style="letter-spacing:4px">${esc(scr)}</div><div class="timer"><i id="tbar"></i></div><div class="ans">${opts.map(o=>`<button data-o="${esc(o)}">${esc(o)}</button>`).join("")}</div>`);
+      const end=w=>{if(done)return;done=true;clearInterval(iv);setTimeout(()=>{closeSheet();res(w)},500)};
+      $$(".sheet .ans button").forEach(b=>b.onclick=()=>{b.classList.add(b.dataset.o===name?"right":"wrong");end(b.dataset.o===name)});
+      const iv=setInterval(()=>{const l=10-(Date.now()-t0)/1000;$("#tbar").style.width=Math.max(0,l/10*100)+"%";if(l<=0)end(false)},100)});
+  }
+  if(won){p.cash+=100;sfx.fan();burst(innerWidth/2,innerHeight/2,40);if(p.memberId===meId())earn("challenge",25,"the challenge")}else sfx.wrong();
+  log(`${p.name} ${won?"won":"missed"} the challenge${won?": +100":""}`);renderPlayers();
+  await ask(`<div class="bigmoji">${won?"🎉":"😅"}</div><h2>${won?"You won +100!":"So close!"}</h2>`,[["OK",1,"btn"]]);
+}
+async function endTurn(){
+  const st=ST();if(st.over)return;$$(".sq").forEach(s=>s.classList.remove("lit"));
+  st.turn=(st.turn+1)%st.players.length;if(st.turn===0)st.round++;
+  if(st.round>st.rounds)return endGame();
+  if(GAME.mode==="online"){const next=st.players[st.turn];
+    if(!next.bot&&next.memberId!==meId()){await syncUp(`${st.log}`);waitingView();return}
+    await syncUp(st.log)}
   setTimeout(()=>beginTurn(),500);
 }
-$("#bQuit").onclick=async()=>{if(!G)return;const c=await ask(`<h2>Game menu</h2>`,[["Keep playing","keep","btn"],["End the game now and see who won","end"],["Quit without saving","quit"]]);
-  if(c==="end"){G.round=G.rounds+1;endGame()}else if(c==="quit"){G.over=true;show("home")}else if(!G.busy&&!G.over){}};
-
+async function syncUp(event,over){
+  if(GAME.mode!=="online")return;const st=ST();
+  try{const r=await act("gameUpdate",{id:GAME.id,rev:GAME.rev,state:st,turnMember:turnMemberOf(st),event,over:!!over});GAME.rev=r.rev}
+  catch(e){if(e.status===409){toast("Someone else just moved. Catching up…");const g=await api(`/f/${SES.fid}/game?id=${GAME.id}`);GAME.rev=g.rev;GAME.st=g.state;paintAll()}else toast(esc(e.message))}
+}
+const worthOf=p=>{const st=ST();return p.cash+BASE.reduce((a,s,i)=>a+(s.t==="prop"&&st.owners[i]===st.players.indexOf(p)?s.price:0),0)};
 async function endGame(){
-  if(G.ended)return;G.ended=true;G.over=true;closeSheet();
-  const worth=p=>p.cash+G.board.filter(s=>G.owners[s.i]===G.players.indexOf(p)&&s.t==="prop").reduce((a,s)=>a+s.price,0);
-  const ranked=G.players.slice().sort((a,b)=>worth(b)-worth(a));const win=ranked[0];
-  const brain=G.players.slice().sort((a,b)=>(b.right/(b.asked||1))-(a.right/(a.asked||1))||b.right-a.right)[0];
-  const landlord=G.players.slice().sort((a,b)=>b.rent-a.rent)[0];
-  const date=new Date().toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
-  G.players.forEach(p=>{if(!p.pid)return;const s=st(p.pid);s.games++;s.right+=p.right;s.asked+=p.asked;s.banked+=Math.max(0,Math.round(worth(p)/10));
-    if(p===win){s.wins++;s.trophies.push("🏆")}if(p===brain&&p.right)s.trophies.push("🧠");if(p===landlord&&p.rent)s.trophies.push("🏠")});
-  saveAll();sfx.fan();buzz(60);burst(innerWidth/2,innerHeight/3,70);
-  const medals=["🥇","🥈","🥉"];
+  const st=ST();if(st.over)return;st.over=true;closeSheet();
+  if(GAME.mode==="online")await syncUp("Game over!",true);
+  showEnd(true);
+}
+async function showEnd(award){
+  const st=ST();const ranked=st.players.slice().sort((a,b)=>worthOf(b)-worthOf(a));const win=ranked[0];
+  const brain=st.players.slice().sort((a,b)=>(b.right/(b.asked||1))-(a.right/(a.asked||1))||b.right-a.right)[0];
+  const landlord=st.players.slice().sort((a,b)=>b.rent-a.rent)[0];
+  if(award){const results=st.players.filter(p=>p.memberId).map(p=>({memberId:p.memberId,worth:worthOf(p),right:p.right,asked:p.asked,rent:p.rent,winner:p===win,
+      trophies:[p===win&&"🏆",p===brain&&p.right&&"🧠",p===landlord&&p.rent&&"🏠"].filter(Boolean)}));
+    try{await act("gameEnd",{gameKey:GAME.mode==="online"?GAME.id:st.key,id:GAME.mode==="online"?GAME.id:null,results,winnerName:win.name})}catch(e){toast(esc(e.message))}
+    // Free Passes won or used during the game settle into each player's bank (only your own account from this phone)
+    const me=st.players.find(p=>p.memberId===meId());if(me){const d=me.pass-me.passStart;for(let i=0;i<Math.abs(d);i++)try{await act("pass",{delta:Math.sign(d)})}catch(e){}}
+    await refresh();sfx.fan();buzz(60);burst(innerWidth/2,innerHeight/3,70)}
+  const medals=["🥇","🥈","🥉"];const iWon=win.memberId===meId();
   sheet(`<div class="bigmoji">${win.piece}</div><h2>${esc(win.name)} wins!</h2>
-   <div class="card" style="text-align:left">${ranked.map((p,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${medals[i]||"·"} ${p.piece} ${esc(p.name)}</span><b>${worth(p)}</b></div>`).join("")}</div>
-   <div class="card" style="text-align:left">
-     <div>🏆 <b>Winner:</b> ${esc(win.name)}</div>
-     ${brain.right?`<div>🧠 <b>Knows the family best:</b> ${esc(brain.name)} (${brain.right} of ${brain.asked} right)</div>`:""}
-     ${landlord.rent?`<div>🏠 <b>Top landlord:</b> ${esc(landlord.name)} (${landlord.rent} in rent)</div>`:""}
-   </div>
-   ${win.pid?`<button class="btn" id="winPic">📸 ${esc(win.name)}, put your picture on a square!</button>`:""}
-   <button class="btn ${win.pid?"ghost":""}" id="again">Play again</button><button class="btn ghost" id="toHome">Home</button>`);
-  $("#again").onclick=()=>{closeSheet();renderSetup();show("setup")};$("#toHome").onclick=()=>{closeSheet();show("home")};
-  if($("#winPic"))$("#winPic").onclick=()=>winnerPicture(win,date);
+   <div class="card" style="text-align:left">${ranked.map((p,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${medals[i]||"·"} ${p.piece} ${esc(p.name)}</span><b>${worthOf(p)}</b></div>`).join("")}</div>
+   <div class="card" style="text-align:left"><div>🏆 <b>Winner:</b> ${esc(win.name)}</div>${brain.right?`<div>🧠 <b>Knows the family best:</b> ${esc(brain.name)} (${brain.right} of ${brain.asked})</div>`:""}${landlord.rent?`<div>🏠 <b>Top landlord:</b> ${esc(landlord.name)} (${landlord.rent} in rent)</div>`:""}
+   <div class="dim small" style="margin-top:6px">Everyone's Pop Bucks went into the family bank.</div></div>
+   ${iWon?`<button class="btn" id="winPic">📸 Put your picture on a square!</button>`:win.memberId?`<div class="dim">${esc(win.name)} can put their picture on a square from their phone: Bank → 📸 My picture square.</div>`:""}
+   <button class="btn ${iWon?"ghost":""}" id="endBack">Back to the app</button>`);
+  if($("#winPic"))$("#winPic").onclick=()=>{closeSheet();squareFlow()};
+  $("#endBack").onclick=()=>{closeSheet();GAME=null;tab("play")};
 }
-async function winnerPicture(win,date){
-  const props=BASE.map((s,i)=>Object.assign({i},s)).filter(s=>s.t==="prop");
-  const pick=await ask(`<h2>Which square gets your picture?</h2><div class="dim">It stays on the board for every game, with your name on it.</div>`,
-    props.map(s=>[`${s.ic} ${esc(SQPICS[s.i]?SQPICS[s.i].name:s.name)}${SQPICS[s.i]?" (replace)":""}`,s.i]).concat([["Not now",-1]]));
-  if(pick<0)return;
-  const photo=await pickPhoto();if(!photo){toast("No picture picked");return}
-  const nm=await new Promise(res=>{sheet(`<img class="sqphoto" src="${photo}" alt=""><label class="f">Name this square<input id="sqName" maxlength="16" value="${esc(SQPICS[pick]?SQPICS[pick].name:BASE[pick].name)}"></label>
-    <label class="f">A few words about the picture (optional)<input id="sqCap" maxlength="40" placeholder="Summer at the lake, 1998"></label><button class="btn" id="sqSave">Put it on the board</button>`);
-    $("#sqSave").onclick=()=>{const v={name:$("#sqName").value.trim()||BASE[pick].name,caption:$("#sqCap").value.trim()};closeSheet();res(v)}});
-  SQPICS[pick]={photo,name:nm.name,caption:nm.caption,by:win.name,date};
-  if(saveAll()!==false){sfx.fan();toast(`📸 ${esc(nm.name)} is on the board for good!`)}
-  show("home");
-}
+$("#pHow").onclick=()=>sheet(`<h2>How to play</h2><div style="text-align:left;line-height:1.55">
+ 🫧 <b>Pick your bubble</b>. <b>Small</b> = easy family question, move <b>2</b>. <b>Medium</b> = move <b>4</b>. <b>Big</b> = hard, timed, move <b>6</b>. Right answers also pay 20, and 3 in a row pays 50 more. Wrong, and you only move 1.<br>
+ 🏡 Buy places nobody owns. When others land there, they <b>pay you rent</b>, double if you own the whole color. Everyone's own house is theirs from the start.<br>
+ 😬 <b>Oops!</b> squares are Mom's family fines. "Forgot to call your mom" pays Mom!<br>
+ 🍀 <b>Lucky Bubble</b> is a surprise, maybe a <b>Free Pass</b>. ⚡ <b>Challenge</b> is a quick game for 100.<br>
+ 🥧 Fines go in the <b>Pie Pot</b>. Land on it and it's yours.<br>
+ 🏆 Richest after the last round wins and puts <b>their picture on a square</b> for good. Everyone's money goes into the family bank.</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Got it</button>`);
 
 /* ================= start ================= */
-if(!window.__TAURI__&&'serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
-if(!PEOPLE.length)setTimeout(()=>sheet(`<div class="bigmoji">🫧</div><h2>Welcome to Family Pop!</h2><div>The board game all about your family. Start by adding yourself. It takes a minute.</div><button class="btn" id="wAdd">Add me</button><button class="btn ghost" id="wLater">Look around first</button>`),300);
-document.addEventListener("click",e=>{if(e.target.id==="wAdd"){personForm(null,()=>{})}if(e.target.id==="wLater")closeSheet()});
+if(!window.__TAURI__&&"serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+(async()=>{
+  const inv=parseInvite(location.search);
+  if(SES){const c=ls.get("cache",null);if(c&&!c.pending){S=c;renderAll();tab("home")}await refresh();connect();
+    if(inv&&inv.fid!==SES.fid)toast("You're already in a family on this phone")}
+  else{showScreen("welcome");if(inv)joinFlow(inv)}
+})();
 })();
 </script>
 </body>

@@ -1,0 +1,316 @@
+{
+  "scenes": [
+    {
+      "id": "wastes_gate",
+      "chapter": "CHAPTER II \u00b7 THE WASTES",
+      "text": "The city wall ends. Beyond it, the Wastes \u2014 grey hills and old bones. A storm is rolling in.\nA merchant caravan huddles by the gate, too afraid to move. A lone rider watches you from a rock.\nYou have the signet ring.",
+      "choices": [
+        {
+          "text": "Show the ring. Demand passage.",
+          "next": "rider_demand",
+          "do": [
+            "trust:-5"
+          ]
+        },
+        {
+          "text": "Sneak past in the storm.",
+          "next": "wastes_lost",
+          "require": "hedgeborn"
+        },
+        {
+          "text": "Talk to the rider.",
+          "next": "rider_join"
+        },
+        {
+          "text": "Join the caravan.",
+          "next": "caravan",
+          "do": [
+            "add_item:supplies"
+          ]
+        },
+        {
+          "text": "A felled tree across the road. Veterans in the brush.",
+          "next": "deep_bandits_1"
+        }
+      ]
+    },
+    {
+      "id": "rider_demand",
+      "chapter": "CHAPTER II \u00b7 THE WASTES",
+      "text": "You hold up the ring. The rider's eyes flick to it, then to your face. Slowly, deliberately, they spit on the ground.\n\"A crown is a crown. I don't owe it nothing.\"\nBut they don't leave. Not yet.\n\"...The road is mine, though. Two gold and I lead you through. No promises past that.\"",
+      "choices": [
+        {
+          "text": "Pay the two gold.",
+          "next": "wastes_ride",
+          "require": "gold:2",
+          "do": [
+            "gold:-2",
+            "companion:ash"
+          ]
+        },
+        {
+          "text": "Refuse. Ride alone.",
+          "next": "wastes_alone",
+          "do": [
+            "trust:-5",
+            "fear:5"
+          ]
+        },
+        {
+          "text": "Offer the castle talisman.",
+          "next": "wastes_ride",
+          "require": "castle_talisman",
+          "do": [
+            "rem_item:castle_talisman",
+            "companion:ash"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rider_join",
+      "chapter": "CHAPTER II \u00b7 THE RIDER",
+      "text": "The rider is young. Eyes like flint.\n\"I know where the tracks go. But I don't work for crowns.\"\nThey watch your hand on your weapon.\n\"A guide costs 20 gold. Or a companion who isn\u2019t likely to die before sundown.\"",
+      "choices": [
+        {
+          "text": "Pay 20 gold.",
+          "next": "wastes_ride",
+          "require": "gold:20",
+          "do": [
+            "gold:-20",
+            "companion:ash"
+          ]
+        },
+        {
+          "text": "Refuse. Continue alone.",
+          "next": "wastes_alone",
+          "do": [
+            "trust:-5"
+          ]
+        },
+        {
+          "text": "Offer the castle talisman instead.",
+          "next": "wastes_ride",
+          "require": "castle_talisman",
+          "do": [
+            "rem_item:castle_talisman",
+            "companion:ash"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wastes_ride",
+      "chapter": "CHAPTER III \u00b7 OLD DOORWAY",
+      "text": "You ride hard for two days. Ash knows every rock and raven in the Wastes.\nOn the second night they point north.\n\"Someone was here. Not long ago. Not human.\"\nYou find an old doorway half-buried in the hillside. Stone. No handle. No keyhole.\nA symbol carved above it makes your eyes hurt.\nAsh steps back.\n\"I\u2019m not going in there.\"",
+      "choices": [
+        {
+          "text": "Enter alone.",
+          "next": "hollow_gate",
+          "do": [
+            "trust:-10"
+          ]
+        },
+        {
+          "text": "Search the hillside first.",
+          "next": "hill_search"
+        },
+        {
+          "text": "Convince Ash to stay (Trust 60+).",
+          "next": "hollow_gate",
+          "require": "trust:60",
+          "do": [
+            "trust:5"
+          ]
+        },
+        {
+          "text": "Call a halt. Make camp for the night.",
+          "next": "camp_rest"
+        },
+        {
+          "text": "Follow the goat track to the hut on the hill.",
+          "next": "side_captain_hut"
+        },
+        {
+          "text": "Stop for the minstrel on the milestone.",
+          "next": "side_minstrel_1"
+        },
+        {
+          "text": "Follow Moth toward an old tower.",
+          "next": "side_moth_roost_1",
+          "require": "companion:moth"
+        },
+        {
+          "text": "Halt. Something thin and gray is following you down the road.",
+          "next": "deep_wraith_road_1"
+        },
+        {
+          "text": "[wraith lingers from yesterday]",
+          "next": "deep_wraith_lingers",
+          "require": "flag:wraith_follows"
+        }
+      ]
+    },
+    {
+      "id": "hill_search",
+      "chapter": "CHAPTER III \u00b7 HILLSIDE",
+      "text": "You circle the doorway and find a second opening smaller, hidden behind roots \u2014 an old servant\u2019s entrance. But a ward hums across it.\nYou can:\n  \u2022 Use the signet ring to weaken the ward.\n  \u2022 Try the lock if you recruited Moth.\n  \u2022 Force it with the sword and take the damage.",
+      "choices": [
+        {
+          "text": "Use the signet ring.",
+          "next": "hollow_gate",
+          "require": "signet_ring",
+          "do": [
+            "rem_item:signet_ring"
+          ]
+        },
+        {
+          "text": "Pick the lock (needs Moth).",
+          "next": "hollow_gate",
+          "require": "moth",
+          "do": [
+            "trust:5"
+          ]
+        },
+        {
+          "text": "Force it.",
+          "next": "hollow_gate",
+          "do": [
+            "fear:15",
+            "trust:-5"
+          ]
+        },
+        {
+          "text": "Find a hollow. Make camp.",
+          "next": "camp_rest"
+        },
+        {
+          "text": "Climb to the stone hut with the smoke.",
+          "next": "side_captain_hut"
+        },
+        {
+          "text": "Visit the King's Yard outside the wall.",
+          "next": "side_graveyard_gate"
+        },
+        {
+          "text": "The tunnel map shows a crown-with-a-slash off the main route.",
+          "next": "deep_lost_city_1",
+          "require": "tunnel_map"
+        }
+      ]
+    },
+    {
+      "id": "wizard_tower",
+      "chapter": "CHAPTER II \u00b7 WIZARD TOWER",
+      "text": "The wizard is old, annoyed, and surrounded by books that whisper.\n\"The letter mentions a hollow gate. These pages call it a wound in the world, stitched shut by the old kings. If she\u2019s through it, ordinary steel won\u2019t help.\"\nHe offers you a wardstone. It won\u2019t open doors \u2014 but it might close one behind you.",
+      "choices": [
+        {
+          "text": "Take the wardstone and leave.",
+          "next": "wastes_gate",
+          "do": [
+            "add_item:wardstone"
+          ]
+        },
+        {
+          "text": "Demand more help.",
+          "next": "wizard_demand",
+          "do": [
+            "trust:-10"
+          ]
+        },
+        {
+          "text": "Walk up to the tower door.",
+          "next": "tower_approach"
+        }
+      ]
+    },
+    {
+      "id": "wizard_demand",
+      "chapter": "CHAPTER II \u00b7 WIZARD TOWER",
+      "text": "The wizard straightens. The books stop whispering.\n\"I can send you through. But the cost is yours, not mine.\"\nA doorway of light opens behind him. Beyond it: grey hills.\nHe winks. \"Say hello to my old apprentice while you\u2019re there.\"",
+      "choices": [
+        {
+          "text": "Step through.",
+          "next": "hollow_gate",
+          "do": [
+            "fear:10"
+          ]
+        },
+        {
+          "text": "Refuse. Do this your own way.",
+          "next": "wastes_gate"
+        },
+        {
+          "text": "Push past him. Explore the tower.",
+          "next": "tower_foyer"
+        }
+      ]
+    },
+    {
+      "id": "barracks",
+      "chapter": "CHAPTER II \u00b7 BARRACKS",
+      "text": "The captain is sharpening a sword. He laughs when you ask for men.\n\"{missing_short_cap} runs off into the dark and you want a parade?\"\nThen he sees the ring \u2014 or your face \u2014 and stops.\n\"I\u2019ll send Vale. He\u2019s the best I have. And the most ruined. If that suits you.\"",
+      "choices": [
+        {
+          "text": "Accept Ser Vale.",
+          "next": "wastes_gate",
+          "do": [
+            "companion:vale"
+          ]
+        },
+        {
+          "text": "Decline. You work better alone.",
+          "next": "wastes_gate"
+        },
+        {
+          "text": "Bed down in the barracks loft.",
+          "next": "camp_rest"
+        },
+        {
+          "text": "Slip out to the King's Yard.",
+          "next": "side_graveyard_gate"
+        }
+      ]
+    },
+    {
+      "id": "city_gates",
+      "chapter": "CHAPTER I \u00b7 CITY GATES",
+      "text": "The city smells of salt and lies. You spend the night in a tavern where maps are traded like secrets.\nA woman in the corner slips you a note: meet her at the bridge at midnight.\nShe calls herself Moth. She knows about doors that shouldn\u2019t exist.\nIn return, she wants half the reward.",
+      "choices": [
+        {
+          "text": "Meet Moth at the bridge.",
+          "next": "moth_join",
+          "do": [
+            "companion:moth"
+          ]
+        },
+        {
+          "text": "Ignore her and head for the Wastes alone.",
+          "next": "wastes_gate"
+        },
+        {
+          "text": "Push into the city proper.",
+          "next": "city_lost"
+        }
+      ]
+    },
+    {
+      "id": "moth_join",
+      "chapter": "CHAPTER II \u00b7 THE THIEF",
+      "text": "Moth is young, fast, and already halfway to stealing your purse before you stop her.\n\"Easy,\" she laughs. \"I needed to know if you were worth the trouble.\"\nShe offers two things: keys to the old smuggler\u2019s tunnels, and a way past locked doors.",
+      "choices": [
+        {
+          "text": "Take the tunnel map and go.",
+          "next": "wastes_gate",
+          "do": [
+            "add_item:tunnel_map"
+          ]
+        },
+        {
+          "text": "Keep your distance.",
+          "next": "wastes_gate"
+        }
+      ]
+    }
+  ]
+}

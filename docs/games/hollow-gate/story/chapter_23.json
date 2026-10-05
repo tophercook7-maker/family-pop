@@ -1,0 +1,638 @@
+{
+  "scenes": [
+    {
+      "id": "u23_start",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "The Long Dark opens without warning, the way a held breath ends.\n\nYou step from the last of the tunnels into a hall that has no walls you can find. The floor is black glass. It goes down forever beneath your boots, and something down there is looking up.\n\nAt the far end — near, then far, then near again, distance lying the way it always lies here — sits a throne. It is grown, not built: a chair of grey antler and drowned wood and the long white roots of some tree that died before there were trees. Frost breathes off it in slow tides.\n\nSomething sits in it. You cannot yet say what. Only that it is watching you cross the black glass, and that it has been watching you since long before you were born.",
+      "choices": [
+        {
+          "text": "Walk toward the throne. Do not slow.",
+          "next": "u23_approach",
+          "do": [
+            "flag:region_throne",
+            "journal:Reached the Hollow Throne. Something has been waiting for me here."
+          ]
+        },
+        {
+          "text": "Stop. Take the measure of the room first.",
+          "next": "u23_measure"
+        }
+      ]
+    },
+    {
+      "id": "u23_measure",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You hold still on the black glass and let your eyes learn the room.\n\nThe hall is a memory of the throne room in the kingdom above — the same proportions, the same high absent windows — but rotted through and reflected wrong, as if drowned and then dreamed. Frost has written on the floor in a hand you almost recognize. The same word, over and over, worn smooth by centuries of writing: a girl's name, half a name, less than a name each time.\n\nAround the throne stand the taken. Children. Hunters in old livery. A widow. They do not move. They are listening to the silence the way plants lean at the sun.\n\nThe thing in the throne lifts its head a fraction. Frost falls from it like snow off a bough.",
+      "choices": [
+        {
+          "text": "Read the frozen writing on the floor.",
+          "next": "u23_writing"
+        },
+        {
+          "text": "Enough looking. Approach the throne.",
+          "next": "u23_approach",
+          "do": [
+            "flag:region_throne"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_writing",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You kneel and press your palm to the frost. The writing wakes under your hand, ten thousand attempts at one word, none of them finished, none of them right. A letter here. A sound there. A name he has been chasing across the ice for a thousand winters and never once caught.\n\nThis is the wound. This is what the minstrel meant. He has written her down and written her down and cannot read his own hand anymore.\n\nIf you carry her true name, you carry the only thing in either world he cannot bear to hear.",
+      "choices": [
+        {
+          "text": "Rise, and go to the throne.",
+          "next": "u23_approach",
+          "do": [
+            "flag:region_throne",
+            "flag:codex_keeper",
+            "journal:The floor of the throne room is one name, written ten thousand times and never finished. His wound has a shape now."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_approach",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You walk. The taken turn their heads to follow you, slow as sunflowers, and something in that gentle attention is worse than any snarl.\n\nHalfway across, the cold stops being weather and starts being intent. It reaches into your chest and feels around for the thing you love most, to hold it up to the light.\n\nThen the thing in the throne stands.\n\nIt unfolds. Antlers, or a crown, or the black branches of a winter tree — the shape will not hold still. Beneath it is the suggestion of a face, the place where a face should be, and two eyes that are only very deep grief with the lights left on.\n\n\"You came all this way,\" the Keeper says. Its voice is every voice you have ever heard go quiet. \"To the last room. How brave. I do so love the brave ones. They fill up so nicely.\"",
+      "choices": [
+        {
+          "text": "\"I know what you are. You're the Keeper.\"",
+          "next": "u23_name_it"
+        },
+        {
+          "text": "Say nothing. Let it come to you.",
+          "next": "u23_offer"
+        },
+        {
+          "text": "Draw steel. No more talk.",
+          "next": "u23_prefight",
+          "do": [
+            "fear:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_name_it",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "\"The Keeper.\" It tastes the word. \"Yes. That is the post. That is the coat I wear. But you have not asked what is under the coat.\"\n\nIt drifts closer, and the taken close ranks behind it, a silent tide of the held.\n\n\"There is always a Keeper. The Gate must be kept, or it opens onto everything at once, and everything at once is a thing no world survives. So someone stays. Someone always stays. The staying hollows you out and fills you back up with door, until you are only the door's hunger wearing a face.\"\n\nIt tilts the ruin of its head.\n\n\"I have kept it so long I have forgotten why I came in. But I came in for something. I know I came in for something.\"",
+      "choices": [
+        {
+          "text": "\"You came in for a girl. You've forgotten her name.\"",
+          "next": "u23_offer",
+          "require": "flag:keeper_weakness",
+          "do": [
+            "flag:codex_keeper",
+            "journal:Told the Keeper to his face that he came in for a drowned girl. Something in the dark flinched."
+          ]
+        },
+        {
+          "text": "\"Then let me take your place, and you can go.\"",
+          "next": "u23_offer",
+          "do": [
+            "flag:codex_keeper"
+          ]
+        },
+        {
+          "text": "\"Whatever you came for, you won't have my kin.\"",
+          "next": "u23_prefight",
+          "do": [
+            "flag:codex_keeper",
+            "trust:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_offer",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "The Keeper stops an arm's length away. This close, the cold is total. Your breath crystals and falls.\n\n\"I will make you an honest offer,\" it says. \"I make it to everyone who reaches this room. You are the first in an age to hear it standing up.\"\n\nBehind it, in the grey ranks of the held, you see them: {missing_name}, small and still and listening, eyes gone to glass. And near them, wearing antlers of {other_poss} own now, {other_name}.\n\n\"Leave me the two you love,\" the Keeper says, \"and I will let the rest of you walk back up into the light. I will even smile when you go. It is a good bargain. It is the only bargain I have. What is two, against a whole life of your own?\"",
+      "choices": [
+        {
+          "text": "\"No. I did not come to trade them away.\"",
+          "next": "u23_refuse"
+        },
+        {
+          "text": "\"Everyone. I take everyone, or no one leaves.\"",
+          "next": "u23_refuse",
+          "do": [
+            "trust:5",
+            "fear:-5"
+          ]
+        },
+        {
+          "text": "Pretend to consider it. Buy a heartbeat.",
+          "next": "u23_stall",
+          "check": {
+            "stat": "fear",
+            "dc": 13,
+            "pass": "u23_stall",
+            "fail": "u23_refuse"
+          }
+        }
+      ]
+    },
+    {
+      "id": "u23_stall",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You let your shoulders drop. You let your eyes go to the floor, to the ten thousand unfinished names in the frost. You let the Keeper believe, for one breath, that it has won.\n\nIt leans in. It is greedy for the yes. In its greed it comes close enough that you can see the boy who is still buried somewhere under all that door — the boy who climbed into the dark after a girl and never climbed out.\n\nNow. While it is close. You choose how this ends.",
+      "choices": [
+        {
+          "text": "Say the name you carry. (true_name)",
+          "next": "u23_truename_check",
+          "require": "true_name"
+        },
+        {
+          "text": "Show it the mirror-shard, and let it see itself. (mirror_shard)",
+          "next": "u23_mirror_path",
+          "require": "mirror_shard"
+        },
+        {
+          "text": "Strike while it is close.",
+          "next": "u23_prefight",
+          "do": [
+            "trust:3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_refuse",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "\"No,\" you say, and the word rings on the black glass like a struck bell.\n\nThe Keeper draws back. For a moment the grief in its eyes curdles into something older and colder, and the whole hall darkens as if a lid closed over a lamp.\n\n\"They always say no,\" it murmurs. \"And then I keep them anyway, and add their no to the quiet. You will make a lovely silence, brave one. You will go so still.\"\n\nThe taken behind it lift their hands. The frost climbs your boots. You have one choice left — how you mean to break this.",
+      "choices": [
+        {
+          "text": "Speak its true name and command it. (true_name)",
+          "next": "u23_truename_check",
+          "require": "true_name"
+        },
+        {
+          "text": "Break the mirror-shard between you. (mirror_shard)",
+          "next": "u23_mirror_path",
+          "require": "mirror_shard"
+        },
+        {
+          "text": "Call your companions to your side.",
+          "next": "u23_rally"
+        },
+        {
+          "text": "No name, no mirror. Only steel.",
+          "next": "u23_prefight"
+        }
+      ]
+    },
+    {
+      "id": "u23_rally",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You do not face it alone. You turn your head a fraction and say the names of the ones who came this far with you — and in this room of the nameless, saying a name is the loudest thing there is.\n\nThe silence cracks. Somewhere behind you, a boot scrapes glass. A blade clears a scabbard. A lantern flares grey.",
+      "choices": [
+        {
+          "text": "Gloam sets his mirror-back against yours.",
+          "next": "u23_gloam_stand",
+          "require": "companion:gloam"
+        },
+        {
+          "text": "Lumen lifts the grey flame between you and the dark.",
+          "next": "u23_lumen_stand",
+          "require": "companion:lumen"
+        },
+        {
+          "text": "Vale steps up, ruined and steady, sword high.",
+          "next": "u23_prefight",
+          "require": "companion:vale",
+          "do": [
+            "trust:5",
+            "max_hp:2"
+          ]
+        },
+        {
+          "text": "No one answers. You stand alone, and choose steel.",
+          "next": "u23_prefight",
+          "do": [
+            "fear:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_gloam_stand",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "The Mirror-Knight sets his back to yours. In his polished breastplate you see the Keeper reflected — and the reflection is not the towering thing before you. In the mirror it is small. A soaked boy. A grief that never got to grow up.\n\n\"It cannot lie in a mirror,\" Gloam says, low. \"The Law holds even here. If we make it look at itself, we make it remember.\"\n\nHe turns his shield toward the Keeper. The Keeper recoils from its own true shape.",
+      "choices": [
+        {
+          "text": "Use the shard-glass with Gloam. (mirror_shard)",
+          "next": "u23_mirror_path",
+          "require": "mirror_shard",
+          "do": [
+            "rel:gloam:5"
+          ]
+        },
+        {
+          "text": "Press the advantage — strike while it flinches.",
+          "next": "u23_prefight",
+          "do": [
+            "rel:gloam:3",
+            "trust:5"
+          ]
+        },
+        {
+          "text": "Say the name while it is looking at itself. (true_name)",
+          "next": "u23_truename_check",
+          "require": "true_name",
+          "do": [
+            "rel:gloam:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_lumen_stand",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "The Lantern-child steps in front of you, small and unafraid, and lifts the grey flame high.\n\nThe taken turn toward the light. For the first time they are not listening to the silence — they are looking at something. A child, a fire, a way out.\n\n\"They followed me here,\" Lumen says, without turning. \"The Keeper takes the ones nobody comes back for. But somebody came back. You came back.\" The small hand tightens on yours. \"I can hold the light. You have to close the wound.\"",
+      "choices": [
+        {
+          "text": "\"Then hold it. I'll do the rest.\" Say the name. (true_name)",
+          "next": "u23_truename_check",
+          "require": "true_name",
+          "do": [
+            "rel:lumen:5"
+          ]
+        },
+        {
+          "text": "Guard Lumen and the flame — meet the Keeper with steel.",
+          "next": "u23_prefight",
+          "do": [
+            "rel:lumen:5",
+            "trust:5"
+          ]
+        },
+        {
+          "text": "Turn the shard toward the flame. (mirror_shard)",
+          "next": "u23_mirror_path",
+          "require": "mirror_shard",
+          "do": [
+            "rel:lumen:3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_truename_check",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You hold the true name in your mouth like a coal. It is small. It is only a girl's name, the name a boy called across a frozen river a thousand years ago and never got to hear answered.\n\nEverything in the Underland has a name it has hidden even from itself. Say one, say it true, and you command the thing — once. Only once.\n\nThe Keeper sees your lips move to shape it and it comes apart at the seams, half lunging to stop you, half aching to hear. The whole hall holds its breath.\n\nSay it clear. Say it true. Do not let your voice shake.",
+      "choices": [
+        {
+          "text": "Speak the name aloud, clear and true.",
+          "next": "u23_truename_resolve"
+        },
+        {
+          "text": "Let the weight of the moment decide — trust your voice.",
+          "next": "u23_truename_resolve",
+          "check": {
+            "stat": "trust",
+            "dc": 14,
+            "pass": "u23_truename_win",
+            "fail": "u23_truename_fail",
+            "onPass": [
+              "flag:codex_keeper",
+              "journal:I said her name. His name. The one he lost. The Gate answered."
+            ],
+            "onFail": [
+              "fear:10"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "u23_truename_resolve",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You open your mouth and the name falls out into the dark.",
+      "choices": [
+        {
+          "text": "…",
+          "next": "u23_truename_win"
+        }
+      ]
+    },
+    {
+      "id": "u23_truename_win",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "The name lands.\n\nIt strikes the Keeper the way spring strikes ice — not with force, but from underneath, everywhere at once. A crack runs up through the towering shape. Then another. The antlers, the crown, the winter branches all shudder and let go, and for one impossible instant the thing in front of you is not a Keeper at all.\n\nIt is a boy. Soaked. Fifteen, no more. Standing on a riverbank a thousand years gone, hearing at last the name he screamed into the water — and understanding, finally, that she did not answer because she could not, and that it was never his to fix.\n\n\"Oh,\" the boy says. Just that. \"Oh. It was you. It was always just… you.\"\n\nThe frost on the floor melts. Ten thousand unfinished names run together into water and the water runs away downhill toward a light.\n\n\"The door,\" the boy whispers, already thinning. \"Someone still has to keep the door. But not like this. Never again like this. Choose better than I did.\"",
+      "choices": [
+        {
+          "text": "\"I will. Go. She's waiting.\"",
+          "next": "u24_start",
+          "require": "companion:lumen",
+          "do": [
+            "flag:keeper_named",
+            "flag:throne_lantern_held",
+            "companion:lumen",
+            "journal:The Keeper was a boy. I gave him back his name and he let go. Lumen holds the light while the door decides who keeps it next.",
+            "trust:10"
+          ]
+        },
+        {
+          "text": "\"Rest now. I have the door.\"",
+          "next": "u24_start",
+          "do": [
+            "flag:keeper_named",
+            "flag:throne_open_seat",
+            "journal:The Keeper was a boy. I named him free. Now the throne is empty, and it is looking at me.",
+            "trust:10"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_truename_fail",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "Your voice shakes. The name comes out cracked down the middle, half-swallowed by the cold, and it lands wrong — a syllable short, a breath too soft.\n\nThe Keeper reels, wounded but not undone. It heard enough to remember there was a name, and not enough to be freed by it, and that is the cruelest place of all.\n\n\"So close,\" it breathes, and its grief goes to fury. \"You had it. You had it and you let it fall.\"\n\nThe hall floods with dark. The taken raise their hands. There is no more talking now — only whether you live through the next minute.",
+      "choices": [
+        {
+          "text": "Steady your breath. Try the name once more. (true_name)",
+          "next": "u23_truename_retry",
+          "require": "true_name"
+        },
+        {
+          "text": "Steel, then. Cut your way to the throne.",
+          "next": "u23_prefight",
+          "do": [
+            "fear:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_truename_retry",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You close your eyes. You stop trying to be brave and just try to be true.\n\nYou think of the widow's letter — being loved makes the dark less wide. You think of the frozen river. You open your eyes, and this time you do not aim the name like a weapon. You give it, gently, the way you would hand a lost thing back to its owner.",
+      "choices": [
+        {
+          "text": "Say her name, softly, like a gift.",
+          "next": "u23_truename_win"
+        },
+        {
+          "text": "Steady your nerve first, then give it — and see if the fear lets you.",
+          "next": "u23_truename_win",
+          "check": {
+            "stat": "fear",
+            "dc": 11,
+            "pass": "u23_truename_win",
+            "fail": "u23_prefight",
+            "onPass": [
+              "flag:codex_keeper",
+              "journal:The second time, I gave the name instead of throwing it. That was the difference."
+            ],
+            "onFail": [
+              "hp:-3"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "u23_mirror_path",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You draw the mirror-shard. It is a splinter of the Underland's own black water, hardened, and it remembers everything it has ever reflected.\n\nA reflection can be truer than the thing it reflects. You turn the shard so the Keeper sees itself.\n\nAnd the Keeper does not see a Keeper. It sees the boy. Soaked, small, fifteen, screaming at a river that will not give her back. It has not looked at that boy in a thousand years. It has built a whole crown, a whole coat of door, precisely so it would never have to.\n\n\"Stop,\" it says. \"Stop showing me that. Put it away. Put it — \"\n\nThe shard is a small thing and the Keeper is vast. Holding the mirror up is like holding a candle to a rising tide. Your arm shakes.",
+      "choices": [
+        {
+          "text": "Hold the mirror steady. Make it look. (skill)",
+          "next": "u23_mirror_hold",
+          "check": {
+            "stat": "trust",
+            "dc": 13,
+            "pass": "u23_mirror_win",
+            "fail": "u23_mirror_shatter",
+            "onPass": [
+              "flag:codex_keeper"
+            ],
+            "onFail": [
+              "fear:8"
+            ]
+          }
+        },
+        {
+          "text": "Drive the shard into the throne itself.",
+          "next": "u23_mirror_shatter"
+        },
+        {
+          "text": "Say the name while it stares at its true face. (true_name)",
+          "next": "u23_truename_check",
+          "require": "true_name",
+          "do": [
+            "rem_item:mirror_shard"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_mirror_hold",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You brace the shard with both hands and do not let it drop.",
+      "choices": [
+        {
+          "text": "Hold. Hold. Hold.",
+          "next": "u23_mirror_win"
+        }
+      ]
+    },
+    {
+      "id": "u23_mirror_win",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "The Keeper cannot look away.\n\nIt is bound by the Mirror Law as surely as Gloam is, as surely — quietly — as you are. It stares into the shard and the crown of branches sloughs off it like snow off a warming roof. The vast shape folds down and down until it is only the boy again, dripping riverwater onto the black glass, staring at his own reflected grief with an expression of terrible, dawning relief.\n\n\"That's me,\" he says, wondering. \"That's just… me. I thought I was the door. I thought I had to be the door.\"\n\nHe reaches toward his reflection. The shard in your hands goes warm, then bright, then still.\n\n\"You can let me put it down now,\" the boy says. \"But someone still has to keep the Gate. That doesn't end. That never ends. Only who — and how.\"",
+      "choices": [
+        {
+          "text": "Free him. Take up the mirror-watch yourself. (Gloam)",
+          "next": "u24_start",
+          "require": "companion:gloam",
+          "do": [
+            "flag:keeper_mirrored",
+            "flag:throne_mirror_pact",
+            "companion:gloam",
+            "rem_item:mirror_shard",
+            "journal:I showed the Keeper his true face in the shard and he laid the crown down. Gloam and I will keep the door by the Mirror Law now — a truer keeping.",
+            "trust:10"
+          ]
+        },
+        {
+          "text": "Free him. Leave the throne empty and open.",
+          "next": "u24_start",
+          "do": [
+            "flag:keeper_mirrored",
+            "flag:throne_open_seat",
+            "rem_item:mirror_shard",
+            "journal:The mirror unmade the Keeper. The throne sits empty. Something in the dark is waiting to see who fills it.",
+            "trust:8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_mirror_shatter",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You drive the shard down into the arm of the throne with everything you have.\n\nThe black glass of the floor answers with a sound like a lake cracking in a thaw — a long, groaning boom that runs out to the horizon and back. The shard shatters, and every splinter throws a reflection, and suddenly the Keeper is surrounded by a thousand tiny true faces of itself, a thousand soaked boys, a thousand griefs it cannot un-see.\n\nThe throne of antler and root screams. It has never been struck before. Nothing has ever refused it in this room and lived, and refusal, it turns out, is a kind of blade.\n\nBut a wounded thing is a dangerous thing, and the shard is gone now. What rises from the broken throne is not a boy. It is the door's hunger, cornered, and it comes for you with a hundred grey hands.",
+      "choices": [
+        {
+          "text": "Meet it. Stand your ground.",
+          "next": "u23_combat",
+          "do": [
+            "flag:codex_keeper",
+            "rem_item:mirror_shard"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_prefight",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "No names. No mirrors. Only the oldest answer there is.\n\nYou set your feet on the black glass and raise your steel. The Keeper regards you with something almost like tenderness, the way a tide regards a sandcastle.\n\n\"Brave,\" it says. \"So brave. The brave ones fight the door. As if a door could be stabbed. As if hunger could bleed.\"\n\nIt spreads the ruin of its arms, and the cold comes down like a falling roof, and the taken close in behind it — but you have come too far to be quiet now. You have a name in your mouth even if it is only your own, and you say it, loud, and step into the dark.",
+      "choices": [
+        {
+          "text": "Charge the throne.",
+          "next": "u23_combat"
+        },
+        {
+          "text": "Wait — try the name one last time. (true_name)",
+          "next": "u23_truename_check",
+          "require": "true_name"
+        }
+      ]
+    },
+    {
+      "id": "u23_combat",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "The Keeper's true form pours off the throne — a churning tower of frost and antler and reaching grey hands, the drowned court boiling up behind it. It does not want to kill you. It wants to keep you, and keeping is worse. Every touch of the cold tries to make you still, tries to make you listen, tries to add you to the quiet.\n\nStrike fast. Do not go quiet. Do not stop making noise.",
+      "choices": [],
+      "combat": {
+        "enemy": "The Keeper's Hunger",
+        "ehp": 15,
+        "edmg": 4,
+        "win": "u23_combat_win",
+        "lose": "u23_combat_lose",
+        "flee": "u23_combat_flee"
+      }
+    },
+    {
+      "id": "u23_combat_win",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You do not stop moving and you do not stop shouting, and in the end that is the trick of it: the Keeper cannot make a loud thing quiet by force. Blow by blow you drive the cold back onto the throne it came from.\n\nThe tower of frost buckles. The grey hands lose their grip on the world one finger at a time. And as the shape collapses, for just a breath, you glimpse the boy inside it — startled, exhausted, almost grateful to be losing.\n\nThe Keeper does not die. Doors do not die. But it is beaten out of its shape and driven back down into the black glass, and the throne stands scorched and empty, and the taken behind it stir like sleepers at a slammed shutter.\n\nYou are still standing. You made enough noise. You are still yourself.",
+      "choices": [
+        {
+          "text": "Stand over the broken throne. Decide what comes next.",
+          "next": "u24_start",
+          "do": [
+            "flag:codex_keeper",
+            "flag:keeper_beaten",
+            "flag:throne_open_seat",
+            "journal:I could not name the Keeper, so I fought it. I broke its shape and cleared the throne. But the door is not closed — only unguarded. That is a new kind of danger.",
+            "trust:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_combat_flee",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You break off. The cold is too much, the hands too many, and dying quietly in this room would help no one you love.\n\nYou fall back to the throne room's edge, where the black glass meets the dark you came from, chest heaving, the Keeper looming but — strangely — not pursuing. It cannot leave the room. It never could. That is the whole tragedy of it.\n\n\"You will come back,\" it calls, almost gentle. \"They all come back. The door is patient. So am I.\"\n\nYou press a hand to the wall and breathe. You are not beaten. You are only not finished. And now you know the shape of the room, the reach of the cold, the weakness under the crown.",
+      "choices": [
+        {
+          "text": "Gather yourself. Go back in — with the name this time. (true_name)",
+          "next": "u23_truename_check",
+          "require": "true_name",
+          "do": [
+            "fear:-5"
+          ]
+        },
+        {
+          "text": "Gather yourself. Go back in and finish the fight.",
+          "next": "u23_combat_return"
+        }
+      ]
+    },
+    {
+      "id": "u23_combat_return",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You catch your breath in the dark at the room's edge until your hands stop shaking. Then you tighten your grip and walk back onto the black glass.\n\nThe Keeper is waiting, exactly as you left it, patient as a tide. But you are not the same as you left it. You know its reach now. You know it cannot follow you out. You know it wants to keep you, not kill you, and a thing that will not kill you can be worn down.\n\n\"Again,\" the Keeper sighs. \"Brave. So brave.\"\n\n\"Again,\" you agree, and step in.",
+      "choices": [],
+      "combat": {
+        "enemy": "The Keeper's Hunger",
+        "ehp": 11,
+        "edmg": 4,
+        "win": "u23_combat_win",
+        "lose": "u23_combat_lose",
+        "flee": "u23_combat_flee"
+      }
+    },
+    {
+      "id": "u23_combat_lose",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "The cold gets its arms around you at last.\n\nIt does not hurt. That is the horror of it. It is warm the way freezing to death is warm at the end — a great and gentle hush, a hand smoothing your hair, a voice telling you that you have done enough, that you can put the fight down now, that you can be still.\n\nAnd you nearly do. You nearly go quiet.\n\nBut somewhere in the grey ranks a small voice says a name — your name — and will not stop saying it. {missing_name}. Or the Lantern-child. Or a widow who kept the chairs. Someone in the dark remembers you were a person, and their remembering is a splinter you can grip.\n\nYou grip it. You do not go quiet. You force one eye open, then the other, and drag yourself back up out of the warm.",
+      "choices": [
+        {
+          "text": "Refuse the hush. Rise once more.",
+          "next": "u23_last_stand",
+          "do": [
+            "hp:3",
+            "fear:5",
+            "flag:codex_keeper"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u23_last_stand",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You come back onto your feet the way the drowned come back — coughing, furious, alive out of pure refusal.\n\nThe Keeper actually pauses. In a thousand years, few have crawled out of its embrace once it had them. It is not sure what to do with a thing that will not be kept.\n\n\"You should be quiet by now,\" it says, and for the first time there is something under the grief that might be fear. \"Why aren't you quiet?\"\n\n\"Because someone came back for me,\" you say. \"That's the whole thing you never understood.\"",
+      "choices": [
+        {
+          "text": "Say the name that ends it. (true_name)",
+          "next": "u23_truename_check",
+          "require": "true_name",
+          "do": [
+            "fear:-5"
+          ]
+        },
+        {
+          "text": "One last charge — break its shape for good.",
+          "next": "u23_last_combat"
+        }
+      ]
+    },
+    {
+      "id": "u23_last_combat",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "Everything you have left, you spend now. Not for glory — you have heard what the door does to heroes — but for the small stubborn people in the grey ranks who kept saying your name.\n\nThe Keeper's shape has never had to fight a thing it could not hush. It does not know how. And that, in the end, is the crack you drive your steel into.",
+      "choices": [],
+      "combat": {
+        "enemy": "The Keeper's Last Shape",
+        "ehp": 8,
+        "edmg": 3,
+        "win": "u23_combat_win",
+        "lose": "u23_bargain_forced",
+        "flee": "u23_bargain_forced"
+      }
+    },
+    {
+      "id": "u23_bargain_forced",
+      "chapter": "CHAPTER XXIII · THE HOLLOW THRONE",
+      "text": "You cannot beat it. Not with steel, not tonight, not without the name you never found.\n\nSo you do the only thing left to a cornered person in a room that will not let you die: you bargain.\n\n\"A trade,\" you gasp. \"You want someone to keep the door. You want to be able to put it down. I'm here. I'm loud. I won't go quiet. Let the taken walk out — all of them — and I'll consider the seat.\"\n\nThe Keeper goes very still. This is not the bargain it offers. This is a bargain offered to it, and it has not heard one of those in an age.\n\n\"You would sit down here,\" it says slowly, \"of your own will. Knowing what it costs.\"\n\n\"I'd hear you out,\" you say. \"That's all. In the next room. Not here.\"",
+      "choices": [
+        {
+          "text": "Hold the offer open. Walk into the next room to decide.",
+          "next": "u24_start",
+          "do": [
+            "flag:keeper_bargain_open",
+            "flag:throne_open_seat",
+            "flag:codex_keeper",
+            "journal:I couldn't beat the Keeper. So I offered it the one thing it never expected: a willing successor. Nothing is signed. But the door is listening now, and so am I.",
+            "fear:5"
+          ]
+        }
+      ]
+    }
+  ]
+}

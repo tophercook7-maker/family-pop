@@ -1,0 +1,30 @@
+{
+  "ash": {
+    "name": "Ash",
+    "description": "A rider with eyes like flint."
+  },
+  "vale": {
+    "name": "Ser Vale",
+    "description": "A knight stripped of his honor."
+  },
+  "moth": {
+    "name": "Moth",
+    "description": "A street urchin with quick fingers."
+  },
+  "rook": {
+    "name": "Rook",
+    "description": "A raven that speaks. Or a madman."
+  },
+  "hedge_witch": {
+    "name": "Hedge Witch",
+    "description": "Old magic in a cabin of bones."
+  },
+  "lumen": {
+    "name": "Lumen, the Lantern-child",
+    "description": "A small figure who carries a grey flame through the Underland."
+  },
+  "gloam": {
+    "name": "Gloam, the Mirror-Knight",
+    "description": "A knight bound inside a reflection, freed at a price."
+  }
+}

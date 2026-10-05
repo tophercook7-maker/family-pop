@@ -1,0 +1,571 @@
+{
+  "scenes": [
+    {
+      "id": "u19_start",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The March gives way to water. Not a river — a floor of it, ankle-deep and black, stretching to where a castle stands on legs of its own reflection.\n\nIt is your king's castle. The one you were born under. But drowned. The banners hang like drowned hair. The gate-arch is a mouth full of dark. Every window holds a second castle, upside down, sinking.\n\nSomewhere inside, a bell tolls underwater — slow, wrong, each note arriving a moment before you expect it.\n\nYou set the flag of this place in your bones.",
+      "choices": [
+        {
+          "text": "Wade toward the drowned gate.",
+          "next": "u19_gate",
+          "do": [
+            "flag:region_court",
+            "journal:Reached the Drowned Court — the king's castle, sunk and mirrored, on the far side of the Gate."
+          ]
+        },
+        {
+          "text": "Circle the walls, looking for another way.",
+          "next": "u19_wall_walk",
+          "do": [
+            "flag:region_court"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_wall_walk",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You wade the perimeter. The water never rises past your ankles no matter how the ground pretends to fall away. In the wall's reflection you see doors that are not in the wall.\n\nAt a corner, a sally-port hangs open, weed-choked. Cold breathes out of it. And carved above the lintel, fresh among the rot, three words: WEAR MY FACE.\n\nBehind you, your own reflection in the black water lifts its head a half-second after you do.",
+      "choices": [
+        {
+          "text": "Slip in through the sally-port.",
+          "next": "u19_undercroft"
+        },
+        {
+          "text": "Go to the main gate instead.",
+          "next": "u19_gate"
+        }
+      ]
+    },
+    {
+      "id": "u19_gate",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The gate-arch swallows you. Inside, the water is gone — or you are inside the reflection now, and the water is the sky.\n\nThe great hall opens ahead, torchlit by flames that give no heat and hang wrong-way-up, roots of light growing down from the ceiling. Courtiers line the walls: men and women in drowned finery, still as portraits, water beading on their skin and never falling.\n\nAt the far end, on a throne set in a shallow pool, sits a king.\n\nHe wears your king's face. He wears it the way a hand wears a glove.",
+      "choices": [
+        {
+          "text": "Approach the throne, openly.",
+          "next": "u19_throne_approach"
+        },
+        {
+          "text": "Study the frozen courtiers first.",
+          "next": "u19_courtiers"
+        },
+        {
+          "text": "Look for a side passage out of the hall.",
+          "next": "u19_side_gallery"
+        }
+      ]
+    },
+    {
+      "id": "u19_courtiers",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "Up close, the courtiers are wrong in the small ways that matter. A lady's smile has no seam where the lips part. A steward's eyes are painted on a face that has forgotten what eyes are for. They do not breathe. They wait, the way a held breath waits.\n\nOne — a girl in a page's coat — has a single real tear frozen on her cheek, mid-fall. When you lean close her mouth moves without sound. You read it off her lips: *he is not the king. he is not the king. he is not*\n\nThe king's voice fills the hall without his mouth moving. \"You will find my court poor company. They agree with everything I say. It is a lonely way to be right.\"",
+      "choices": [
+        {
+          "text": "Turn and face the throne.",
+          "next": "u19_throne_approach",
+          "do": [
+            "journal:A frozen page mouthed the same words over and over: he is not the king."
+          ]
+        },
+        {
+          "text": "Whisper to the frozen page: 'Who are you?'",
+          "next": "u19_page_whisper"
+        }
+      ]
+    },
+    {
+      "id": "u19_page_whisper",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You put your mouth near the frozen girl's ear. \"Who are you?\"\n\nFor a moment nothing. Then her eyes swivel — only the eyes — and fix on you, and they are horribly alive.\n\n\"I was the one who brought his supper,\" she breathes, lips barely moving. \"The real king. Before. He took the king's face and then he took the king, and now the king is a coat he wears on cold days. Say nothing you would not want repeated. The walls are his ears. The walls were us.\"\n\nHer eyes roll back to painted stillness.\n\nYou straighten. The false king is watching. He has been watching the whole time.",
+      "choices": [
+        {
+          "text": "Approach the throne.",
+          "next": "u19_throne_approach",
+          "do": [
+            "fear:5",
+            "journal:A trapped servant: the false king took the true king's face, then the king himself. The walls hear everything."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_side_gallery",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You edge along the wall toward a curtained arch. Behind it: a gallery of portraits, all the same face — your king, in a hundred styles, a hundred ages. In each one the painted eyes have been scratched out and repainted, scratched out and repainted, layers deep, as if someone could not decide whose eyes should go in that face.\n\nAt the gallery's end, water pools under a low door. The undercroft. You could go down, away from the throne. Or you could go back.\n\nA reflection in the pooled water shows the false king already standing behind you. You turn. The hall is empty. You turn back. Gone.",
+      "choices": [
+        {
+          "text": "Go down to the undercroft.",
+          "next": "u19_undercroft"
+        },
+        {
+          "text": "Return to the hall and face him.",
+          "next": "u19_throne_approach"
+        }
+      ]
+    },
+    {
+      "id": "u19_undercroft",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The stair goes down into standing water and older stone. Here the drowning is real — cold to the knee, then the waist. The walls are cells. Iron doors, most rusted open, all empty.\n\nAll but one.\n\nBehind the last grate, a shape sits with its back to you, wrapped in a cloak the grey of wet ash. It does not turn. But it speaks, in a voice worn smooth as river-glass.\n\n\"You carry a lantern that isn't lit,\" it says. \"That means you met the child, or you will. Lumen. Little grey flame.\"",
+      "choices": [
+        {
+          "text": "\"You know Lumen?\" (companion: lumen)",
+          "next": "u19_gloam_lumen",
+          "require": "companion:lumen"
+        },
+        {
+          "text": "\"Who are you, behind the grate?\"",
+          "next": "u19_gloam_intro"
+        },
+        {
+          "text": "Leave the prisoner. Return upstairs.",
+          "next": "u19_throne_approach"
+        }
+      ]
+    },
+    {
+      "id": "u19_gloam_intro",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "\"A knight,\" the shape says. \"Was. The court called me the Mirror-Knight when there was a court worth calling anything. I guarded the true king. I failed him in the ordinary way: I believed the thing wearing his face because it asked me to.\"\n\nIt turns its head, and you see a helm of black glass, and in the glass, your own face, tired and afraid.\n\n\"He keeps me here because I am the last who remembers the king's real laugh. As long as I remember it, his mask is imperfect. So he keeps me where no one can hear me remember.\"\n\nThe grate is locked with a warding-glyph, not a bolt.",
+      "choices": [
+        {
+          "text": "Try to break the warding-glyph.",
+          "next": "u19_gloam_glyph"
+        },
+        {
+          "text": "\"Come with me. I'll get you out.\"",
+          "next": "u19_gloam_free"
+        },
+        {
+          "text": "\"I can't free you now. I'm sorry.\"",
+          "next": "u19_gloam_leave"
+        }
+      ]
+    },
+    {
+      "id": "u19_gloam_lumen",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "\"I know Lumen,\" the shape says, and for the first time something like warmth crosses the smooth voice. \"The child lit my cell once, walking past on the water. Grey flame through the grate. It was the only light I have had in an age of years.\"\n\nLumen presses close to the bars beside you, holding the ash-lantern high. Grey fire pools on black glass. The prisoner turns — a helm of dark mirror — and bows its head to the child.\n\n\"Little flame. You came back.\"\n\n\"I said I would,\" Lumen says, small and certain. Then, to you: \"This one is true. I have seen its inside. Free it. Please.\"",
+      "choices": [
+        {
+          "text": "\"Then we free it. Break the glyph.\"",
+          "next": "u19_gloam_glyph",
+          "do": [
+            "rel:lumen:+3",
+            "journal:Lumen vouched for the Mirror-Knight prisoner. 'This one is true. I have seen its inside.'"
+          ]
+        },
+        {
+          "text": "\"There's no time. We have a king to face.\"",
+          "next": "u19_gloam_leave",
+          "do": [
+            "rel:lumen:-4",
+            "journal:Lumen begged me to free the Mirror-Knight. I refused. The child would not look at me after."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_gloam_glyph",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The glyph is a knot of pale light burned into the iron. It answers to certainty, the knight says — you must lay your hand on it and mean, without flinching, that this prisoner deserves to walk free. Doubt, and it bites.\n\nYou press your palm flat against the cold fire.",
+      "choices": [
+        {
+          "text": "Hold your hand and your certainty. (Trust)",
+          "next": "u19_gloam_free",
+          "check": {
+            "stat": "trust",
+            "dc": 13,
+            "pass": "u19_gloam_free",
+            "fail": "u19_gloam_glyph_fail",
+            "onPass": [
+              "trust:+4"
+            ],
+            "onFail": [
+              "hp:-4",
+              "fear:6"
+            ]
+          }
+        },
+        {
+          "text": "Draw back. Leave the knight to its cell.",
+          "next": "u19_gloam_leave"
+        }
+      ]
+    },
+    {
+      "id": "u19_gloam_glyph_fail",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The glyph reads the flinch in you — the small voice that wonders if the knight is one more mask — and it bites. White fire runs up your arm. You wrench your hand away, palm smoking, breath ragged.\n\n\"You doubted,\" the knight says, not unkindly. \"Everyone here doubts. It is the water in the walls. Try again, if you can hold your heart still. Or go. I have waited an age; I can wait a little more.\"",
+      "choices": [
+        {
+          "text": "Steady yourself. Press again.",
+          "next": "u19_gloam_free2"
+        },
+        {
+          "text": "Leave the knight. Climb to the hall.",
+          "next": "u19_gloam_leave"
+        }
+      ]
+    },
+    {
+      "id": "u19_gloam_free2",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You breathe until the doubt sinks, the way silt sinks in still water. You think of the king's real laugh you have never heard, and decide it was worth hearing, and press.\n\nThe glyph flares — and gutters out. The iron door sighs open on its ruined hinges.",
+      "choices": [
+        {
+          "text": "Help the knight up.",
+          "next": "u19_gloam_free"
+        }
+      ]
+    },
+    {
+      "id": "u19_gloam_free",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The Mirror-Knight rises. Taller than you thought, plated in glass that is half-armor, half-reflection. Where you stand in its surface, you stand a little braver.\n\n\"Gloam,\" it says. \"That was my name, when names were worn instead of hidden. I will walk with you to the throne. I know the false king's tricks; I taught him half of them, believing him my liege.\"\n\nIt lays a cold, mirrored hand on your shoulder. \"When he offers you his face, refuse it. That is the whole of my counsel. Everything else, we survive together.\"",
+      "choices": [
+        {
+          "text": "\"Then walk with me, Gloam.\"",
+          "next": "u19_throne_approach",
+          "do": [
+            "companion:gloam",
+            "add_item:mirror_shard",
+            "trust:+5",
+            "journal:Freed the Mirror-Knight, Gloam. Its counsel: when the false king offers you his face, refuse it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_gloam_leave",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You climb back toward the hall, the knight's smooth voice following you up the stair.\n\n\"Go on, then. Perhaps you're wise. Perhaps I am one more of his faces, set here to catch the kind.\" A pause. \"I hope you're wise. I hope, too, that you're wrong.\"\n\nThe cold water lets go of your legs. Above, the wrong-way torches wait.",
+      "choices": [
+        {
+          "text": "Enter the hall and face the throne.",
+          "next": "u19_throne_approach",
+          "do": [
+            "fear:4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_throne_approach",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You cross the long hall. Your footsteps make no sound; the false king's voice makes all of it.\n\n\"Come closer. Let me look at one of the living.\" He leans forward on the drowned throne, water sheeting off the arms. Up close his borrowed face is beautiful and slightly loose, like a portrait hung on a peg too small. \"I know you. Not you — your kind. You come for a child, or a father, or a crown, and you find me wearing all three.\"\n\nHe smiles the king's smile. It fits wrong.\n\n\"Tell me true, and I may let you leave breathing: what did you come to take?\"",
+      "choices": [
+        {
+          "text": "\"The truth. You are not the king.\"",
+          "next": "u19_accuse"
+        },
+        {
+          "text": "\"Only passage. I'll bend the knee if I must.\"",
+          "next": "u19_bend_knee"
+        },
+        {
+          "text": "\"Your face. Whose was it before?\"",
+          "next": "u19_whose_face"
+        },
+        {
+          "text": "Say nothing. Let Gloam speak. (companion: gloam)",
+          "next": "u19_gloam_speaks",
+          "require": "companion:gloam"
+        }
+      ]
+    },
+    {
+      "id": "u19_gloam_speaks",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "Gloam steps past you, glass ringing on stone. In the black helm, the false king sees himself — and for the first time the borrowed face slips, showing something grey and unfinished beneath.\n\n\"I remember your true liege's laugh,\" Gloam says. \"You never learned it. You practiced the frown, the decree, the cold hand on the treaty. But you could never do the laugh, because you have nothing in you to laugh with.\"\n\nThe false king recoils on his throne. \"You. I drowned you in glass.\"\n\n\"You kept me in glass. There is a difference. It is the difference that will unmake you.\"\n\nThe hall's water begins, very slightly, to boil.",
+      "choices": [
+        {
+          "text": "\"He's right. Take off the king's face.\"",
+          "next": "u19_accuse",
+          "do": [
+            "trust:+3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_bend_knee",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You lower yourself to one knee in the shallow water. It laps cold at your shin.\n\n\"Wiser than most,\" the false king purrs. \"Kneel, and I give you a gift beyond passage. I give you what everyone here wanted: to be sure. No more doubt. No more grief. You need only wear a face I choose, and speak the words I choose, and you will never be uncertain again.\"\n\nHe reaches down. His hand comes off at the wrist — not blood, but light — and floats toward your face, opening like a mask about to be pressed on.\n\nGloam's counsel rings in your memory, if you heard it: *refuse his face.*",
+      "choices": [
+        {
+          "text": "Refuse. Strike the mask away and rise.",
+          "next": "u19_accuse",
+          "do": [
+            "trust:+4",
+            "journal:The false king offered me the gift of certainty — to wear a face he chose. I refused."
+          ]
+        },
+        {
+          "text": "Let the mask settle. Just for a moment.",
+          "next": "u19_mask_touch"
+        }
+      ]
+    },
+    {
+      "id": "u19_mask_touch",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The mask of light presses cool against your face and, for one breath, it is heaven. The doubt drains out of you. The grief for the lost one goes quiet. You are sure. You are so beautifully sure.\n\nThen you feel it start to take root, threading grey fingers behind your eyes, and you understand this is how the courtiers were made — sure, and empty, and his.\n\nYou tear it off. It comes away with a sound like a peeling scab, and takes something with it: some of your warmth, some of your nerve.",
+      "choices": [
+        {
+          "text": "Hurl the mask into the pool and rise, shaking.",
+          "next": "u19_accuse",
+          "do": [
+            "fear:10",
+            "trust:-4",
+            "journal:I let the false king's mask touch me. It nearly rooted. I got it off, but it took something warm with it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_whose_face",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "\"Whose face?\" The king traces the borrowed jaw with borrowed fingers. \"Yours, one day, perhaps. It has been a hundred faces. A guardsman who wept. A queen who did not. A child — always a child underneath, the first face I stole, so long ago I have worn out the memory of it.\"\n\nFor a moment the beautiful king-mask thins, and beneath it you glimpse something small and grey and drowned, a face no bigger than a boy's, mouth open in an old scream that never finished.\n\n\"Do not pity me,\" he says, and the mask snaps back. \"Pity is a door. And I keep all the doors.\"",
+      "choices": [
+        {
+          "text": "\"I pity you anyway. You're not the king.\"",
+          "next": "u19_accuse",
+          "do": [
+            "journal:Beneath the king-mask: a drowned child's face, the first the false king ever stole."
+          ]
+        },
+        {
+          "text": "\"Then keep this door shut behind me.\" (bend)",
+          "next": "u19_bend_knee"
+        }
+      ]
+    },
+    {
+      "id": "u19_accuse",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "\"You are not the king,\" you say, and the words land like stones in the still water. The courtiers along the walls shudder — a hundred held breaths, released at once. The frozen page's single tear finally falls.\n\nThe false king rises. He is taller standing. The borrowed face darkens, the beauty curdling. \"No,\" he agrees, and his voice is many voices now, all the stolen ones speaking together. \"But possession is nine parts of a crown. Say it again and I will drown the word in your throat.\"\n\nThe water of the hall rises around your ankles, your knees, cold and climbing, and the throne-pool churns.",
+      "choices": [
+        {
+          "text": "Draw steel. End the imposter.",
+          "next": "u19_combat"
+        },
+        {
+          "text": "Try to name the drowned child beneath the mask. (Fear)",
+          "next": "u19_name_check"
+        },
+        {
+          "text": "Stand your ground with Gloam. (companion: gloam)",
+          "next": "u19_combat_gloam",
+          "require": "companion:gloam"
+        }
+      ]
+    },
+    {
+      "id": "u19_name_check",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You do not draw. You reach instead for the drowned child you glimpsed — the first face, the true one under all the theft. If you can hold your nerve against the rising water and the many-voiced roar, you might speak to that child, and the false king cannot bear to be a child again.\n\nThe water is at your chest. His many voices scream you down.",
+      "choices": [
+        {
+          "text": "Hold your nerve. Speak past the king, to the child. (Fear)",
+          "check": {
+            "stat": "fear",
+            "dc": 14,
+            "pass": "u19_name_success",
+            "fail": "u19_combat",
+            "onPass": [
+              "trust:+6"
+            ],
+            "onFail": [
+              "hp:-3",
+              "fear:8"
+            ]
+          }
+        },
+        {
+          "text": "Nerve fails. Draw steel instead.",
+          "next": "u19_combat"
+        }
+      ]
+    },
+    {
+      "id": "u19_name_success",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You find a stillness under the fear, and you speak into it — not to the king, but through him, to the small drowned thing that wore the first face.\n\n\"You were cold,\" you say. \"You were cold and no one came, and you took a warm face so you would not be cold alone. I know. It's over now. You can put it down.\"\n\nThe king staggers as if struck. The many voices break apart into one thin child's wail. The rising water stops, trembles, and begins to fall. The borrowed king-face slides half off, hanging by the jaw, and beneath it the grey child weeps without sound.\n\nHe is not defeated. But he is listening now, which he has not done in centuries.",
+      "choices": [
+        {
+          "text": "Press the mercy. Offer your hand.",
+          "next": "u19_court_falls",
+          "do": [
+            "trust:+8",
+            "fear:-10",
+            "journal:I spoke to the drowned child under the false king's mask. He stopped. He listened. The court began to wake."
+          ]
+        },
+        {
+          "text": "He's weakened — strike now while you can.",
+          "next": "u19_combat",
+          "do": [
+            "trust:-6",
+            "fear:6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_combat_gloam",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "Gloam sets its glass shoulder to yours. In the mirror of its armor the false king sees a dozen of you, a dozen knights, and cannot tell which blade is real.\n\n\"His trick is the reflection,\" Gloam says. \"So we give him too many. Strike where I am not, and I will be where he strikes.\"\n\nThe false king surges from the throne in a wall of black water, borrowed face splitting into a snarl, and the two of you meet him.",
+      "combat": {
+        "enemy": "The False King",
+        "ehp": 11,
+        "edmg": 3,
+        "win": "u19_court_falls",
+        "lose": "u19_combat_lose",
+        "flee": "u19_combat_flee"
+      }
+    },
+    {
+      "id": "u19_combat",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "Steel clears the scabbard. The false king comes off the throne in a surge of black water, the borrowed king-face splitting down the middle to show the grey drowned thing beneath, screaming with a hundred stolen mouths.\n\nHe fights like a reflection — always where you did not swing, never where you did. The water drags at your legs. But he is a thief of faces, not a soldier, and thieves tire.",
+      "combat": {
+        "enemy": "The False King",
+        "ehp": 13,
+        "edmg": 4,
+        "win": "u19_court_falls",
+        "lose": "u19_combat_lose",
+        "flee": "u19_combat_flee"
+      }
+    },
+    {
+      "id": "u19_combat_flee",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You break off and run for the drowned gallery. Water hammers at your heels; the many-voiced roar chases you between the scratched-out portraits.\n\nYou throw yourself through the low undercroft door and slam it. The pounding stops. In the sudden quiet you hear only your own heart and the drip of black water off your sleeves.\n\nThere is another way up from here — a servants' stair that climbs past the drowned court and out toward the pale country beyond. You are not proud of running. But you are alive to run.",
+      "choices": [
+        {
+          "text": "Climb the servants' stair, out of the Court.",
+          "next": "u20_start",
+          "do": [
+            "fear:8",
+            "trust:-3",
+            "journal:I fled the false king rather than fall to him. The Drowned Court still stands behind me. So does he."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_combat_lose",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "A wall of black water takes you off your feet. The false king's borrowed hands close on your face, cold and eager, and everything goes to drowning-dark.\n\nYou wake on a cold flagstone with no memory of climbing out, your gear soaked, blood in your mouth, one breath from the long silence. Something pulled you clear — the frozen page, perhaps, or Gloam, or the water itself deciding it was not yet done with you.\n\nThe hall behind you is empty. The throne is empty. For now.",
+      "choices": [
+        {
+          "text": "Crawl up and drag yourself onward.",
+          "next": "u20_start",
+          "do": [
+            "hp:-2",
+            "fear:12",
+            "trust:-4",
+            "journal:The false king nearly drowned me. Someone — something — pulled me clear. The throne sits empty behind me, waiting to be filled again."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_court_falls",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The false king comes apart the way a reflection comes apart when the water is struck — into rings, into ripples, into nothing. The borrowed king-face floats free, a peeled and empty thing, and sinks.\n\nThe drowned court wakes. Along the walls, a hundred held breaths finally release; the courtiers slump, blink, become people. The frozen page rubs her wet cheek and stares at her own moving hand as if it is a miracle, which it is.\n\nThe throne stands empty. The water drains through cracks that were not there before, out toward the pale country beyond the far door.",
+      "choices": [
+        {
+          "text": "See to the waking court.",
+          "next": "u19_aftermath"
+        },
+        {
+          "text": "Take the empty king-face from the water. (raise fear)",
+          "next": "u19_take_face"
+        }
+      ]
+    },
+    {
+      "id": "u19_take_face",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You lift the peeled king-face from the draining pool. It is light as a wet leaf and cold as the inside of a mirror. It would fit you. Some part of you, tired of doubt, wants it to.\n\nGloam, if it is with you, goes very still. The waking page whispers, \"Put it down. Put it down, road-friend.\"\n\nYou fold the empty face and tuck it away. Just in case. Just in case. The wanting of it sits in your chest like a swallowed coal.",
+      "choices": [
+        {
+          "text": "Keep it. Turn to the court.",
+          "next": "u19_aftermath",
+          "do": [
+            "add_item:mirror_shard",
+            "fear:10",
+            "trust:-3",
+            "journal:I took the false king's peeled face from the water. I tell myself it is only in case. The wanting of it will not sit still."
+          ]
+        },
+        {
+          "text": "No. Let it sink. Turn to the court.",
+          "next": "u19_aftermath",
+          "do": [
+            "trust:+4",
+            "fear:-4",
+            "journal:I let the false king's empty face sink. Some crowns are only masks with better manners."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_aftermath",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "The waking courtiers gather to you, dripping, dazed, grateful. The page — her name is Wren, she remembers now — presses your hands.\n\n\"He wore us,\" she says. \"He wore the whole court as one face, and we forgot we were more than his frown. You un-wore us.\" She looks toward the far door, where the last water is draining into pale light. \"That way leads out of the Court. Deeper in. The wood, they say. The unmaking wood. Whatever you're chasing, it went that way. It always goes that way.\"\n\nShe presses something into your palm: a shard of the throne's black glass, edged in silver.",
+      "choices": [
+        {
+          "text": "Thank Wren. Take the far door.",
+          "next": "u19_depart",
+          "do": [
+            "add_item:mirror_shard",
+            "trust:+3",
+            "journal:Wren and the freed court sent me on toward the unmaking wood, deeper into the Underland."
+          ]
+        },
+        {
+          "text": "Ask if any here saw the one you seek.",
+          "next": "u19_ask_court"
+        }
+      ]
+    },
+    {
+      "id": "u19_ask_court",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "\"The one I'm looking for,\" you say. \"Small. Frightened. Came through not long ago.\"\n\nWren's brow furrows. \"There was a shape that passed through and did not stop,\" she says slowly. \"It would not look at the throne. It went straight for the far door, toward the wood, the way a candle goes toward a draught.\" She hesitates. \"It carried a grey light. Or a grey light carried it. Hard to say which, here.\"\n\nA grey light. Lumen's light, or its like. Someone is being led into the wood ahead of you.",
+      "choices": [
+        {
+          "text": "Take the far door at once.",
+          "next": "u19_depart",
+          "do": [
+            "add_item:mirror_shard",
+            "journal:A shape carrying a grey light went ahead of me into the wood, and would not look at the throne. I follow."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u19_depart",
+      "chapter": "CHAPTER XIX · THE DROWNED COURT",
+      "text": "You cross the draining hall to the far door. Behind you the Drowned Court is becoming a living one again — quiet voices, a swept floor, someone weeping the good kind of tears. It is the first thing on this side of the Gate that has healed instead of hollowed.\n\nBeyond the door the water gives way to root and mist. The pale country begins. Somewhere in it, trees stand that unmake what walks between them.\n\nYou step out of the Court and into the wood's long shadow.",
+      "choices": [
+        {
+          "text": "Into the unmaking wood.",
+          "next": "u20_start"
+        },
+        {
+          "text": "Look back once at the waking court, then go.",
+          "next": "u20_start",
+          "do": [
+            "trust:+2",
+            "journal:Left the Drowned Court alive and awake behind me. Not everything here has to hollow out."
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,525 @@
+{
+  "scenes": [
+    {
+      "id": "u24_start",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "The Hollow Throne is empty now. Or not empty — occupied by a stillness that has the shape of a person and the weight of a mountain.\n\nThe Keeper kneels at the foot of the door that has no wall, both hands pressed to the stone as if holding shut a wound that keeps trying to open. Grey light leaks between the fingers. Every leak is a face. Every face is a child who did not come home.\n\nBehind you the Underland exhales. The drowned court, the ashen march, the sunk city — all of it leans toward this room, listening, the way the whole realm leans toward a thing about to be decided.\n\nYou came to end the Gate. You are here. It is time to learn what that costs.",
+      "choices": [
+        {
+          "text": "Approach the kneeling Keeper.",
+          "next": "u24_keeper_close"
+        },
+        {
+          "text": "Study the door itself first.",
+          "next": "u24_door_study"
+        },
+        {
+          "text": "Take stock. Who still stands with you?",
+          "next": "u24_party_check"
+        }
+      ]
+    },
+    {
+      "id": "u24_party_check",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You turn. The hall behind you is a long throat of black water and older stone, and in it, faint as breath on glass, stand the ones who came this far.\n\nNot all made it. Some you left in the march. Some the wood kept. But those who remain remain because they chose to, and that is the only kind of company worth having at the end of a world.\n\nThe grey light gutters. Whatever you do, you will not do it with clean hands. You will only do it with the hands you have.",
+      "choices": [
+        {
+          "text": "Speak with Lumen, the lantern-child.",
+          "next": "u24_lumen_talk",
+          "require": "companion:lumen"
+        },
+        {
+          "text": "Speak with Gloam, the Mirror-Knight.",
+          "next": "u24_gloam_talk",
+          "require": "companion:gloam"
+        },
+        {
+          "text": "Speak with the ones from the far side of the Gate.",
+          "next": "u24_old_friends"
+        },
+        {
+          "text": "Turn back to the door. Enough waiting.",
+          "next": "u24_door_study"
+        }
+      ]
+    },
+    {
+      "id": "u24_old_friends",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "Not everyone who followed you into the dark was born of it. Some came from the sunlit realm and should never have been asked to walk this far — and came anyway.\n\nYou find them where the black water shallows: the faces of the road. Whichever of them lived, whichever of them stayed. They look at you the way people look at someone about to do a terrible, necessary thing, and love them for it, and cannot help them do it.\n\nWho do you go to?",
+      "choices": [
+        {
+          "text": "Ash, who guided you through the Wastes.",
+          "next": "u24_friend_ash",
+          "require": "companion:ash"
+        },
+        {
+          "text": "Ser Vale, the ruined knight.",
+          "next": "u24_friend_vale",
+          "require": "companion:vale"
+        },
+        {
+          "text": "Rook, who was never supposed to make it this far.",
+          "next": "u24_friend_rook",
+          "require": "companion:rook"
+        },
+        {
+          "text": "The hedge-witch, who knew the old doors.",
+          "next": "u24_friend_witch",
+          "require": "companion:hedge_witch"
+        },
+        {
+          "text": "Moth, who could always find the way out.",
+          "next": "u24_friend_moth",
+          "require": "companion:moth"
+        },
+        {
+          "text": "No time for goodbyes. Back to the door.",
+          "next": "u24_door_study"
+        }
+      ]
+    },
+    {
+      "id": "u24_friend_ash",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "Ash spits — out of habit, there is no ground here worth spitting on — and looks at the door like it owes them money.\n\n\"I don't work for crowns,\" they say. \"Never did. Followed you anyway. Don't let it go to your head.\" The flint in their eyes softens by a hair. \"Whatever you do in there, do it and come back out. I know every rock and raven between here and the sun. I'll get you home. That's a guide's promise, and I don't break those.\"",
+      "choices": [
+        {
+          "text": "\"Keep the way lit behind me, Ash.\"",
+          "next": "u24_door_study",
+          "do": ["rel:ash:+3", "flag:u24_ash_waits", "journal:Ash promised to guide me back to the sun, whatever I do at the door."]
+        }
+      ]
+    },
+    {
+      "id": "u24_friend_vale",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "Ser Vale kneels — armor grinding, the old ruin in him showing — and bows his head as if you were the crown he swore to and lost.\n\n\"I failed once at a door like this,\" he says. \"They sent six of us. I was the one who came back, and I have hated the coming back every day since.\" He lifts his ruined face. \"Let me stand at this one. Whatever you choose, I will hold the threshold, so that this time no one has to come back alone.\"",
+      "choices": [
+        {
+          "text": "\"Stand with me, Ser Vale.\"",
+          "next": "u24_door_study",
+          "do": ["rel:vale:+3", "flag:u24_vale_holds", "journal:Ser Vale will hold the threshold. This time, he says, no one comes back alone."]
+        }
+      ]
+    },
+    {
+      "id": "u24_friend_rook",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "Rook grins at you, gap-toothed and impossible. Rook should be dead. Rook has been should-be-dead for the entire journey and keeps declining to notice.\n\n\"Big door,\" Rook observes. \"Bigger than the last big door. You reckon there's a bigger one after this? There's always a bigger one after this.\" The grin falters, just for a moment. \"Hey. Whatever's on the other side of what you're about to do — if it's got room for one more idiot who wasn't supposed to make it, save me a seat. I've gotten used to not dying near you.\"",
+      "choices": [
+        {
+          "text": "\"There's a seat, Rook. There's always a seat.\"",
+          "next": "u24_door_study",
+          "do": ["rel:rook:+4", "flag:u24_rook_stays", "journal:Rook — who was never supposed to make it this far — asked me to save a seat wherever I end up."]
+        }
+      ]
+    },
+    {
+      "id": "u24_friend_witch",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "The hedge-witch runs her thumb along the seam of the door and hisses through her teeth, the way she hisses at a wound gone bad.\n\n\"Old,\" she mutters. \"Older than my grandmother's grandmother's spells. This isn't a door you break, child. It's a door you tend or a door you close, and both cost blood — yours, or a name's, or a life spent standing still.\" She takes your hand and presses something into it: a knot of dried herbs, for courage or for grief, you can't tell which. \"Whatever you choose, choose it kind. The unkind endings to doors like this are the ones that come back around.\"",
+      "choices": [
+        {
+          "text": "\"I'll choose it kind. I promise.\"",
+          "next": "u24_door_study",
+          "do": ["rel:hedge_witch:+3", "trust:+3", "flag:u24_witch_warned", "journal:The hedge-witch: an unkind ending to a door like this is the kind that comes back around. Choose it kind."]
+        }
+      ]
+    },
+    {
+      "id": "u24_friend_moth",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "Moth is already halfway to picking the lock of a door that has no lock, out of pure habit, before she catches herself and laughs.\n\n\"Old thief's rule,\" she says. \"Always know your way out before you go in. And I do. I always do.\" She jerks her chin at the long black-water throat behind you. \"There's a way back through all of it. I've mapped it in my head, every rotten inch. Do what you came for. I'll get whoever's left standing out the far side.\" She hesitates, which Moth never does. \"Just — try to be one of the ones I get out. Yeah?\"",
+      "choices": [
+        {
+          "text": "\"I'll try, Moth. Keep the way ready.\"",
+          "next": "u24_door_study",
+          "do": ["rel:moth:+3", "flag:u24_moth_ready", "journal:Moth mapped the way out of the whole Underland. She asked me to be one of the ones she gets out."]
+        }
+      ]
+    },
+    {
+      "id": "u24_lumen_talk",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "Lumen lifts the grey flame. In its light the child's face is younger than it was in the march, or older — the light can't decide.\n\n\"I carried the dead who didn't know they were dead,\" Lumen says. \"I lit their road so they'd stop being afraid. That was the whole of my job, before you.\"\n\nThe small hand finds yours.\n\n\"If you close the door, they stop leaking out. But the ones already inside stop being able to leave, too. If you open it all the way — everyone comes. The lost. And the hungry. Everything.\"\n\nLumen looks up.\n\n\"I'll light whichever road you pick. That's still my job. I just wanted you to know both roads are dark.\"",
+      "choices": [
+        {
+          "text": "\"Would you come back through, if I opened it?\"",
+          "next": "u24_lumen_home",
+          "do": ["rel:lumen:+3"]
+        },
+        {
+          "text": "\"Thank you. Stay close.\"",
+          "next": "u24_door_study",
+          "do": ["rel:lumen:+2", "flag:u24_lumen_counsel"]
+        }
+      ]
+    },
+    {
+      "id": "u24_lumen_home",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "The child considers this the way children consider the truly enormous questions — seriously, and without any of the flinching adults have learned.\n\n\"I've been dead a long time,\" Lumen says. \"I don't remember the sun. But I remember wanting it.\" The grey flame steadies. \"Yes. If the road home opens, I'll walk it. I'll walk it holding your hand so I don't get scared and blow out.\"\n\nSomething in your chest folds up small and warm.\n\n\"Then decide bravely,\" Lumen says. \"I'll light it either way.\"",
+      "choices": [
+        {
+          "text": "\"I will.\"",
+          "next": "u24_door_study",
+          "do": ["rel:lumen:+4", "flag:u24_lumen_wants_home", "flag:u24_lumen_counsel", "journal:Lumen would come home through the Gate — holding my hand so as not to blow out."]
+        }
+      ]
+    },
+    {
+      "id": "u24_gloam_talk",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "Gloam's visor is a sheet of black glass, and in it you see yourself, and behind yourself, the door. The Mirror-Knight has never shown you a face. The Mirror-Knight is a face — yours, reflected and made to kneel.\n\n\"I am bound by the mirror law,\" Gloam says, voice like a bell rung underwater. \"I am what the Gate made of the last one who tried to close it. If you close it, I unmake. That is not death. That is release. I would thank you for it.\"\n\nThe knight lays a gauntlet on the mirror shard at your belt — if you carry one, it hums; if not, the gauntlet finds only cloth.\n\n\"But hear me: the Keeper is not evil. The Keeper is bereaved. You cannot beat grief. You can only answer it, seal it away, or take it on. Choose which, and I will hold the line while you do.\"",
+      "choices": [
+        {
+          "text": "\"Tell me how to answer it.\"",
+          "next": "u24_gloam_answer",
+          "require": "mirror_shard"
+        },
+        {
+          "text": "\"How do I take it on?\"",
+          "next": "u24_gloam_burden"
+        },
+        {
+          "text": "\"Hold the line. That's all I need.\"",
+          "next": "u24_door_study",
+          "do": ["rel:gloam:+2", "flag:u24_gloam_counsel"]
+        }
+      ]
+    },
+    {
+      "id": "u24_gloam_answer",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "The mirror shard at your belt goes suddenly cold, then warm, as Gloam's gauntlet closes over it.\n\n\"The Keeper lost someone to black water, an age ago, and forgot her name so the loss couldn't keep cutting. But the door remembers. The door is her name, written in stone, over and over, a wound shaped like letters.\"\n\nGloam lifts the shard so it catches the grey light.\n\n\"Hold this to the door. It will show you the name. Say it — truly, gently, the way you'd say it to a child who is afraid — and you answer the grief instead of fighting it. The Keeper becomes a boy again. And a boy can be led home, or laid to rest.\"\n\nThe knight releases the shard. It thrums against your hip like a second heart.",
+      "choices": [
+        {
+          "text": "\"Then I have my answer.\"",
+          "next": "u24_door_study",
+          "do": ["rel:gloam:+3", "flag:u24_knows_answer", "flag:u24_gloam_counsel", "journal:Gloam: hold the mirror shard to the door to read the Keeper's forgotten name. Say it gently. Grief must be answered, not fought."]
+        }
+      ]
+    },
+    {
+      "id": "u24_gloam_burden",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "\"Someone must keep the door,\" Gloam says. \"It is a law older than the kings. If the Keeper is freed and no one takes the post, the door does not close — it opens, hungry and unheld, and eats the realm from underneath.\"\n\nThe black-glass visor tilts toward you.\n\n\"To take it on is to sit where he sits. To be hollowed slow. To forget your own name so the door has one to wear. It is the bravest ending and the cruelest. I would not wish it on you.\"\n\nA pause.\n\n\"But you are the only one here still warm enough to mean it.\"",
+      "choices": [
+        {
+          "text": "\"I'll remember that when I stand at the door.\"",
+          "next": "u24_door_study",
+          "do": ["rel:gloam:+2", "flag:u24_knows_burden", "flag:u24_gloam_counsel", "journal:To take the Keeper's post is to be hollowed slow, to forget your own name. The bravest and cruelest road."]
+        }
+      ]
+    },
+    {
+      "id": "u24_door_study",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You go to the door.\n\nUp close it is not stone at all. It is writing — one word, carved a thousand thousand times, so densely the carvings become surface, become wall, become the thing itself. The word has been worn illegible by its own repetition. Whoever wrote it wrote it until the meaning bled out and only the ache was left.\n\nThe grey light comes through the gaps in the letters. Where you stand, it is very cold, and very quiet, and you understand — the way Tess said you would, if you ever met her — that the silence is the danger. Not the dark. The silence.\n\nYour own name feels loose on you here, like a coat you might set down.",
+      "choices": [
+        {
+          "text": "Read the name in the stone (need mirror shard).",
+          "next": "u24_read_name",
+          "require": "mirror_shard"
+        },
+        {
+          "text": "Read the name in the stone (you already know it).",
+          "next": "u24_read_name",
+          "require": "true_name"
+        },
+        {
+          "text": "Speak to the Keeper directly.",
+          "next": "u24_keeper_close"
+        },
+        {
+          "text": "Say nothing. Simply lay your hand on the door.",
+          "next": "u24_hand_on_door"
+        },
+        {
+          "text": "Steel your nerve against the pull of the silence.",
+          "next": "u24_nerve_check",
+          "check": {
+            "stat": "fear",
+            "dc": 12,
+            "pass": "u24_nerve_pass",
+            "fail": "u24_nerve_fail"
+          }
+        }
+      ]
+    },
+    {
+      "id": "u24_nerve_check",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You set your feet and refuse the door.",
+      "choices": [
+        {
+          "text": "Hold.",
+          "next": "u24_crossroads"
+        }
+      ]
+    },
+    {
+      "id": "u24_nerve_pass",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "The silence reaches for your name and finds it nailed down.\n\nYou have walked through too much dark to go quiet now. You think of everyone who told you the same thing on the road — Tess, the widow, the captain, your own dead ancestor with his hand lifted in farewell — and their voices fill the quiet before it can empty you.\n\nWhen you open your eyes the door looks smaller. Not because it shrank. Because you grew, in the only way that matters here.",
+      "choices": [
+        {
+          "text": "Step to the crossroads, clear-eyed.",
+          "next": "u24_crossroads",
+          "do": ["trust:+3", "flag:u24_steadied", "journal:I held my name against the door's silence. It looks smaller now. I do not."]
+        }
+      ]
+    },
+    {
+      "id": "u24_nerve_fail",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "The silence gets a hand around your name and pulls.\n\nFor a heartbeat you forget — who you are, why you came, whose faces you carried this far. The grey light offers you the post, gentle, gentle, and it would be so easy to sit down and be quiet forever.\n\nThen the herb-knot in your pocket, or the ache in your feet, or sheer stubbornness drags you back into your own skin. You are shaking. You held on. Barely. But barely is enough.",
+      "choices": [
+        {
+          "text": "Stagger back to the crossroads.",
+          "next": "u24_crossroads",
+          "do": ["fear:5", "journal:The door nearly took my name. I got it back. Barely counts as back."]
+        }
+      ]
+    },
+    {
+      "id": "u24_read_name",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You lift the mirror shard — or the true name you carried in like a coal cupped against the wind — and hold it to the door.\n\nThe glass drinks the grey light. Then, slowly, the thousand illegible carvings resolve, all of them at once, into the single word they always were. Not a word of power. Not a spell. A girl's name, small and plain and heartbreaking, the kind of name a boy would whisper to a frozen river a thousand years ago and go on whispering until whispering was all he was.\n\nYou know it now. It sits on your tongue like the last coin in a dead man's mouth.\n\nBehind you, the Keeper goes very still. He does not turn. But his hands, on the wound of the door, begin — just perceptibly — to shake.",
+      "choices": [
+        {
+          "text": "Carry the name to the Keeper.",
+          "next": "u24_keeper_close",
+          "do": ["add_item:true_name", "flag:u24_has_name", "journal:I read the name in the door. A girl. Drowned. The Keeper's whole grief, written a thousand times until it stopped meaning anything but ache."]
+        }
+      ]
+    },
+    {
+      "id": "u24_hand_on_door",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You lay your palm flat against the letters.\n\nThe cold goes up your arm and into your chest and it is not cold, it is grief — someone else's, an ocean of it, an age of it, a boy at a riverbank refusing to stop looking. You feel how easy it would be to stay here holding the wound. You feel the door offering you the post, gently, the way it offers everyone, the way it offered him.\n\nYou take your hand back before the silence takes your name.\n\nYou are shaking. But you are still yourself. And now you know, in your body and not just your head, what this door is and what it wants.",
+      "choices": [
+        {
+          "text": "Go to the Keeper.",
+          "next": "u24_keeper_close",
+          "do": ["fear:5", "flag:u24_felt_grief", "journal:I touched the door. It offered me the post, gentle as anything. I nearly stayed."]
+        }
+      ]
+    },
+    {
+      "id": "u24_keeper_close",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You kneel beside the Keeper.\n\nThis close, the crown of listening is not antlers, not iron — it is names, hundreds of them, twined into a circlet, every one a thing he took because it might have been her. His face, where a face should be, is a suggestion the grey light keeps trying and failing to finish.\n\n\"You are warm,\" he says, and it is the first thing he has ever said to you. His voice is a room no one has entered in a thousand years. \"They are always warm when they come. And then I keep them, and they go quiet, and the warmth goes out, and still it is not her.\"\n\nThe hands press harder on the door.\n\n\"Have you come to fight me? They come to fight me. I am so tired of being fought.\"",
+      "choices": [
+        {
+          "text": "\"No. I've come to end this. Every ending is here.\"",
+          "next": "u24_crossroads"
+        },
+        {
+          "text": "\"I know her name.\" (need the true name)",
+          "next": "u24_speak_name",
+          "require": "true_name"
+        },
+        {
+          "text": "\"I've come to take your place, so you can rest.\"",
+          "next": "u24_offer_post"
+        }
+      ]
+    },
+    {
+      "id": "u24_speak_name",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "\"I know her name,\" you say.\n\nThe hall stops. The black water stops. Even the leaking faces in the grey light stop, and turn, as one, toward you.\n\n\"You do not,\" the Keeper says, and for the first time there is something under the room-that-is-his-voice — a floorboard, a heartbeat, a boy. \"You cannot. I forgot it. I forgot it on purpose so it would stop — so it would stop — \"\n\n\"You wrote it a thousand times,\" you say softly. \"You built the door out of it. You never forgot it. You only stopped letting yourself hear it.\"\n\nHis hands, on the wound, begin to loosen.\n\n\"Say it, then,\" he whispers. \"Say it gently. I have not been said to gently in an age of the world.\"\n\nThis is the hinge of everything. How do you use the name?",
+      "choices": [
+        {
+          "text": "Say the name to seal the door — grief laid to rest, forever.",
+          "next": "u24_path_seal",
+          "do": ["flag:u24_name_spoken"]
+        },
+        {
+          "text": "Say the name, then open the road home for everyone inside.",
+          "next": "u24_path_home",
+          "require": "companion:lumen",
+          "do": ["flag:u24_name_spoken"]
+        },
+        {
+          "text": "Say the name, then offer him a bargain instead of an ending.",
+          "next": "u24_path_bargain",
+          "do": ["flag:u24_name_spoken"]
+        },
+        {
+          "text": "Say the name — and offer to take his grief and his post as your own.",
+          "next": "u24_path_keeper",
+          "do": ["flag:u24_name_spoken"]
+        }
+      ]
+    },
+    {
+      "id": "u24_offer_post",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "The Keeper turns his unfinished face fully toward you for the first time.\n\n\"Take my place,\" he repeats, tasting it, disbelieving it. \"No one offers. They come to fight, or to steal a child back, or to die badly. No one has ever knelt here and offered to stay.\"\n\nThe grey light flickers between you like a candle two people are shielding.\n\n\"You do not know what you offer. You would sit here. You would grow quiet. You would forget your own name — you must, for the door needs a name to wear and yours would do. In a hundred years you would be me, and some other warm thing would kneel where you kneel now.\"\n\nHe leans close.\n\n\"And yet. If you truly mean it — I could rest. I have wanted rest longer than your kingdom has had a crown.\"",
+      "choices": [
+        {
+          "text": "\"I mean it. Let me take the post.\"",
+          "next": "u24_path_keeper"
+        },
+        {
+          "text": "\"Wait. There may be another way.\"",
+          "next": "u24_crossroads"
+        }
+      ]
+    },
+    {
+      "id": "u24_crossroads",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "The grey light pulses, slow, like something breathing that would rather stop. The Keeper waits. He has infinite patience. It is the only thing the post left him.\n\nYou run it back in your mind — everything the road taught you. Tess in the graveyard: the silence takes them, make noise. Halwyn: the dark is grieving, not hungry. The minstrel's seventh verse: say the name and the door will shear. Gloam: grief must be answered, sealed, or taken on. Lumen: both roads are dark.\n\nFour doors stand open in front of you now, though only one is made of stone.\n\nChoose what comes back.",
+      "choices": [
+        {
+          "text": "Seal the Gate forever. Say the name and close the wound. (need the true name)",
+          "next": "u24_path_seal",
+          "require": "true_name"
+        },
+        {
+          "text": "Strike a bargain with the Keeper — a door half-open, on terms.",
+          "next": "u24_path_bargain"
+        },
+        {
+          "text": "Take up the post yourself. Let him rest. (need to have faced the burden)",
+          "next": "u24_path_keeper",
+          "require": "flag:u24_knows_burden"
+        },
+        {
+          "text": "Open the road and bring everyone back through. (need Lumen to light it)",
+          "next": "u24_path_home",
+          "require": "companion:lumen"
+        },
+        {
+          "text": "You have no name, no light, no plan — only your two hands. Try anyway.",
+          "next": "u24_desperate"
+        }
+      ]
+    },
+    {
+      "id": "u24_desperate",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You have no true name to speak, no lantern-child to light a road, no shard to read the stone. You have what you walked in with: a body, a will, and a stubbornness that has already carried you further than anyone of your line.\n\nThe Keeper watches you decide to do the impossible with empty hands.\n\n\"Warm thing,\" he murmurs, almost tender. \"You cannot fight me. But you have not come to fight, have you. You have come to end it. There is one ending that needs no name and no light. It needs only someone willing to stop being themselves.\"\n\nHe holds out a hand toward the door, toward the post, toward the long quiet.\n\n\"Or one that needs only that you dare to bargain with a thing that has never once been bargained with.\"",
+      "choices": [
+        {
+          "text": "Take his hand. Take the post. Let him rest.",
+          "next": "u24_path_keeper"
+        },
+        {
+          "text": "Refuse the post. Offer a bargain instead.",
+          "next": "u24_path_bargain"
+        },
+        {
+          "text": "Wrench the door and try to force it shut with your own strength.",
+          "next": "u24_force_combat"
+        }
+      ]
+    },
+    {
+      "id": "u24_force_combat",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You set both hands to the seam of the door and pull. The grief pours into you — the boy, the river, the age of waiting — and the door fights back with the only weapon it has: your own longing to lay your name down and rest. This is not a battle of swords. It is a battle of who forgets first.",
+      "choices": [],
+      "combat": {
+        "enemy": "the Door's Silence",
+        "ehp": 12,
+        "edmg": 3,
+        "win": "u24_force_win",
+        "lose": "u24_path_keeper",
+        "flee": "u24_crossroads"
+      }
+    },
+    {
+      "id": "u24_force_win",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You do not forget first.\n\nWhen the silence reaches for your name you fill it — with noise, with rage, with every living person you refuse to become quiet for. You shout the name of the kingdom. You shout your own. You shout {missing_name}, and {other_name}, and the widow's Owin, and the captain's Halric, until the door has no quiet left to take.\n\nThe Keeper, beside you, makes a sound that has not been made in a thousand years. It is a sob.\n\n\"You would not go quiet,\" he breathes. \"None of them would not go quiet. Only you.\"\n\nThe wound in the door is loose now, trembling, undecided. You have pried it open with sheer refusal. Now you must choose what to do with a Gate that will, for one heartbeat, do what you tell it.",
+      "choices": [
+        {
+          "text": "Tell it to close forever. Bargain the terms with the Keeper.",
+          "next": "u24_path_bargain",
+          "do": ["flag:u24_forced_open"]
+        },
+        {
+          "text": "Tell it to open the road home, and lead everyone out.",
+          "next": "u24_path_home",
+          "require": "companion:lumen",
+          "do": ["flag:u24_forced_open"]
+        },
+        {
+          "text": "Sit down in the wound yourself and hold it shut with your life.",
+          "next": "u24_path_keeper",
+          "do": ["flag:u24_forced_open"]
+        }
+      ]
+    },
+    {
+      "id": "u24_path_seal",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You say the name.\n\nGently. The way Gloam told you. The way you'd say it to a frightened child, or a frozen river, or a boy who has been looking for someone across a thousand years of black water.\n\nThe Keeper hears it — hears it, finally, lets himself hear it — and the crown of stolen names falls from his brow and rings on the floor like snow.\n\n\"Oh,\" he says. Just that. The whole of a grief, answered. \"Oh. That was her name. That was her name the whole time.\"\n\nThe faces in the grey light go still, and then soft, and then out — not eaten, not lost, but released, the way breath releases when you finally set down something heavy.\n\n\"You could seal it,\" he whispers. \"Say her name into the stone and it will close, and stay closed, and I will be a boy at a riverside for one moment before I am nothing. No door. No Keeper. No child taken ever again. But nothing that is inside will ever come out. Not the lost ones. Not the ones you love. That is the price of forever.\"",
+      "choices": [
+        {
+          "text": "Speak her name into the stone. Seal the Gate forever.",
+          "next": "ending_seal",
+          "do": ["flag:region_gate", "flag:codex_truename", "journal:I sealed the Hollow Gate forever with a dead girl's name. The lost stay lost. The living stay safe. No child will ever be taken again."]
+        },
+        {
+          "text": "Stop. This price is too high — find another ending.",
+          "next": "u24_crossroads"
+        }
+      ]
+    },
+    {
+      "id": "u24_path_bargain",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "\"No one bargains with me,\" the Keeper says. \"They fight, or flee, or offer their whole selves. No one has ever simply... negotiated.\"\n\n\"Then I'll be the first,\" you say.\n\nYou lay it out like a merchant on the Wastes road. The door stays — because a sealed door leaves the lost sealed in, and an open door lets the hungry out — but it changes its terms. No more children taken to fill the shape of a girl who drowned. A door that opens only for the willing, only for the grieving who come knowing the cost, only ever outward, never to snatch.\n\nAnd in exchange: you will bring him her name, once a year, and say it gently, so the wound is tended and never again festers into hunger. A Keeper who is kept. A grief that is visited, instead of forgotten.\n\nThe Keeper is quiet a long time.\n\n\"That is not an ending,\" he says at last. \"That is a marriage.\"\n\n\"That is how you live with grief,\" you say. \"You don't seal it. You visit it.\"",
+      "choices": [
+        {
+          "text": "Seal the bargain. A door on terms, tended forever.",
+          "next": "ending_bargain",
+          "do": ["flag:region_gate", "flag:codex_keeper", "journal:I struck a bargain with the Keeper. The Gate stays — but takes no one against their will, and I return each year to say the name and tend the wound. Grief visited, not sealed."]
+        },
+        {
+          "text": "He hesitates. Sweeten it — or walk away and choose another ending.",
+          "next": "u24_crossroads"
+        }
+      ]
+    },
+    {
+      "id": "u24_path_keeper",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "You reach out and take the Keeper's hands off the door, and put your own there in their place.\n\nThe grief comes up your arms and it is enormous and it is not yours and you hold it anyway, the way you'd hold a door shut against a storm, the way your ancestor Halwyn wanted to and could not. The stone is cold. It will get colder. The silence is already leaning toward your name, patient, certain.\n\nThe Keeper — the old Keeper, the boy at last — stands. Straightens. For one heartbeat he is just a young man, ordinary, with a face the grey light finally allows to be a face. He looks at you with something no post could hollow out: gratitude.\n\n\"You will forget your name,\" he says. \"I am sorry. It is the cruelest gift. But the lost inside can be led out now, by those you love, while I keep the way — no. While you keep the way. I am only a boy again. I am going to go and find a riverbank and sit down and finally, finally be finished.\"\n\nHe kisses your brow like a brother.\n\n\"Keeper,\" he says. \"Hold the door. Hold it gently. And every child that would have been taken — that is who you save, every single day, by being the one who stays.\"",
+      "choices": [
+        {
+          "text": "Take up the post. Be the one who stays.",
+          "next": "ending_keeper",
+          "do": ["flag:codex_keeper", "flag:region_gate", "journal:I took up the Keeper's post. I will forget my own name so the door has one to wear. Every child not taken is the child I save by staying. The old Keeper walked away a boy, to rest at last."]
+        },
+        {
+          "text": "Falter. You are not ready to be forgotten — pull back.",
+          "next": "u24_crossroads"
+        }
+      ]
+    },
+    {
+      "id": "u24_path_home",
+      "chapter": "CHAPTER XXIV · WHAT COMES BACK",
+      "text": "\"Open it,\" you tell the door. \"All the way. Outward. Let them come home.\"\n\nLumen steps up beside you and lifts the grey flame, and it is not grey anymore — it is gold, the first gold light this hall has held in an age, and it pours down the long throat of black water and out into the room of waiting where the taken have sat quiet for so long they forgot they were going somewhere.\n\n\"Make noise,\" you say to Lumen, and the child laughs — actually laughs — and the sound goes ringing down the dark, and one by one the quiet ones lift their heads. Pell's ribbon. Halric with his blue-cord knot. The widow's Owin, gone grey but grinning. And {missing_name}. And {other_name}. And every child of every house that ever set out a bowl and kept a chair facing the door.\n\nThe Keeper does not stop them. The Keeper watches them file toward the gold light, toward the sun they half-remember, and on his unfinished face is the nearest thing to peace he has known.\n\n\"But if the door stays open,\" he warns, soft, \"the hungry come too, eventually. An open Gate is an open Gate. You would be trading a sealed loss for an unsealed danger. You must choose fast, warm thing. The light will not hold forever.\"",
+      "choices": [
+        {
+          "text": "Lead them all out — the lost, the loved, everyone — and take the risk.",
+          "next": "ending_homecoming",
+          "do": ["flag:region_gate", "flag:codex_lumen", "journal:I opened the road and led everyone home through the Gate — the lost, the loved, {missing_name}, all of them, lit by Lumen's gold flame. The door stands open behind us. Whatever comes next, no one is left in the dark."]
+        },
+        {
+          "text": "The risk is too great — pull the light back and choose another way.",
+          "next": "u24_crossroads"
+        }
+      ]
+    }
+  ]
+}

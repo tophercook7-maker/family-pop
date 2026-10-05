@@ -1,0 +1,567 @@
+{
+  "scenes": [
+    {
+      "id": "u17_start",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The Keeper flees.\n\nHe should not be able to. He is the door and the door does not move, and yet the tall hollow shape of him is running, shrinking backward into the arch, into the dark that has no far wall.\n\nBehind you the realm you know is quiet again. The heir is safe. The story is over. Everyone will tell you it is over.\n\nBut the Keeper is running, and a thing that runs is a thing that is afraid, and a thing that is afraid has somewhere it does not want you to go.\n\nThe arch hums against your teeth. Cold pours out of it like water finding a low place.",
+      "choices": [
+        {
+          "text": "Step through, after him.",
+          "next": "u17_arrival"
+        },
+        {
+          "text": "Stop at the threshold. Look first.",
+          "next": "u17_lip"
+        }
+      ]
+    },
+    {
+      "id": "u17_lip",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You stand at the very lip of the arch, one boot on grass, one boot on nothing.\n\nThe nothing is not empty. Look long enough and it resolves: a hillside like this hillside, a sky like this sky, all of it hung upside down and filled with black water instead of air.\n\nYour own reflection stares up at you from that drowned country. It is a half-second slow. When you lift your hand, it lifts its hand after, the way an echo answers a shout.\n\nThe Keeper's grey shape is already small down there, wading away.",
+      "choices": [
+        {
+          "text": "Enough looking. Go through.",
+          "next": "u17_arrival"
+        },
+        {
+          "text": "Steel yourself against the fear first, then step through.",
+          "next": "u17_arrival",
+          "check": {
+            "stat": "fear",
+            "dc": 12,
+            "pass": "u17_arrival",
+            "fail": "u17_arrival",
+            "onPass": [
+              "trust:+3",
+              "journal:I looked into the drowned country and did not flinch."
+            ],
+            "onFail": [
+              "fear:+5"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "u17_arrival",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You step through.\n\nFor one heartbeat there is no up, no down — only the crossing, made of the sound of every door you have ever heard close, played backward all at once. Then the world inverts. You do not fall so much as get poured, and you land on your hands and knees on cold wet stone that was, a moment ago, the empty air above the arch.\n\nYou stand in the drowned twin of the hillside.\n\nEverything is here that was there. The doorway. The hills. A sky the colour of a bruise going yellow at the edges. But it is all reflected, all reversed — your sword-hand is your wrong hand now, your heart beats on the side it should not.\n\nAnd it is all underwater without being wet. You breathe. The air is thick and slow and tastes of pond-bottom, but it is air. Sound arrives late. When a pebble slips under your boot you hear it a moment after you feel it.\n\nBehind you, the arch you came through still stands — but from this side it is a hole in still black water, and your own reflection hangs in it, watching you, not quite matching.",
+      "choices": [
+        {
+          "text": "Touch the reflection in the arch.",
+          "next": "u17_mirror_touch"
+        },
+        {
+          "text": "Turn your back on it. Find the Keeper's trail.",
+          "next": "u17_trail"
+        },
+        {
+          "text": "Take stock. Speak aloud, to hear your own voice.",
+          "next": "u17_speak"
+        }
+      ]
+    },
+    {
+      "id": "u17_speak",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "\"I am here,\" you say. \"I chose this.\"\n\nThe words leave your mouth and hang in the thick air, visible almost, like breath on a cold morning. Then they drift down and pool at your feet and are gone.\n\nA voice answers from nowhere and everywhere, patient as silt settling:\n\n\"Few speak, here. The taken forget they can. You have not been here long enough to forget. Enjoy it. It does not last.\"\n\nYou cannot tell if the voice is the Keeper, or the place itself, or your own reflection learning to lie.",
+      "choices": [
+        {
+          "text": "\"Who's speaking? Teach me this place.\"",
+          "next": "u17_rules_underland"
+        },
+        {
+          "text": "Say nothing more. Find the trail.",
+          "next": "u17_trail"
+        }
+      ]
+    },
+    {
+      "id": "u17_rules_underland",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "\"I am the country,\" the voice says. \"Or its memory of having once been spoken to. Down here that is nearly the same thing. This is the Underland — the realm you came from, drowned and reversed. Every rule you trust is bent here, but two are iron.\n\n\"The first rule is that distance lies. A thing that looks close is far. A thing that looks far is already at your shoulder. Do not trust your eyes to measure. Trust your feet, and count your steps, and never run — running is how the taken get taken.\n\n\"The second rule you must learn from a mirror, not from me. Go and find one. There is always a mirror. This is a country made of them.\"\n\nThe voice thins, like a ripple reaching the edge of a pond, and is gone.\n\nYou understand the Underland a little now. Enough to be afraid of it correctly.",
+      "choices": [
+        {
+          "text": "Go to the reflection in the arch — the nearest mirror.",
+          "next": "u17_mirror_touch",
+          "do": [
+            "flag:region_threshold",
+            "journal:Underland rule one: distance lies. Never run. Count your steps."
+          ]
+        },
+        {
+          "text": "Find the Keeper's trail instead; learn mirrors later.",
+          "next": "u17_trail",
+          "do": [
+            "flag:region_threshold"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_mirror_touch",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You reach into the black water of the arch and touch your own reflected hand.\n\nIt is warm. Warmer than you. Your reflection's fingers close gently around yours, and for one impossible moment you are on both sides of the glass at once — the one who came through, and the one who stayed drowned and waiting all along.\n\nThe reflection speaks with your voice, but slower, kinder, more tired:\n\n\"You should know the law before you go deeper. Down here a reflection can be truer than the thing it reflects. Break a mirror and you free what it held — or you loose it. There is no third outcome. Every knight, every ghost, every door in this country is bound by this. So are you, now.\"",
+      "choices": [
+        {
+          "text": "\"Truer than the thing? How?\"",
+          "next": "u17_mirror_law"
+        },
+        {
+          "text": "\"What do you hold? What would breaking you loose?\"",
+          "next": "u17_mirror_self"
+        }
+      ]
+    },
+    {
+      "id": "u17_mirror_self",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "Your reflection almost smiles.\n\n\"Me? I hold you. The part of you that would have stayed on the safe side and called it over. Break this glass and you loose that part into the country — and it will wear your face and undo everything you do.\n\n\"So do not break me. Not this one. But you will find others, and some of them will beg to be broken, and some of them will lie. Learning which is which is how you survive the Underland.\"\n\nThe grip on your hand loosens.",
+      "choices": [
+        {
+          "text": "\"I understand the law.\"",
+          "next": "u17_mirror_law"
+        }
+      ]
+    },
+    {
+      "id": "u17_mirror_law",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You draw your hand back out of the water. It is cold again the moment it leaves the glass.\n\nThe Mirror Law settles into you like a stone into silt. In this country, what is reflected can be more real than what stands. Break a mirror to free — or to loose. Never carelessly. Never in anger.\n\nYou feel, obscurely, that you have just been given the only rulebook this place will ever offer, and that it fits on the back of your hand.",
+      "choices": [
+        {
+          "text": "Now find the Keeper's trail.",
+          "next": "u17_trail",
+          "do": [
+            "flag:codex_mirror",
+            "journal:The Mirror Law: a reflection can be truer than the thing. Break a mirror to free what it holds — or loose it. Never carelessly."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_trail",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The Keeper left a trail. Not footprints — the wet stone takes no prints — but a wake. A line of stiller water in the moving air, a seam where the country has been parted and not yet closed.\n\nIt leads down, always down, toward a low place where the reflected hills fold into a valley you do not remember from the world above.\n\nHalfway to the valley the seam splits. One branch bends left, along a shelf of black rock. One goes right, down into a stand of reeds taller than a rider.",
+      "choices": [
+        {
+          "text": "Take the left branch, along the rock shelf.",
+          "next": "u17_shelf"
+        },
+        {
+          "text": "Take the right branch, into the reeds.",
+          "next": "u17_reeds"
+        },
+        {
+          "text": "Study the split. Read the water the way Ash taught you.",
+          "next": "u17_read_pass",
+          "check": {
+            "stat": "trust",
+            "dc": 13,
+            "pass": "u17_read_pass",
+            "fail": "u17_read_fail"
+          }
+        }
+      ]
+    },
+    {
+      "id": "u17_read_pass",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The left seam is already healing — old, closing. The right one still trembles. He went right, into the reeds, and not long ago.\n\nMore than that: you see now that the left branch is a lure. The country made it, the way a hunted thing folds a false trail. If you had run down it you would have run a long way from him.\n\nYou did not run. Rule one.",
+      "choices": [
+        {
+          "text": "Follow the true trail into the reeds.",
+          "next": "u17_reeds",
+          "do": [
+            "trust:+4",
+            "journal:Read the Keeper's wake. The left path was a lure. He went into the reeds."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_read_fail",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The two seams look identical to you. Water is water. You pick the left branch because it is easier walking, and the country lets you, which should have warned you.\n\nHalf a mile along the shelf the seam simply stops, healed over, a dead end. You have wasted breath and nerve on a false trail the Underland folded to fool you.",
+      "choices": [
+        {
+          "text": "Backtrack. Take the reeds this time.",
+          "next": "u17_reeds",
+          "do": [
+            "fear:+4",
+            "journal:Followed a false trail down here. The country lies with its own geography."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_shelf",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The rock shelf runs along the valley's rim. Below you, the drowned valley opens: a whole sunk country of roofs and reeds and one grey shape wading through it, unhurried now, as though it knows exactly how lost you are.\n\nThe shelf is easy walking. Too easy. Rule one whispers in your ear — a thing that looks close is far, a thing that looks far is already at your shoulder.\n\nYou count your steps. At two hundred the shelf ends at a fall of black stone, and the seam you were following is old here, healed, cold. This was the false path.",
+      "choices": [
+        {
+          "text": "Climb down into the valley and cut across to the reeds.",
+          "next": "u17_reeds",
+          "do": [
+            "journal:The rock shelf was the lure. He never came this way."
+          ]
+        },
+        {
+          "text": "Rest a moment on the fallen stone, and steady yourself.",
+          "next": "u17_shelf_rest"
+        }
+      ]
+    },
+    {
+      "id": "u17_shelf_rest",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You sit on the fallen stone. The Underland does not let you rest so much as it lets you stop.\n\nIn the flat black water at your feet you catch a reflection that is not yours: a hunched shape with a grey flame in its hands, small, childlike, far off in the valley. It looks up as if it feels you looking. Then a reed sways and it is gone.\n\nYou file it away. Something lives down here besides the Keeper.",
+      "choices": [
+        {
+          "text": "Down to the reeds, and the true trail.",
+          "next": "u17_reeds",
+          "do": [
+            "journal:Saw a small figure with a grey flame in the drowned valley. Not the Keeper. Something else."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_reeds",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The reeds close over your head. They are black and wet and taller than a mounted knight, and they whisper against one another in a language that is almost words.\n\nThe Keeper's wake runs true here, fresh, still trembling. You are gaining on him.\n\nThe reeds thin. Ahead, half-sunk in the black water, stands a shape you did not expect: a gatehouse. A drowned twin of some threshold in the world above — a low arch of wet stone, a lintel, and set into the mud beneath it, catching no light, a key.",
+      "choices": [
+        {
+          "text": "Wade to the gatehouse and take the key.",
+          "next": "u17_key_reach"
+        },
+        {
+          "text": "Watch the gatehouse first. Nothing here is free.",
+          "next": "u17_key_watch"
+        }
+      ]
+    },
+    {
+      "id": "u17_key_watch",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You hold in the reeds and watch.\n\nThe key lies in the mud beneath the drowned arch. Around it the water is stiller than still — a held-breath stillness. A dragonfly the size of your thumb lands on the lintel, walks toward the key, and simply stops existing, folded quietly out of the world.\n\nThe key is guarded. Not by a beast — by the country itself. It will take you the same way it took the dragonfly, unless you approach it correctly.",
+      "choices": [
+        {
+          "text": "Approach slowly, naming each step aloud. (Rule one)",
+          "next": "u17_key_named"
+        },
+        {
+          "text": "Snatch it fast and get clear.",
+          "next": "u17_key_grab"
+        }
+      ]
+    },
+    {
+      "id": "u17_key_reach",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You wade out toward the drowned gatehouse. The water thickens around your knees, then your waist, resisting you like cold syrup.\n\nThe closer you get, the farther the key seems — distance lies here, and it is lying to you now, stretching the last few feet into a long slow forever. If you push straight for it you will wade until the country decides you have waded enough.",
+      "choices": [
+        {
+          "text": "Stop pushing. Approach slow, naming each step.",
+          "next": "u17_key_named"
+        },
+        {
+          "text": "Push through by main strength.",
+          "next": "u17_key_grab"
+        }
+      ]
+    },
+    {
+      "id": "u17_key_named",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You stop fighting the water. You take one step and name it: \"One.\" The distance shortens by exactly one step's worth, no lie in it. \"Two.\" Another. \"Three.\"\n\nBy naming them you rob the country of its lever. It cannot stretch a step you have counted. At \"seven\" your hand closes on the key.\n\nIt is iron gone soft-black with water, warm as a living thing, and heavier than iron should be. The moment you lift it the held-breath stillness lets go, and the whole gatehouse exhales.",
+      "choices": [
+        {
+          "text": "Take the key. Wade back to the reeds.",
+          "next": "u17_key_got",
+          "do": [
+            "add_item:gate_key",
+            "trust:+3",
+            "journal:Took the gate_key from the drowned gatehouse by naming each step. The country cannot stretch what you have counted."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_key_grab",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You lunge for it.\n\nThe water fights you. This is a skill check of nerve against a country that wants to fold you away like a dragonfly — and you are doing the one thing rule one forbids. You are hurrying.",
+      "choices": [
+        {
+          "text": "Commit — seize the key, hand cutting through the thick water.",
+          "next": "u17_key_grab_pass",
+          "check": {
+            "stat": "fear",
+            "dc": 14,
+            "pass": "u17_key_grab_pass",
+            "fail": "u17_key_grab_fail"
+          }
+        },
+        {
+          "text": "Lose your nerve. Pull back and approach slow, naming each step.",
+          "next": "u17_key_named"
+        }
+      ]
+    },
+    {
+      "id": "u17_key_grab_pass",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "Your fingers close on the key a hair before the stillness closes on you. You wrench it free and throw yourself backward, and the fold of the world snaps shut on the empty place where your hand was.\n\nYou have the key. You also have a cold certainty, right down your spine, that you will not get away with breaking rule one twice.",
+      "choices": [
+        {
+          "text": "Back to the reeds, key in hand.",
+          "next": "u17_key_got",
+          "do": [
+            "add_item:gate_key",
+            "fear:+3",
+            "journal:Snatched the gate_key against the country's grip. Barely kept my hand."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_key_grab_fail",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The stillness closes first.\n\nThe world folds around your wrist — not pain, exactly, but a terrible cold subtraction, as if your hand is being asked to agree it was never there. You tear free and reel back into the reeds, breath sawing, and stare at your fingers to be sure they all came with you.\n\nThey did. Barely. The key still lies in the mud, waiting.",
+      "choices": [
+        {
+          "text": "Try again — slowly this time, naming each step.",
+          "next": "u17_key_named",
+          "do": [
+            "fear:+5",
+            "hp:-2",
+            "journal:The country nearly folded my hand away. Never hurry down here."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_key_got",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "Back in the shelter of the reeds you turn the key over. It has no shape you recognise — no ward, no bit — just a stem of soft-black iron and, at its head, a hollow ring, like a keyhole looking for a key rather than the other way round.\n\nYou understand, without being told, that this is the gate_key: the thing that opens doors in the Underland, and maybe one door back out of it. You do not intend to test that hope yet.\n\nThe Keeper's wake runs on past the gatehouse, into a dark where the reeds give way to open water and a far shore you cannot see.",
+      "choices": [
+        {
+          "text": "Follow the wake toward the far shore.",
+          "next": "u17_dark_water"
+        }
+      ]
+    },
+    {
+      "id": "u17_dark_water",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The reeds end. Before you lies open black water under a bruise-yellow sky, and the far shore is a rumour, a smudge, a place rule one says could be a mile off or one step away.\n\nAnd it is dark. Not night-dark — the Underland has no night — but a dark that lives in the water itself, a dark that thickens the farther you look, until the wake you are following simply dissolves into it.\n\nYou cannot follow what you cannot see. You need a light. And the only light in this whole drowned country is grey, and small, and carried by whatever you glimpsed from the shelf.",
+      "choices": [
+        {
+          "text": "Call out to the small light in the dark.",
+          "next": "u17_hail_light"
+        },
+        {
+          "text": "Wade in blind and feel for the wake with your feet.",
+          "next": "u17_blind_wade"
+        }
+      ]
+    },
+    {
+      "id": "u17_blind_wade",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You wade into the black water, feeling for the seam of the wake with your boots, arms out in the dark.\n\nThe cold climbs your legs. The far shore does not come closer no matter how you count. Somewhere out in the black, something with the size of a whale and the patience of a stone moves once, and the water lifts you gently and sets you down, as if reminding you whose house this is.\n\nYou are not going to cross this blind. You need the light after all.",
+      "choices": [
+        {
+          "text": "Wade back. Call out to the grey light.",
+          "next": "u17_hail_light",
+          "do": [
+            "fear:+3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_hail_light",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "\"Hello, light!\" you call, and your voice hangs and drifts and pools the way it did before. \"I'm looking for a light to cross by!\"\n\nFor a long time, nothing.\n\nThen, far out on the black water — or close, you cannot tell — the grey flame turns toward you. It comes without any sound of wading, without a wake, until all at once it is right at the reed's edge, held in the two small hands of a child who is not entirely a child.",
+      "choices": [
+        {
+          "text": "Kneel to the child's level. Speak gently.",
+          "next": "u17_child"
+        },
+        {
+          "text": "Stand your ground and ask what it is.",
+          "next": "u17_child"
+        }
+      ]
+    },
+    {
+      "id": "u17_child",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The child is grey as everything here, and translucent at the edges, like a candle-flame you can see the wall through. In its cupped hands burns a grey fire that gives no heat and casts no shadow — only a soft, cold, seeing light.\n\n\"You spoke to me,\" it says, wondering. \"They almost never speak. They just follow. Are you dead? You don't look dead. You look loud.\"\n\nIt tilts its head.\n\n\"I light the way for the ones who are dead and don't know it yet. That's my whole job. I'm not sure if you count. You might. Everyone down here counts, a little.\"",
+      "choices": [
+        {
+          "text": "\"I'm not dead. I came in on my own feet — and I could show you the way out.\"",
+          "next": "u17_child_ask",
+          "do": [
+            "trust:+3"
+          ]
+        },
+        {
+          "text": "\"Will you light my way across?\"",
+          "next": "u17_child_ask"
+        }
+      ]
+    },
+    {
+      "id": "u17_child_ask",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The child considers you for a long, wet moment.\n\n\"I can't give you my flame,\" it says. \"It's the only me there is. But I can give you a lantern to carry a piece of it. You have to make the lantern, though. From ash. There's always ash, at a threshold. The old fires burned here first.\"\n\nIt points a grey finger back the way you came, to the drowned gatehouse, where a cold black hearth sits under the arch, full of ash that has never once been warm.",
+      "choices": [
+        {
+          "text": "\"Show me how.\"",
+          "next": "u17_lantern_make"
+        },
+        {
+          "text": "\"Why help me at all?\"",
+          "next": "u17_child_why"
+        }
+      ]
+    },
+    {
+      "id": "u17_child_why",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The child looks down at its own grey flame.\n\n\"Because you spoke to me,\" it says simply. \"Because you asked instead of took. Down here that is so rare it is almost a currency. The Keeper never asks. He only keeps. You asked.\"\n\nIt lifts its eyes.\n\n\"And because I would like, very much, to see the way out lit for once, instead of only lighting it for other people. Even if it isn't for me. Even if I only get to watch you use it. That would be enough. That would be a lot.\"\n\nYou will remember this later, when it matters.",
+      "choices": [
+        {
+          "text": "\"Then let's make the lantern.\"",
+          "next": "u17_lantern_make",
+          "do": [
+            "trust:+3",
+            "journal:The Lantern-child helps because I asked instead of took. It wants only to see the way out lit — even if not for itself."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_lantern_make",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The child leads you back to the drowned gatehouse and the cold black hearth beneath its arch.\n\n\"Scoop the ash into your hands,\" it says. \"Shape it. It wants to be a lantern. It has wanted to be a lantern for a thousand years, it just needed someone to ask it.\"\n\nYou kneel. The ash is dry despite the water everywhere, and it comes together under your fingers like wet clay, holding whatever shape you give it — a small cage of ash, a handle, a hollow where a flame could sit.",
+      "choices": [
+        {
+          "text": "Shape it carefully, talking to the ash the way you gentle a frightened animal.",
+          "next": "u17_lantern_pass",
+          "check": {
+            "stat": "trust",
+            "dc": 12,
+            "pass": "u17_lantern_pass",
+            "fail": "u17_lantern_soft"
+          }
+        },
+        {
+          "text": "Just cup a rough shape; good enough.",
+          "next": "u17_lantern_soft"
+        }
+      ]
+    },
+    {
+      "id": "u17_lantern_pass",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The ash sets hard and true, black and light as a wasp's nest, every bar of the little cage whole. The child leans in, breathes a thread of its grey flame into the hollow, and the lantern catches.\n\nIt gives the same cold seeing-light — no heat, no shadow — but it is yours now, to carry into the dark. An ash-lantern, made by asking.\n\n\"There,\" the child says, pleased in a way that makes your chest ache. \"Now you can see the ones who are dead and don't know it. And the way across. And, if you are very lucky, the way out.\"",
+      "choices": [
+        {
+          "text": "Take the ash-lantern. Thank the child.",
+          "next": "u17_cross_water",
+          "do": [
+            "add_item:ash_lantern",
+            "trust:+4",
+            "journal:Made the ash_lantern from a thousand-year hearth, lit by the Lantern-child's grey flame. It shows the dead, and the way."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_lantern_soft",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You cup the ash into a rough cage. It holds — barely, one bar crumbling and re-forming as you steady it. The child sighs, breathes its grey thread into the hollow anyway, and the lantern catches, dimmer than it might have, but lit.\n\n\"It'll do,\" the child says. \"It'll get you across. Be gentle with it. It wasn't asked as kindly as it wanted.\"\n\nAn ash-lantern, all the same. Cold light in your hand.",
+      "choices": [
+        {
+          "text": "Take the ash-lantern. Thank the child.",
+          "next": "u17_cross_water",
+          "do": [
+            "add_item:ash_lantern",
+            "trust:+1",
+            "journal:Made the ash_lantern in a hurry. It lit, dimmer than it could have. Be gentle with it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_cross_water",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You wade into the black water with the ash-lantern held high, and its cold light does what no torch could: it does not push the dark back, it makes the dark honest. In its glow the wake of the Keeper reappears, a bright seam running dead ahead. And in its glow you see them — the taken, standing waist-deep all across the water, hundreds of them, patient, listening, dead and not knowing.\n\nNone of them look at you. You keep the lantern up and your steps counted, and you wade the true seam between them, and they let you pass like reeds letting a boat through.\n\nThe far shore rises out of the dark: a black strand, and beyond it, low hills the colour of drowned iron, and a road.",
+      "choices": [
+        {
+          "text": "Step onto the far shore.",
+          "next": "u17_far_shore"
+        }
+      ]
+    },
+    {
+      "id": "u17_far_shore",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "You come ashore dripping the country's cold. Behind you the black water closes over your wake. The taken have already forgotten you were ever there.\n\nThe Lantern-child stands beside you on the strand, small and grey and looking up the dark road with something like dread and something like relief.\n\n\"That's the Ashen March,\" it says. \"The dead-mirror of the caravan road. Everyone who ever walked to the Gate walks it still, down here, not knowing they arrived. If you're going after the Keeper, you go through them.\"\n\nIt slips its small grey hand toward yours, then hesitates, unsure it is allowed.",
+      "choices": [
+        {
+          "text": "Take the child's hand. \"Then we walk it together.\"",
+          "next": "u17_child_join",
+          "do": [
+            "companion:lumen",
+            "trust:+3",
+            "journal:The Lantern-child (lumen) walks with me now. Ahead: the Ashen March, the dead-mirror of the road."
+          ]
+        },
+        {
+          "text": "\"Stay behind me. Point the way.\" (Walk on alone-ish)",
+          "next": "u17_child_follow"
+        }
+      ]
+    },
+    {
+      "id": "u17_child_join",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The child's hand is cold and light as candle-smoke, and it holds on as though it has wanted to hold someone's hand for a thousand years and never dared ask.\n\n\"Nobody's ever taken my hand before,\" it says, wondering. \"They all just follow the light. You're loud, and you ask, and you take hands. You might be the strangest dead person I've ever guided.\"\n\n\"I'm not dead,\" you remind it.\n\n\"We'll see,\" it says, and it is almost a joke, and the almost is what frightens you.\n\nAhead, the Ashen March waits under its bruise-yellow sky, and somewhere on that road the Keeper is still running.",
+      "choices": [
+        {
+          "text": "Walk on, into the March.",
+          "next": "u18_start",
+          "do": [
+            "flag:region_threshold",
+            "flag:region_gate",
+            "flag:codex_mirror",
+            "journal:Crossed the threshold. The Underland is real, the Mirror Law is learned, and I am not walking it alone."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u17_child_follow",
+      "chapter": "CHAPTER XVII · THE THRESHOLD",
+      "text": "The child nods and falls in behind your shoulder, holding its flame to light your steps, quiet now, the way it must have gone quiet a thousand times behind a thousand travellers who never once looked back.\n\nYou look back. Just once.\n\n\"Keep close,\" you tell it. \"I don't lose people down here.\"\n\nSomething in the grey face steadies. It comes up level with you after that, no longer quite behind, and does not ask permission.\n\nAhead, the Ashen March waits under its bruise-yellow sky, and somewhere on that road the Keeper is still running.",
+      "choices": [
+        {
+          "text": "Walk on, into the March.",
+          "next": "u18_start",
+          "do": [
+            "companion:lumen",
+            "flag:region_threshold",
+            "flag:region_gate",
+            "flag:codex_mirror",
+            "journal:Crossed the threshold. Learned the Underland and the Mirror Law. The Lantern-child (lumen) walks with me into the March."
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,715 @@
+{
+  "scenes": [
+    {
+      "id": "u22_start",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The stair down begins where the Sunk City ends. No last step is ever visible. You walk into a dark that has weight, that leans on your shoulders and asks to be carried.\n\nThe grey flame in your hand — or in the child's — throws a circle no wider than a grave. Beyond it, nothing answers the light. Not stone. Not water. Not the dead.\n\nSomething down there is breathing. Slow. Patient. It has been waiting longer than the realm has had a name.\n\nYou mark the border in your mind: this is the Long Dark. From here the door is closer, and so is everything the door has eaten.",
+      "choices": [
+        {
+          "text": "Descend into the dark.",
+          "next": "u22_first_step",
+          "do": [
+            "flag:region_dark",
+            "fear:5",
+            "journal:Entered the Long Dark. The way down has no bottom you can see."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_first_step",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The stair forgets to be a stair. Now it is a slope of black sand that swallows your boots to the ankle and drinks the sound of your steps.\n\nThe air thins. Each breath costs more than the last. Fear is a taste now, copper on the back of the tongue, and the dark leans closer to lick at the light.\n\nAhead the slope splits: a low crack that weeps cold air, and a broad ledge where the sand has been swept smooth, as if something keeps it that way.",
+      "choices": [
+        {
+          "text": "Squeeze through the weeping crack.",
+          "next": "u22_crack_1"
+        },
+        {
+          "text": "Take the swept ledge.",
+          "next": "u22_ledge_1"
+        },
+        {
+          "text": "Stop. Steady your breathing before going on.",
+          "next": "u22_breathe"
+        }
+      ]
+    },
+    {
+      "id": "u22_breathe",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You plant your back against something that might be rock and make yourself breathe slow. In. Hold. Out. The oldest trick, and the only one the dark cannot steal.\n\nThe grey flame steadies. Your heartbeat comes down off its ledge.\n\nIf a companion walks with you, they match your breathing without being asked. That is what companions are for, down here — not their swords. Their lungs.",
+      "choices": [
+        {
+          "text": "Steady now. Take the crack.",
+          "next": "u22_crack_1",
+          "do": [
+            "fear:-3"
+          ]
+        },
+        {
+          "text": "Steady now. Take the ledge.",
+          "next": "u22_ledge_1",
+          "do": [
+            "fear:-3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_crack_1",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The crack is a throat. You go through it sideways, cheek to wet stone, the flame pinched small so it will not gutter. The cold that weeps out of it is the cold of held breath.\n\nHalfway through, the walls narrow. Your pack snags. For one long heartbeat the dark has you by the ribs and will not let go, and every story you were ever told about being buried alive comes to sit on your chest at once.\n\nSteady hands, or panic. Choose which.",
+      "choices": [
+        {
+          "text": "Ease the pack loose with steady hands.",
+          "next": "u22_crack_pass",
+          "check": {
+            "stat": "fear",
+            "dc": 12,
+            "pass": "u22_crack_pass",
+            "fail": "u22_crack_fail",
+            "onFail": [
+              "hp:-4",
+              "fear:6"
+            ]
+          }
+        },
+        {
+          "text": "Cut the pack straps and shove through.",
+          "next": "u22_crack_cut",
+          "do": [
+            "fear:4"
+          ]
+        },
+        {
+          "text": "Back out. Take the ledge instead.",
+          "next": "u22_ledge_1"
+        }
+      ]
+    },
+    {
+      "id": "u22_crack_pass",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You breathe out until you are thinner than fear, and the stone lets you pass. The crack opens into a low gallery where the ceiling drips a slow, deliberate rhythm, like a clock built to count something other than hours.\n\nOn a shelf of dry rock sits a stub of grey candle and a coil of good rope, left by someone who did not need them anymore.",
+      "choices": [
+        {
+          "text": "Take the rope and press on.",
+          "next": "u22_gallery",
+          "do": [
+            "add_item:rope",
+            "journal:Found rope in the weeping gallery. Someone left it. They did not come back."
+          ]
+        },
+        {
+          "text": "Leave it. Some gifts down here are bait.",
+          "next": "u22_gallery",
+          "do": [
+            "fear:2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_crack_fail",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "Panic takes you. You thrash, and the stone takes its price — a strip of skin, a crack across the ribs, the flame nearly out. When you finally spill through into the gallery beyond, you are shaking and bleeding and smaller than you were.\n\nThe dark noticed. It always notices. Somewhere ahead, something that was asleep is now awake.",
+      "choices": [
+        {
+          "text": "Bind the wound and go on.",
+          "next": "u22_gallery"
+        }
+      ]
+    },
+    {
+      "id": "u22_crack_cut",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You slash the straps. The pack drops behind you into the dark, and you hear it fall for far too long before it stops. You are through — lighter, and poorer.\n\nWhatever was in the outermost pocket is gone. But your lungs are your own again, and that is worth more than most things down here.",
+      "choices": [
+        {
+          "text": "Go on into the gallery.",
+          "next": "u22_gallery"
+        }
+      ]
+    },
+    {
+      "id": "u22_ledge_1",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The swept ledge is too clean. Nothing is this tidy by accident. The sand lies in soft ridges, brushed smooth over and over, the way a nervous hand smooths a bedsheet.\n\nHalfway across, the flame shows you why. The ledge is ringed with small white stones, set at even spaces. Not stones. Teeth. Set point-up, all of them pointing at the ledge's center, where the sand is smoothest of all.\n\nThe center is a mouth that keeps its own porch swept.",
+      "choices": [
+        {
+          "text": "Skirt the ring, hugging the wall.",
+          "next": "u22_ledge_skirt"
+        },
+        {
+          "text": "Cross straight and fast, before it wakes.",
+          "next": "u22_ledge_cross"
+        },
+        {
+          "text": "Go back and take the crack instead.",
+          "next": "u22_crack_1"
+        }
+      ]
+    },
+    {
+      "id": "u22_ledge_skirt",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You press your spine to the wall and go around, one slow foot at a time, keeping the tooth-ring at arm's length. The smooth center never stirs. But you feel it feeling you, the way a shut eye feels the light.\n\nAt the far side a gap in the wall leads down toward the gallery — and the smell of old water, and the sound of the slow clock-drip.",
+      "choices": [
+        {
+          "text": "Slip through to the gallery.",
+          "next": "u22_gallery",
+          "do": [
+            "fear:2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_ledge_cross",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You run. The smooth sand gives under you like a held breath, and the tooth-ring shudders, and the whole center of the ledge rises on a wet root of muscle and reaches for the light in your hand.\n\nIt does not want your flesh. It wants your flame. The dark down here is starving for anything that shines.",
+      "choices": [
+        {
+          "text": "Turn and face it.",
+          "next": "u22_combat_maw"
+        }
+      ]
+    },
+    {
+      "id": "u22_combat_maw",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The Sand-Maw heaves itself out of its swept porch — a lipless ring of teeth on a stalk of muscle, blind and fast, snapping at the grey flame and the warm thing that carries it. There is no going around it now. Only through.",
+      "combat": {
+        "enemy": "Sand-Maw",
+        "ehp": 9,
+        "edmg": 3,
+        "win": "u22_maw_win",
+        "lose": "u22_maw_lose",
+        "flee": "u22_ledge_skirt"
+      },
+      "choices": []
+    },
+    {
+      "id": "u22_maw_win",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The stalk splits under your blade and folds back into its hole with a sound like a drain unclogging. The teeth stop pointing. The porch is just sand again.\n\nIn the pit it kept, half-buried, your flame finds a shard of dull mirror — Underland silver, cold as a coin off a dead man's eye.",
+      "choices": [
+        {
+          "text": "Take the shard. Move on.",
+          "next": "u22_gallery",
+          "do": [
+            "add_item:mirror_shard",
+            "fear:2",
+            "journal:Killed the Sand-Maw. It hoarded a mirror shard in its throat."
+          ]
+        },
+        {
+          "text": "Leave the pit. Move on.",
+          "next": "u22_gallery"
+        }
+      ]
+    },
+    {
+      "id": "u22_maw_lose",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The Maw takes you down into its swept dark, teeth first. But the grey flame — the flame it wanted — burns it from the inside, and it spits you back out onto the ledge, scorched and gasping and alive by a margin too thin to name.\n\nThe flame is nearly out. Fear has you by the throat. But the Maw is gone, and the way down is open.",
+      "choices": [
+        {
+          "text": "Crawl on, half-broken, into the gallery.",
+          "next": "u22_gallery",
+          "do": [
+            "fear:8",
+            "journal:The Sand-Maw nearly ended me. Only the grey flame drove it off."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_gallery",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The gallery is a long room of dripping stone, its far end lost to dark. Water pools black on the floor and does not reflect the flame — a small wrongness that is worse than a large one.\n\nHere the pressure of the place settles into your bones. You take stock. Whatever you carried in is all you have. There is no market in the Long Dark. There is only what you brought, and what you are willing to spend of yourself.\n\nA cold current of air says the way continues past the pools. And somewhere in the black water, something long is uncoiling.",
+      "choices": [
+        {
+          "text": "Wade the pools directly.",
+          "next": "u22_pools_wade"
+        },
+        {
+          "text": "Find the dry edge and pick along it.",
+          "next": "u22_pools_edge"
+        },
+        {
+          "text": "Rest a moment against the wall.",
+          "next": "u22_gallery_rest"
+        }
+      ]
+    },
+    {
+      "id": "u22_gallery_rest",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You lower yourself against cold stone and let the dark hold still for a breath. If you carry anything that heals — a draught, dried bread, a strip of clean cloth — this is the moment to spend it. Past the pools there will be no such quiet.\n\nA companion, if you have one, keeps watch on the water while you tend yourself. Their eyes catch the flame and give it back, and for a moment the circle of light feels less like a grave and more like a fire.",
+      "choices": [
+        {
+          "text": "Drink the warding draught.",
+          "next": "u22_gallery",
+          "require": "warding_draught",
+          "do": [
+            "rem_item:warding_draught",
+            "hp:5",
+            "fear:-6",
+            "journal:Spent the widow's warding draught in the Long Dark. Against bad dreams, she said."
+          ]
+        },
+        {
+          "text": "Eat what supplies you have.",
+          "next": "u22_gallery",
+          "require": "supplies",
+          "do": [
+            "rem_item:supplies",
+            "hp:3"
+          ]
+        },
+        {
+          "text": "Rest is enough. Go on.",
+          "next": "u22_gallery",
+          "do": [
+            "fear:-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_pools_wade",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You step into the black water. It is colder than water should be, and it climbs your legs like it is deciding whether to keep them. Halfway across, the long thing in the pool finds you — a coil of pale muscle, eyeless, feeling for warmth.\n\nIt loops your ankle. It begins, without hurry, to pull.",
+      "choices": [
+        {
+          "text": "Strike down at the coil.",
+          "next": "u22_combat_eel"
+        },
+        {
+          "text": "Wrench free and lunge for the far edge.",
+          "next": "u22_pools_lunge",
+          "check": {
+            "stat": "hp",
+            "dc": 13,
+            "pass": "u22_pools_far",
+            "fail": "u22_combat_eel",
+            "onPass": [
+              "fear:3"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "u22_pools_lunge",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You throw your weight toward the dry stone.",
+      "choices": [
+        {
+          "text": "Pull.",
+          "next": "u22_pools_far"
+        }
+      ]
+    },
+    {
+      "id": "u22_pools_edge",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You trace the gallery's dry rim, where the stone rises just above the black water. It is slow going, hand over hand along a lip no wider than your foot, the flame clenched in your teeth.\n\nThe pale thing in the pool follows you the whole way, a shadow under the surface, keeping pace, waiting for you to slip. You do not slip. But your nerve frays like old rope, and by the time the edge widens you are wrung out with the effort of not falling.",
+      "choices": [
+        {
+          "text": "Step onto solid ground, shaking.",
+          "next": "u22_pools_far",
+          "do": [
+            "fear:5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_combat_eel",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The Pale Coil rears out of the black water, a blind length of muscle thick as your thigh, mouth a ring of inward hooks. It smells the heat of you and wants it. You set your feet in the shallows and raise your blade.",
+      "combat": {
+        "enemy": "Pale Coil",
+        "ehp": 11,
+        "edmg": 4,
+        "win": "u22_pools_far",
+        "lose": "u22_eel_lose",
+        "flee": "u22_pools_edge"
+      },
+      "choices": []
+    },
+    {
+      "id": "u22_eel_lose",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The Coil drags you under. Black water fills your ears, your nose, the world. You feel the far edge with your fingertips and haul yourself up onto it by will alone, coughing the pool out of your lungs while the Coil sinks back to wait for the next warm thing.\n\nYou live. Barely. The dark takes another piece of your courage as payment.",
+      "choices": [
+        {
+          "text": "Drag yourself onward.",
+          "next": "u22_pools_far",
+          "do": [
+            "fear:8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_pools_far",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The far edge is dry, and beyond it the gallery narrows to a corridor of standing stones — pale markers set in two rows, leaning inward, older than the Underland's oldest lie.\n\nAt the corridor's mouth, your companion stops. Whether it is Lumen with the grey flame or Gloam with the mirror-cold blade, they will not step between the stones. Something in this passage frightens the part of them that is not quite yours yet.\n\nThe dark here is the deepest you have met. To go on, the party must go on together — or not at all.",
+      "choices": [
+        {
+          "text": "Turn to Lumen at the stones.",
+          "next": "u22_lumen_gate",
+          "require": "companion:lumen"
+        },
+        {
+          "text": "Turn to Gloam at the stones.",
+          "next": "u22_gloam_gate",
+          "require": "companion:gloam"
+        },
+        {
+          "text": "You walk alone. Enter the stones.",
+          "next": "u22_alone_stones"
+        }
+      ]
+    },
+    {
+      "id": "u22_lumen_gate",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "Lumen holds the grey flame up between the leaning stones and will not take a step. The little light shivers.\n\n\"This is where they take the children,\" the child says, very small. \"I remember the stones. I was carried through them. If I go back in, the dark might remember it owns me.\"\n\nThe Lantern-child looks up at you. Everything depends on whether the child believes you will not let go.",
+      "choices": [
+        {
+          "text": "\"I have you. I will not let the dark have you.\" (Lumen 40+)",
+          "next": "u22_lumen_hold",
+          "require": "rel:lumen:40"
+        },
+        {
+          "text": "\"Then light the way and trust me.\"",
+          "next": "u22_lumen_check",
+          "check": {
+            "stat": "rel:lumen",
+            "dc": 14,
+            "pass": "u22_lumen_hold",
+            "fail": "u22_lumen_lost",
+            "onFail": [
+              "fear:6"
+            ]
+          }
+        },
+        {
+          "text": "\"Wait here in the light. I will come back for you.\"",
+          "next": "u22_lumen_lost"
+        }
+      ]
+    },
+    {
+      "id": "u22_lumen_check",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The child searches your face for the truth of it.",
+      "choices": [
+        {
+          "text": "Hold out your hand.",
+          "next": "u22_lumen_hold"
+        }
+      ]
+    },
+    {
+      "id": "u22_lumen_hold",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "Lumen takes your hand. The small fingers are cold, but they hold hard. Together you step between the first two stones, and the dark leans in to claim its old possession — and finds the child's hand already claimed.\n\n\"You held on,\" Lumen whispers, wondering. \"Nobody held on before.\"\n\nThe grey flame steadies to a clean, brave point. Whatever waits at the bottom, the light goes down with you.",
+      "choices": [
+        {
+          "text": "Descend, hand in hand.",
+          "next": "u22_deep_landing",
+          "do": [
+            "rel:lumen:5",
+            "fear:-4",
+            "journal:Held Lumen's hand through the child-stones. Nobody held on before, the child said."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_lumen_lost",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You tell the child to wait in the light. It is the sensible thing. It is the wrong thing.\n\nYou take a dozen steps between the stones and turn back — and the flame is gone. The place where Lumen stood is only dark, and the dark is smug about it. No cry. No struggle. The Long Dark simply remembered it owned the child, and the child, unheld, went back to it.\n\nYou go on without a light. That is the price of letting go.",
+      "choices": [
+        {
+          "text": "Walk into the dark you can no longer see.",
+          "next": "u22_deep_landing",
+          "do": [
+            "companion:lumen",
+            "rem_item:ash_lantern",
+            "fear:12",
+            "flag:lost_lumen",
+            "journal:I let go of Lumen at the child-stones. The dark took the flame back. I go on blind."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_gloam_gate",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The Mirror-Knight halts at the leaning stones. In the flame's light Gloam's polished visor throws back not your face but the corridor's — and in the reflection, the stones are not stones. They are figures. A double row of knights exactly like Gloam, standing sentinel, waiting to be recognized.\n\n\"These were my order,\" Gloam says, low. \"The Mirror-Knights who came before me and were unmade here. If I walk in, the law may bind me back among them. I need to know you will not let the mirror keep me.\"",
+      "choices": [
+        {
+          "text": "\"You are mine, not the mirror's. Walk on.\" (Gloam 40+)",
+          "next": "u22_gloam_hold",
+          "require": "rel:gloam:40"
+        },
+        {
+          "text": "\"Look at me, not the glass. Come.\"",
+          "next": "u22_gloam_check",
+          "check": {
+            "stat": "rel:gloam",
+            "dc": 14,
+            "pass": "u22_gloam_hold",
+            "fail": "u22_gloam_lost",
+            "onFail": [
+              "fear:6"
+            ]
+          }
+        },
+        {
+          "text": "\"If the law wants you, I won't fight it.\"",
+          "next": "u22_gloam_lost"
+        }
+      ]
+    },
+    {
+      "id": "u22_gloam_check",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "Behind the visor, you feel Gloam weighing your voice against a thousand years of the Mirror Law.",
+      "choices": [
+        {
+          "text": "Hold the knight's gaze.",
+          "next": "u22_gloam_hold"
+        }
+      ]
+    },
+    {
+      "id": "u22_gloam_hold",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "Gloam looks away from the glass, to you. The reflected order calls silently in the polished steel, and the knight — for the first time in a very long time — refuses the reflection.\n\n\"Then I am yours,\" Gloam says, and steps between the stones. The mirrored knights in the visor bow their heads as one, and let their brother pass.\n\nThe mirror-cold blade warms half a degree. Down you go, the two of you, into the deep.",
+      "choices": [
+        {
+          "text": "Descend together.",
+          "next": "u22_deep_landing",
+          "do": [
+            "rel:gloam:5",
+            "fear:-4",
+            "journal:Gloam refused the mirror's pull at the knight-stones. 'Then I am yours.'"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_gloam_lost",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You do not fight the law. Gloam nods, once, the way a soldier nods at an order they expected.\n\nThe reflected order in the visor lifts their hands, and the Mirror-Knight steps sideways into the glass as if into an open door. The stones drink the last of the mirror-cold light. Where Gloam stood there is only another leaning stone, exactly like the rest, one knight longer than the row was before.\n\nYou go on without a shield. That is the price of not fighting for someone.",
+      "choices": [
+        {
+          "text": "Walk on, unguarded, into the deep.",
+          "next": "u22_deep_landing",
+          "do": [
+            "companion:gloam",
+            "rem_item:mirror_shard",
+            "fear:12",
+            "flag:lost_gloam",
+            "journal:I let the Mirror Law keep Gloam at the knight-stones. One knight longer, the row was. I go on unguarded."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_alone_stones",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You have no companion to fear the stones for you, and so you walk into them alone, as most who come this far have walked.\n\nThe leaning markers watch you pass with the patience of things that have watched everyone pass. None of them reach for you. You are not what they collect. You are only a warm thing, going down, carrying too little light.\n\nThe corridor tilts. The floor becomes a slope becomes a fall.",
+      "choices": [
+        {
+          "text": "Ride the slope down into the deep.",
+          "next": "u22_deep_landing",
+          "do": [
+            "fear:6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_deep_landing",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The slope spills you out into a vast, low cavern — the deepest floor of the Long Dark. The ceiling is too far up to see. The far wall is too far off to guess. And the whole floor is bones: pale, uncountable, the leavings of everyone the Gate has ever swallowed and let sink this far.\n\nAt the center of the boneyard, a light. Not your grey flame. A red one — a brazier, tended, which means something down here tends it.\n\nAnd around the brazier, shapes are standing up out of the bones.",
+      "choices": [
+        {
+          "text": "Approach the brazier.",
+          "next": "u22_boneyard"
+        },
+        {
+          "text": "Skirt the boneyard toward the far dark.",
+          "next": "u22_boneyard_skirt"
+        }
+      ]
+    },
+    {
+      "id": "u22_boneyard_skirt",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You keep to the boneyard's rim, away from the red light and the standing shapes. The bones shift under you, whispering, each step a small betrayal of sound.\n\nHalfway around, the whispering stops. That is worse. In the sudden quiet you understand you have been herded — the standing shapes have simply walked the shorter arc, and now they are between you and every direction but one: forward, into them.",
+      "choices": [
+        {
+          "text": "Meet them where they stand.",
+          "next": "u22_combat_gaunt"
+        }
+      ]
+    },
+    {
+      "id": "u22_boneyard",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You walk into the red light. The shapes resolve: the Gaunt — the taken who sank too far to be held gently anymore, worn down to hunger and habit. They do not speak. They tend the brazier because tending is the last thing their hands remember.\n\nThen they smell the warm blood in you, and remembering ends. The nearest lifts a face that is mostly socket and starts toward you, and the rest follow, and the brazier's red light makes long reaching shadows of them all.",
+      "choices": [
+        {
+          "text": "Set your back to the brazier and fight.",
+          "next": "u22_combat_gaunt"
+        },
+        {
+          "text": "Try to reach the part of them that still remembers.",
+          "next": "u22_gaunt_plea",
+          "check": {
+            "stat": "trust",
+            "dc": 15,
+            "pass": "u22_gaunt_calm",
+            "fail": "u22_combat_gaunt",
+            "onFail": [
+              "fear:4"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "u22_gaunt_plea",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You do the thing the dead Hunter told you, long ago and a world above: you make noise. You name them. You call them children, travellers, the loved and the lost, and you say the one thing the silence hates. You say: your people set bowls out. Your people kept the chairs.",
+      "choices": [
+        {
+          "text": "Say it, and mean it.",
+          "next": "u22_gaunt_calm"
+        }
+      ]
+    },
+    {
+      "id": "u22_gaunt_calm",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The Gaunt stop.\n\nSomething moves through the empty sockets — not sight, but memory of sight. The nearest one lowers its reaching hand and, with terrible slowness, turns back to the brazier. One by one the others follow, sitting down again among the bones, tending the small red fire that is the last warm thing they have.\n\nThey let you pass. As you go, the nearest presses something into your hand — a scrap of cloth, a faded ribbon, held all this time by a child who could not remember why.",
+      "choices": [
+        {
+          "text": "Take the ribbon. Walk on, humbled.",
+          "next": "u22_far_dark",
+          "do": [
+            "add_item:ribbon",
+            "trust:5",
+            "fear:-4",
+            "journal:Named the Gaunt in the boneyard. They let me pass, and gave me a child's ribbon."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_combat_gaunt",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "There is no more talking. The Gaunt come off the bones in a starving tide, all reaching hands and open sockets and the awful patience of the very hungry. You cannot fight them all. You do not have to. You only have to break the tide that reaches you and get to the far dark before the rest close in.",
+      "combat": {
+        "enemy": "The Gaunt",
+        "ehp": 14,
+        "edmg": 4,
+        "win": "u22_gaunt_win",
+        "lose": "u22_gaunt_lose",
+        "flee": "u22_far_dark"
+      },
+      "choices": []
+    },
+    {
+      "id": "u22_gaunt_win",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You cut a road through them. The ones that fall do not scream; they simply stop, and lie down among the bones they came from, and are quiet in a way that looks almost like relief.\n\nWhen it is done you are standing in a ring of stillness, breathing hard, red brazier-light on your blade. The rest of the Gaunt have drawn back to the fire. They will not follow you past the light's edge.\n\nBeyond the boneyard, the far dark waits, and in it, a stair going up.",
+      "choices": [
+        {
+          "text": "Cross to the far dark and the rising stair.",
+          "next": "u22_far_dark",
+          "do": [
+            "fear:4",
+            "journal:Fought through the Gaunt in the boneyard. The fallen looked relieved."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_gaunt_lose",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The tide closes over you. Hands in your hair, your collar, your sleeves, cold and countless, dragging you down toward the brazier to be tended, to be kept, to be made quiet.\n\nAnd then — light. Your own grey flame flares, or the memory of it does, and the Gaunt flinch from the warmth as from a blade. You tear free and run, leaving skin and blood and most of your courage behind, and you do not stop running until the red light is a coal behind you.",
+      "choices": [
+        {
+          "text": "Run for the far dark. Do not look back.",
+          "next": "u22_far_dark",
+          "do": [
+            "fear:10",
+            "journal:The Gaunt nearly kept me. I ran and left half my nerve in the boneyard."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u22_far_dark",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The far dark is quieter than the rest. The bones thin, then end. Ahead, cut into the cavern's far wall, a stair climbs — and the air that comes down it is not the dead air of the deep but something with a taste to it. Cold stone. Old incense. The breath of a great shut room.\n\nYou have crossed the bottom of the Long Dark and come out the far side. Whatever the party is now — whole, or one short, blooded and afraid — it is what will climb this stair.\n\nAt the first step, you stop and take the measure of yourself. This is the last dark before the throne.",
+      "choices": [
+        {
+          "text": "Take account of who still walks with you.",
+          "next": "u22_reckoning"
+        },
+        {
+          "text": "No time. Climb.",
+          "next": "u22_ascend"
+        }
+      ]
+    },
+    {
+      "id": "u22_reckoning",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "You count the circle of your light.\n\nIf Lumen still holds the grey flame, it burns steady, and the child holds your sleeve and does not let go. If Gloam still walks, the mirror-cold blade is a comfort at your shoulder. And if you left one of them in the dark below — you feel the shape of that absence more than any wound. The party is only as strong as what it refused to lose.\n\nWhatever you have, it is enough to climb with, or it is not, and there is only one way to find out.",
+      "choices": [
+        {
+          "text": "[Lumen still walks] Nod to the Lantern-child. Climb.",
+          "next": "u22_ascend",
+          "require": "companion:lumen"
+        },
+        {
+          "text": "[Gloam still walks] Nod to the Mirror-Knight. Climb.",
+          "next": "u22_ascend",
+          "require": "companion:gloam"
+        },
+        {
+          "text": "[Alone] Square your shoulders. Climb.",
+          "next": "u22_ascend"
+        }
+      ]
+    },
+    {
+      "id": "u22_ascend",
+      "chapter": "CHAPTER XXII · THE LONG DARK",
+      "text": "The stair climbs and does not tire, though you do. Step after step out of the deep, the bones behind you, the boneyard's red coal shrinking to nothing below.\n\nThe cold-incense breath grows stronger. Somewhere far above, a light that is not fire and not flame — a pale, patient glow, the glow of a room where something has sat still for a thousand years, waiting for the sound of a footstep on its stair.\n\nYour footstep. It hears you coming. It has always heard you coming.\n\nThe Long Dark ends. The Hollow Throne begins.",
+      "choices": [
+        {
+          "text": "Climb the last steps into the pale glow.",
+          "next": "u23_start",
+          "do": [
+            "fear:5",
+            "journal:Climbed out of the Long Dark. Something above has been waiting for my footstep."
+          ]
+        }
+      ]
+    }
+  ]
+}

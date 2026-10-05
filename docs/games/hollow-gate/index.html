@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Hollow Gate</title>
+<style>
+  :root{
+    --bg:#0e0c0b; --panel:#1a1613; --ink:#e9e3d6; --muted:#8c8576;
+    --accent:#e6b334; --danger:#c64e4e; --ok:#6da87e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:radial-gradient(circle at 30% 10%,#241e18,var(--bg) 60%)}
+  body{color:var(--ink);font-family:Georgia,Times,serif}
+  #app{display:grid;grid-template-rows:auto 1fr auto;max-width:860px;margin:2.5vh auto;padding:2rem;min-height:92vh;gap:1.25rem}
+  header{text-align:center}
+  h1{letter-spacing:.35em;font-size:clamp(1.4rem,2.6vw,2.2rem);margin:.2rem 0}
+  .chapter{color:var(--accent);letter-spacing:.25em;font-size:.85rem}
+  .scene{background:linear-gradient(180deg,#1f1a15,#16120f);border:1px solid #2f2720;border-radius:14px;padding:1.5rem;line-height:1.7}
+  .scene pre{white-space:pre-wrap;word-wrap:break-word;font:inherit;margin:0}
+  .hud{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;font-size:.85rem;color:var(--muted)}
+  .hud b{color:var(--ink)}
+  .choices{display:flex;flex-direction:column;gap:.65rem}
+  button{background:#201a14;color:#f6ead1;border:1px solid #3a3128;border-radius:10px;padding:.9rem 1.1rem;text-align:left;cursor:pointer;font:inherit;transition:transform .05s ease,background .2s ease}
+  button:hover{background:#2a221a;border-color:#4d3f33}
+  button:active{transform:translateY(1px)}
+  button.primary{background:#2a2214;border-color:#6d5620;color:#ffe08a}
+  button.primary::before{content:"▸ ";color:var(--accent)}
+  .toolbar{display:flex;gap:.6rem;justify-content:flex-end}
+  .toolbar button{padding:.5rem .8rem;font-size:.8rem;border-radius:8px}
+  footer{text-align:center;color:#5c564a;font-size:.75rem;margin-top:.5rem}
+  .toast{background:#0f0d0b;border:1px solid #3a2f1e;color:#f3dc8d;padding:.6rem .9rem;border-radius:8px;margin:.4rem 0;font-size:.85rem}
+  .hidden{display:none}
+  /* combat + skill-check feedback */
+  .roll{background:#120f0c;border:1px solid #4d3f33;color:#e6b334;padding:.5rem .8rem;border-radius:8px;margin:.4rem 0;font-size:.85rem;text-align:center;letter-spacing:.04em}
+  .roll.pass{border-color:#3f5c47;color:#9fd6b0}
+  .roll.fail{border-color:#5c3a3a;color:#e59a9a}
+  .foe{display:flex;justify-content:space-between;gap:1rem;font-size:.9rem;margin:.2rem 0 .6rem}
+  .bar{height:8px;border-radius:6px;background:#2a221a;overflow:hidden;flex:1;align-self:center;max-width:180px}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,#c64e4e,#e6b334)}
+  /* overlay panels */
+  .overlay{position:fixed;inset:0;background:rgba(6,5,4,.82);display:flex;align-items:center;justify-content:center;padding:1.2rem;z-index:20}
+  .sheet{background:linear-gradient(180deg,#1f1a15,#14100d);border:1px solid #3a3128;border-radius:14px;max-width:640px;width:100%;max-height:86vh;overflow:auto;padding:1.4rem 1.5rem}
+  .sheet h2{color:var(--accent);letter-spacing:.18em;font-size:1rem;margin:.2rem 0 1rem;text-transform:uppercase}
+  .sheet .row{border-bottom:1px solid #2a2219;padding:.6rem 0}
+  .sheet .row b{color:var(--ink)}
+  .sheet .muted{color:var(--muted);font-size:.85rem}
+  .sheet .locked{color:#5c564a;font-style:italic}
+  .closeX{float:right;padding:.3rem .7rem;font-size:.85rem}
+  @media (max-width: 540px){
+    #app{padding:1rem}
+    .scene{padding:1rem}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="chapter" id="chapter">LOADING</div>
+    <h1>THE HOLLOW GATE</h1>
+    <div style="color:var(--muted);font-size:0.9rem;margin-top:0.5rem;">A dark-fantasy interactive text adventure</div>
+  </header>
+  <main>
+    <div class="scene" id="scene"><pre id="story">Loading…</pre></div>
+    <div class="hud" id="hud"></div>
+    <div class="toast hidden" id="toast"></div>
+    <div class="choices" id="choices"></div>
+  </main>
+  <footer>
+    <div class="toolbar" id="toolbar">
+      <button id="btn-inv" class="hidden" onclick="openPanel('inv')">Pack</button>
+      <button id="btn-map" class="hidden" onclick="openPanel('map')">Map</button>
+      <button id="btn-codex" class="hidden" onclick="openPanel('codex')">Codex</button>
+      <button onclick="resetToMenu()">New Game</button>
+    </div>
+  </footer>
+</div>
+<div id="overlay" class="overlay hidden" onclick="if(event.target===this)closePanel()"><div class="sheet" id="sheet"></div></div>
+<script src="./story-data.js"></script>
+<script>
+const COMPANION_NAMES = {"ash": "Ash", "vale": "Ser Vale", "moth": "Moth", "rook": "Rook", "hedge_witch": "Hedge Witch", "lumen": "Lumen, the Lantern-child", "gloam": "Gloam, the Mirror-Knight"};
+const ITEM_LABELS = {"castle_talisman": "Castle Talisman", "poultice": "Poultice", "rook_note": "Rook Note", "seeing_draught": "Seeing Draught", "shadow_blade": "Shadow Blade", "signet_ring": "Signet Ring", "supplies": "Supplies", "sword": "Sword", "tunnel_map": "Tunnel Map", "village_map": "Village Map", "warding_draught": "Warding Draught", "wardstone": "Wardstone",
+  "gate_key":"Gate Key","mirror_shard":"Mirror Shard","ash_lantern":"Ash Lantern","true_name":"A True Name","underland_map":"Underland Map","knife":"Knife",
+  "rope":"Rope","ribbon":"A Faded Ribbon"};
+// Optional flavor for the Pack panel; falls back to the label if absent.
+const ITEM_DESC = {
+  sword:"Honest steel. +1 in a fight.", knife:"Quick and quiet.", poultice:"Heals a wound. Restores some HP.",
+  castle_talisman:"A sigil of the old house. Doors remember it.", signet_ring:"Proof of who you are — or a target.",
+  seeing_draught:"Drink to see what hides.", warding_draught:"Turns one blow aside.", wardstone:"Cold to the touch near the dark.",
+  shadow_blade:"It drinks light. It costs something.", tunnel_map:"Every way under the city.", village_map:"The back roads home.",
+  supplies:"Food, rope, flint — the boring things that keep you alive.", rook_note:"A raven's scrawl you can almost read.",
+  gate_key:"It has no lock on this side.", mirror_shard:"You are older in it.", ash_lantern:"Burns grey. Shows the true path in the Underland.",
+  true_name:"Say it once. Mean it.", underland_map:"A map that argues with you.",
+  rope:"Long, strong, and never quite long enough.", ribbon:"It belonged to someone. You mean to give it back."
+};
+// Regions light up in the Map panel as their flag is set. Act II = the Underland.
+const REGIONS = [
+  {flag:"region_courtyard", name:"The Courtyard", note:"Where the King grieves."},
+  {flag:"region_road",      name:"The Caravan Road", note:"Dust, strangers, first blood."},
+  {flag:"region_wood",      name:"The Witch's Wood", note:"Old magic, older debts."},
+  {flag:"region_tower",     name:"The Wizard's Tower", note:"Books that read you back."},
+  {flag:"region_lostcity",  name:"The Lost City", note:"Stone that remembers a name."},
+  {flag:"region_gate",      name:"The Hollow Gate", note:"The door that shouldn't open."},
+  {flag:"region_threshold", name:"◈ The Threshold", note:"The far side. The world inverts."},
+  {flag:"region_march",     name:"◈ The Ashen March", note:"A dead mirror of the road."},
+  {flag:"region_court",     name:"◈ The Drowned Court", note:"A false king on a rotted throne."},
+  {flag:"region_uwood",     name:"◈ The Unmaking Wood", note:"Trees that forget they were trees."},
+  {flag:"region_sunk",      name:"◈ The Sunk City", note:"Where the Keeper began."},
+  {flag:"region_dark",      name:"◈ The Long Dark", note:"Down, and down."},
+  {flag:"region_throne",    name:"◈ The Hollow Throne", note:"The end of the door."},
+];
+
+let CODEX = {}; // loaded from codex.json: { id: {title, flag, text} }
+
+const SAVE_KEY = "hollow_gate_save_v2";
+const DEFAULT_MAX_HP = 10;
+
+let state = newState();
+let routes = {};
+let scenes = {};
+
+function newState(){
+  return {
+    route: null, charKey: null, charName: null, gender: null,
+    hp: DEFAULT_MAX_HP, max_hp: DEFAULT_MAX_HP,
+    trust: 50, fear: 0, gold: 0,
+    pack: [], companions: [], relationships: {}, journal: [],
+    flags: {}, here: "gender", sceneCount: 0,
+  };
+}
+
+function saveGame(){
+  if(state.here === "gender" || state.here === "select") return;
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(_) {}
+}
+function loadGame(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    const s = JSON.parse(raw);
+    return s && s.charName ? s : null;
+  } catch(_) { return null; }
+}
+function clearSave(){ try { localStorage.removeItem(SAVE_KEY); } catch(_) {} }
+
+function slugifyName(n){
+  return n.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+}
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.remove("hidden");
+  setTimeout(()=>t.classList.add("hidden"), 1800);
+}
+
+async function fetchJSON(path){
+  // Baked-in data first: fetch() on Tauri's custom protocol is broken on
+  // macOS 26 WebKit, so packaged builds must never hit the network path.
+  const key = path.replace(/^\.\//, "");
+  if(window.__STORY_DATA__ && key in window.__STORY_DATA__) return window.__STORY_DATA__[key];
+  const res = await fetch(path, {cache: "no-store"});
+  if(!res.ok) throw new Error(`HTTP ${res.status} fetching ${path}`);
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch(e){ throw new Error(`Parse error in ${path}: ${e.message} | head: ${text.slice(0,80)}`); }
+}
+
+async function loadData(){
+  const r = await fetchJSON("./routes.json");
+  routes = r;
+  try { state._companionNames = await fetchJSON("./companions.json"); } catch(e) { state._companionNames = {}; }
+  try { CODEX = await fetchJSON("./codex.json"); } catch(e) { CODEX = {}; }
+  const files = await fetchJSON("./story/index.json");
+  const entries = Array.isArray(files) ? files : (files.chapters || []);
+  for(const item of entries){
+    const path = "./story/" + (typeof item === "string" ? item : item.file);
+    const data = await fetchJSON(path);
+    const arr = Array.isArray(data.scenes) ? data.scenes : [];
+    for(const s of arr) scenes[s.id] = s;
+  }
+}
+
+function parseEffect(raw){
+  const i = raw.indexOf(":");
+  if(i < 0) return [raw, "", ""];
+  const k = raw.slice(0, i);
+  const rest = raw.slice(i+1);
+  if(k === "rel"){
+    const j = rest.indexOf(":");
+    if(j > 0) return [k, rest.slice(0, j), rest.slice(j+1)];
+  }
+  return [k, rest, ""];
+}
+
+function applyDo(doList){
+  if(!doList) return;
+  for(const raw of doList){
+    if(!raw) continue;
+    const [k, a, b] = parseEffect(raw);
+    if(k === "add_item"){
+      if(state.pack.length < 8 && !state.pack.includes(a)) state.pack.push(a);
+    } else if(k === "rem_item"){
+      state.pack = state.pack.filter(x => x !== a);
+    } else if(k === "gold"){
+      state.gold = Math.max(0, state.gold + Number(a));
+    } else if(k === "trust"){
+      state.trust = Math.max(0, Math.min(100, state.trust + Number(a)));
+    } else if(k === "fear"){
+      state.fear = Math.max(0, Math.min(100, state.fear + Number(a)));
+    } else if(k === "hp"){
+      state.hp = Math.max(0, Math.min(state.max_hp, state.hp + Number(a)));
+    } else if(k === "max_hp"){
+      state.max_hp = Math.max(1, state.max_hp + Number(a));
+      state.hp = Math.min(state.hp, state.max_hp);
+    } else if(k === "companion"){
+      if(!state.companions.includes(a)) state.companions.push(a);
+      if(!(a in state.relationships)) state.relationships[a] = 10;
+    } else if(k === "rel"){
+      const cur = state.relationships[a] || 0;
+      state.relationships[a] = Math.max(0, Math.min(100, cur + Number(b)));
+    } else if(k === "flag"){
+      state.flags[a] = true;
+    } else if(k === "journal"){
+      state.journal.push(a);
+      if(state.journal.length > 12) state.journal = state.journal.slice(-12);
+    }
+  }
+}
+
+function visible(req){
+  if(!req) return true;
+  if(req.startsWith("companion:")) return state.companions.includes(req.split(":")[1]);
+  if(req.startsWith("gold:"))      return state.gold  >= Number(req.split(":")[1]);
+  if(req.startsWith("trust:"))     return state.trust >= Number(req.split(":")[1]);
+  if(req.startsWith("fear:"))      return state.fear  >= Number(req.split(":")[1]);
+  if(req.startsWith("hp:"))        return state.hp    >= Number(req.split(":")[1]);
+  if(req.startsWith("flag:"))      return !!state.flags[req.split(":")[1]];
+  if(req.startsWith("route:"))     return state.route === req.split(":")[1];
+  if(req.startsWith("rel:")){
+    const [,who,n] = req.split(":");
+    return (state.relationships[who] || 0) >= Number(n);
+  }
+  if(state.route && req.toLowerCase() === state.route.toLowerCase()) return true;
+  return (state.pack || []).includes(req);
+}
+
+function updateToolbar(){
+  const playing = !!state.charName && state.here !== "gender" && state.here !== "select";
+  for(const id of ["btn-inv","btn-map","btn-codex"]){
+    document.getElementById(id).classList.toggle("hidden", !playing);
+  }
+}
+
+function showScene(){
+  const sc = scenes[state.here];
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+  updateToolbar();
+  if(!sc){
+    document.getElementById("story").textContent = `Missing scene: ${state.here}`;
+    document.getElementById("chapter").textContent = "ERROR";
+    return;
+  }
+  // Combat scenes take over the render once, until resolved.
+  if(sc.combat && !state.flags["_won_" + sc.id]){
+    startCombat(sc);
+    return;
+  }
+  document.getElementById("chapter").textContent = sc.chapter || "";
+  document.getElementById("story").textContent = fillSceneText(sc.text || "");
+  let packLabel = (state.pack || []).map(it => (ITEM_LABELS[it] || it.replace(/_/g, " "))).join(", ");
+
+  let partyParts = [];
+  for(const c of state.companions){
+    partyParts.push(COMPANION_NAMES[c] || c);
+  }
+
+  const relBits = state.companions
+    .filter(c => (state.relationships[c] || 0) > 0)
+    .map(c => `${COMPANION_NAMES[c]||c} ${state.relationships[c]||0}`)
+    .join(", ");
+  const journalTail = (state.journal || []).slice(-2).map(j => fillSceneText(j)).join(" · ");
+  document.getElementById("hud").innerHTML = `
+    <div>HP: <b>${state.hp}/${state.max_hp}</b> &nbsp; Trust: <b>${state.trust}</b> &nbsp; Fear: <b>${state.fear}</b> &nbsp; Gold: <b>${state.gold}</b></div>
+    <div>Pack: <b>${packLabel || "—"}</b></div>
+    ${partyParts.length ? `<div>Party: <b>${partyParts.join(", ")}</b>${relBits ? ` &nbsp; <span style="color:#8c8576">(${relBits})</span>` : ""}</div>` : ""}
+    ${journalTail ? `<div style="color:#8c8576">Journal: ${journalTail}</div>` : ""}
+  `;
+
+  const avail = [];
+  for(const ch of (sc.choices || [])){
+    if(visible(ch.require)) avail.push(ch);
+  }
+  if(!avail.length){
+    box.innerHTML = `<div>No options left.</div>`;
+    return;
+  }
+  for(const ch of avail){
+    const b = document.createElement("button");
+    const isPrimary = /^(fight|enter|face|use)/i.test(ch.text || "");
+    b.className = isPrimary ? "primary" : "";
+    b.textContent = fillSceneText(ch.text);
+    b.onclick = () => choose(ch);
+    box.appendChild(b);
+  }
+  state.sceneCount++;
+}
+
+// Skill check: d20 + stat bonus vs dc. Returns {pass, roll, bonus, total, dc}.
+function statBonus(stat){
+  if(stat === "hp")   return Math.floor(state.hp / 2);
+  if(stat === "fear") return Math.floor((100 - state.fear) / 12); // calm helps
+  if(stat && stat.startsWith("rel:")) return Math.floor((state.relationships[stat.slice(4)] || 0) / 12);
+  const v = Number(state[stat]) || 0;      // trust, gold, ...
+  return Math.floor(v / 12);
+}
+function resolveCheck(chk){
+  const roll = 1 + Math.floor(Math.random() * 20);
+  const bonus = statBonus(chk.stat);
+  const total = roll + bonus;
+  const pass = (roll === 20) || (roll !== 1 && total >= (chk.dc || 10));
+  return {pass, roll, bonus, total, dc: chk.dc || 10};
+}
+function statLabel(stat){
+  if(stat === "hp") return "Vigor"; if(stat === "trust") return "Nerve";
+  if(stat === "fear") return "Calm"; if(stat === "gold") return "Coin";
+  if(stat && stat.startsWith("rel:")) return (COMPANION_NAMES[stat.slice(4)]||stat.slice(4)) + "'s trust";
+  return stat;
+}
+
+function choose(ch){
+  // Skill-check choices route to pass/fail with their own effects + feedback.
+  if(ch.check){
+    const c = ch.check;
+    const r = resolveCheck(c);
+    applyDo(ch.do);                                  // base cost of attempting
+    applyDo(r.pass ? c.onPass : c.onFail);
+    showRoll(`${statLabel(c.stat)} check — rolled ${r.roll}+${r.bonus} vs ${r.dc}: ${r.pass ? "SUCCESS" : "FAILURE"}`, r.pass);
+    goto(r.pass ? c.pass : c.fail);
+    return;
+  }
+  applyDo(ch.do);
+  goto(ch.next);
+}
+
+// Central scene advance: handles death, paywall gate, endings, and combat scenes.
+function goto(next){
+  if(state.hp <= 0 && !String(next).startsWith("ending")){
+    showEnding("ending_sacrifice");
+    return;
+  }
+  if(actOf(next) > 1 && actOf(state.here) <= 1 && !isPaid()){
+    showPaywall(next);
+    return;
+  }
+  if(String(next).startsWith("ending")){
+    showEnding(next);
+    return;
+  }
+  state.here = next;
+  saveGame();
+  showScene();
+}
+
+function showRoll(msg, ok){
+  const box = document.getElementById("toast");
+  box.className = "roll " + (ok ? "pass" : "fail");
+  box.textContent = (ok ? "✦ " : "✕ ") + msg;
+  box.classList.remove("hidden");
+  setTimeout(()=>{ box.classList.add("hidden"); box.className = "toast hidden"; }, 2600);
+}
+
+const PAY_URL = "https://buy.stripe.com/5kQ4gs7DAeizgkl6d83cc0c";
+const PAY_KEY = "hollow_gate_paid_v1";
+// $1.99 gate fires when the player leaves CHAPTER I (the courtyard / city gates)
+// into the journey — i.e. right after the first chapter. Watertight: EVERY path out
+// of act 1 is gated, computed from the scene's chapter heading (not a hand-picked few).
+const ACT_ROMAN = { I:1, II:2, III:3, IV:4, V:5, VI:6 };
+function actOf(sceneId){
+  const c = (scenes[sceneId] || {}).chapter || "";
+  const m = c.match(/^CHAPTER\s+([IVX]+)\b/);
+  if(m) return ACT_ROMAN[m[1]] || 9;
+  return c ? 9 : 0; // SIDE / WAVE / INTERLUDE / EPILOGUE = beyond ch1; blank = neutral
+}
+const MAS_FREE_BUILD = true; /* free for family inside Family Pop */ /* flipped to true by build-mas.sh when MAS_FREE=1 */
+
+function isPaid(){
+  if(MAS_FREE_BUILD) return true;
+  try { return localStorage.getItem(PAY_KEY) === "true"; } catch(_) { return false; }
+}
+function markPaid(){
+  try { localStorage.setItem(PAY_KEY, "true"); } catch(_) {}
+}
+
+function showPaywall(pendingNext){
+  document.getElementById("chapter").textContent = "·  CONTINUE THE JOURNEY  ·";
+  document.getElementById("hud").innerHTML = "";
+  document.getElementById("story").textContent =
+    "You have crossed the courtyard and reached the edge of the city. The first chapter is done.\n\nThe whole road lies ahead — the caravan, the witch's wood, the wizard's tower, the lost city, and the Hollow Gate itself. Fifteen more chapters of story, and how it ends is up to you.\n\nIf you would like to keep walking, this is where the road costs something.\n\n$1.99, once. The story unlocks forever on this machine. Every future update too.";
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+
+  const pay = document.createElement("a");
+  pay.href = PAY_URL;
+  pay.target = "_blank";
+  pay.rel = "noopener noreferrer";
+  pay.className = "primary";
+  pay.style.cssText = "display:block; text-decoration:none;";
+  pay.textContent = "Pay $1.99 →  (opens your browser)";
+  box.appendChild(pay);
+
+  const unlock = document.createElement("button");
+  unlock.className = "primary";
+  unlock.textContent = "I've paid — unlock the rest";
+  unlock.onclick = () => { markPaid(); state.here = pendingNext; saveGame(); showScene(); };
+  box.appendChild(unlock);
+
+  const back = document.createElement("button");
+  back.textContent = "Not yet — go back";
+  back.onclick = () => showScene();
+  box.appendChild(back);
+
+  const fallback = document.createElement("div");
+  fallback.style.cssText = "color:#5c564a; font-size:.72rem; margin-top:.6rem; word-break:break-all; text-align:center;";
+  fallback.textContent = "If the button didn't open a browser: " + PAY_URL;
+  box.appendChild(fallback);
+}
+
+const RESCUED_INFO = {
+  rescued_elara:   {name:"Elara",           pronoun:"she", possessive:"her"},
+  rescued_cassian: {name:"Prince Cassian",  pronoun:"he",  possessive:"his"},
+  rescued_vale:    {name:"Ser Vale",        pronoun:"he",  possessive:"his"},
+  rescued_moth:    {name:"Moth",            pronoun:"she", possessive:"her"},
+  rescued_rook:    {name:"Rook",            pronoun:"he",  possessive:"his"},
+  rescued_hedge:   {name:"the Hedge Witch", pronoun:"she", possessive:"her"},
+};
+
+function getRescued(){
+  for(const flag of Object.keys(RESCUED_INFO)){
+    if(state.flags && state.flags[flag]) return RESCUED_INFO[flag];
+  }
+  return null;
+}
+
+const ENDING_TEMPLATES = {
+  ending_fight:
+"You won by steel.\nThe Keeper falls — a heap of old cloth and older bone. The dark in this place fades to ordinary night.\n\n{name} stands over the body, blinking, alive. {pronoun_cap} kneels by you while you're still breathing hard, and says nothing for a long minute.\nOn the long road home, {pronoun} rides three paces from your saddle. By the time you see the castle gate, {possessive} hand is on your back, and you have stopped pretending you don't notice.",
+  ending_talk:
+"You won with words.\nThe Keeper, ancient and weary, lets {name} go without a fight. You ride home together under a sky that has not been kind to either of you.\n\nThree nights into the journey, by the campfire, {pronoun} confesses {pronoun} doesn't want to go back to {possessive} old life. {Pronoun_cap} wants to ride out again. With you.\nYou don't argue. You stoke the fire and pass {possessive} the wineskin.",
+  ending_clever:
+"You won with a trick the old stories never predicted.\nThe Keeper is still in there, somewhere, scratching at the door of the place you locked it.\n\n{name} laughs all the way out of the dark. Laughs again on the long ride home. Laughs the night {pronoun} kisses you, when the campfire is dying and you both should be asleep.\nThe kingdom thinks you're a hero. {Pronoun_cap} knows you're better than that.",
+  ending_sacrifice:
+"You chose the hardest road.\nYou stayed in the dark so {name} could leave. {Pronoun_cap} fought you for it. {Pronoun_cap} lost.\n\nYou can hear {possessive} voice for a long time, even after the gate closes. Years later, somewhere far from here, {pronoun} will spend the rest of {possessive} life looking for you.\nThat, too, is a kind of love. The hardest kind.",
+  ending_seal:
+"BEYOND THE GATE · THE SEAL\nYou found the door's true name in the Sunk City and spoke it at the Hollow Throne. The Gate does not slam — it simply forgets it was ever open. The Underland folds shut like an eye.\n\nYou come back thinner, greyer, older in the eyes. {name} is waiting on the far side where you left {possessive} light burning. The realm will never know what it cost. {Pronoun_cap} does. {Pronoun_cap} never lets go of your hand again.",
+  ending_bargain:
+"BEYOND THE GATE · THE BARGAIN\nYou did not kill the Keeper. You made a deal with it — the oldest kind, the kind that has interest.\n\nThe door stays. But it answers to you now, a little, the way a dog answers a stranger who once fed it. {name} walks out of the dark beside you, whole. Some nights you wake and feel the Underland tug at the promise you made. You do not tell {missing_obj}. Not yet.",
+  ending_keeper:
+"BEYOND THE GATE · THE HOLLOW CROWN\nSomeone always keeps the Gate. You understood that at the throne, and you did the thing no hero is supposed to do: you sat down.\n\nYou send {name} home with the others. {Pronoun_cap} begs you not to. You smile with a mouth that is already becoming a door. In a hundred years someone brave and grieving will come through, and you will have forgotten your own name, and you will only remember to be gentle. You hope. You hope.",
+  ending_homecoming:
+"BEYOND THE GATE · WHAT COMES BACK\nYou refused every clean ending. You reached back into the dark and dragged out everyone the Gate ever swallowed — {name}, the lost, the drowned, the forgotten — and you brought them ALL home.\n\nThe realm cannot hold so much returning. It changes. You change it. {name} stands in a sunrise that shouldn't be possible, surrounded by the found, and looks at you like you are the impossible thing. Maybe you are.",
+};
+
+function fillTemplate(tmpl, r){
+  if(!r) return tmpl.replace(/\{[a-z_]+\}/gi, "").replace(/\s+\n/g, "\n");
+  const cap = s => s[0].toUpperCase() + s.slice(1);
+  return tmpl
+    .replaceAll("{name}",            r.name)
+    .replaceAll("{pronoun}",         r.pronoun)
+    .replaceAll("{pronoun_cap}",     cap(r.pronoun))
+    .replaceAll("{possessive}",      r.possessive)
+    .replaceAll("{possessive_cap}",  cap(r.possessive));
+}
+
+function showEnding(id){
+  clearSave();
+  const r = getRescued();
+  const base = fillTemplate(ENDING_TEMPLATES[id] || "The story ends here... for now.", r);
+  document.getElementById("chapter").textContent = "THE END";
+  const packStr = (state.pack || []).map(it => ITEM_LABELS[it] || it.replace(/_/g," ")).join(", ") || "none";
+  const partyStr = (state.companions || []).map(c => COMPANION_NAMES[c] || c).join(", ") || "none";
+  const who = state.charName ? `\n\n— ${state.charName} —` : "";
+  document.getElementById("story").textContent =
+    base + who +
+    `\n\nTrust ${state.trust}   Fear ${state.fear}   Gold ${state.gold}` +
+    `\nPack: ${packStr}` +
+    `\nParty: ${partyStr}`;
+  document.getElementById("hud").innerHTML = "";
+  const box = document.getElementById("choices");
+  box.innerHTML = "<button class='primary' onclick='resetToMenu()'>Play again</button>";
+}
+
+// Women first — display order is array order.
+const CHARACTERS = [
+  {key:"lyra",   name:"Lyra Cassine",     gender:"f", route:"Castellan",
+   blurb:"castle-born; sword, signet, and her father's enemies"},
+  {key:"wren",   name:"Wren Hollowfield", gender:"f", route:"Hedgeborn",
+   blurb:"of the marsh and the back roads; poultice, knife, patience"},
+  {key:"aldric", name:"Aldric Sterling",  gender:"m", route:"Castellan",
+   blurb:"castle-born; sword, signet, and a name to lose"},
+  {key:"kael",   name:"Kael Briarpath",   gender:"m", route:"Hedgeborn",
+   blurb:"of the marsh and the back roads; knife and quiet ways"},
+];
+
+function pickCharacter(charKey){
+  const ch = CHARACTERS.find(x => x.key === charKey);
+  const r = routes[ch.route];
+  state = Object.assign(newState(), {
+    route: ch.route,
+    charKey: ch.key,
+    charName: ch.name,
+    gender: ch.gender,
+    trust: Number(r.trust) || 50,
+    fear: Number(r.fear) || 0,
+    gold: Number(r.gold) || 0,
+    pack: (r.pack || []).slice(),
+    flags: { ["gender_" + ch.gender]: true },
+    here: "intro",
+  });
+  toast(`You ride as ${ch.name}.`);
+  saveGame();
+  showScene();
+}
+
+function continueSavedGame(){
+  const s = loadGame();
+  if(!s) return;
+  state = Object.assign(newState(), s);
+  if(scenes[state.here]) showScene();
+  else { state.here = "intro"; showScene(); }
+}
+
+const MISSING_INFO = {
+  f: {name:"Prince Cassian",  short:"prince",   short_cap:"Prince",   title:"the King's son",      title_cap:"The King's son",      child:"son",      pronoun:"he",  pron_cap:"He",  poss:"his", poss_cap:"His",  obj:"him"},
+  m: {name:"Princess Elara",  short:"princess", short_cap:"Princess", title:"the King's daughter", title_cap:"The King's daughter", child:"daughter", pronoun:"she", pron_cap:"She", poss:"her", poss_cap:"Her",  obj:"her"},
+};
+const OTHER_INFO = {
+  f: {name:"Princess Elara",  short:"princess", short_cap:"Princess", title:"the princess", initial:"E", sibling:"sister",  sibling_cap:"Sister",  pronoun:"she", pron_cap:"She", poss:"her", poss_cap:"Her", obj:"her"},
+  m: {name:"Prince Cassian",  short:"prince",   short_cap:"Prince",   title:"the prince",   initial:"C", sibling:"brother", sibling_cap:"Brother", pronoun:"he",  pron_cap:"He",  poss:"his", poss_cap:"His", obj:"him"},
+};
+
+function fillSceneText(text){
+  if(!text) return "";
+  const m = MISSING_INFO[state.gender];
+  const o = OTHER_INFO[state.gender];
+  if(!m) return text;
+  return text
+    .replaceAll("{missing_name}",      m.name)
+    .replaceAll("{missing_short}",     m.short)
+    .replaceAll("{missing_short_cap}", m.short_cap)
+    .replaceAll("{missing_title}",     m.title)
+    .replaceAll("{missing_title_cap}", m.title_cap)
+    .replaceAll("{missing_child}",     m.child)
+    .replaceAll("{missing_pron}",      m.pronoun)
+    .replaceAll("{missing_pron_cap}",  m.pron_cap)
+    .replaceAll("{missing_poss}",      m.poss)
+    .replaceAll("{missing_poss_cap}",  m.poss_cap)
+    .replaceAll("{missing_obj}",       m.obj)
+    .replaceAll("{other_name}",        o.name)
+    .replaceAll("{other_short}",       o.short)
+    .replaceAll("{other_short_cap}",   o.short_cap)
+    .replaceAll("{other_title}",       o.title)
+    .replaceAll("{other_initial}",     o.initial)
+    .replaceAll("{other_sibling}",     o.sibling)
+    .replaceAll("{other_sibling_cap}", o.sibling_cap)
+    .replaceAll("{other_pron}",        o.pronoun)
+    .replaceAll("{other_pron_cap}",    o.pron_cap)
+    .replaceAll("{other_poss}",        o.poss)
+    .replaceAll("{other_poss_cap}",    o.poss_cap)
+    .replaceAll("{other_obj}",         o.obj);
+}
+
+function showGenderPick(){
+  document.getElementById("chapter").textContent = "";
+  document.getElementById("hud").innerHTML = "";
+  document.getElementById("story").textContent =
+    "THE HOLLOW GATE\n\nA dark-fantasy interactive text adventure. The kingdom bleeds silence. A royal child has been taken through a door that shouldn't open.\n\nYou are an adventurer of the realm who must embark on a dangerous journey to save the lost royal heir.\n\nAre you a woman or a man of the realm?";
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+  const saved = loadGame();
+  if(saved && saved.charName){
+    const cont = document.createElement("button");
+    cont.className = "primary";
+    cont.textContent = `Continue — ${saved.charName} (${saved.here || "in progress"})`;
+    cont.onclick = continueSavedGame;
+    box.appendChild(cont);
+  }
+  const opts = [
+    {key:"f", label:"New game — a woman of the realm"},
+    {key:"m", label:"New game — a man of the realm"},
+  ];
+  for(const o of opts){
+    const b = document.createElement("button");
+    b.className = "primary";
+    b.textContent = o.label;
+    b.onclick = () => { clearSave(); state.gender = o.key; showCharacterPick(); };
+    box.appendChild(b);
+  }
+  state.here = "gender";
+}
+
+function showCharacterPick(){
+  document.getElementById("chapter").textContent = "";
+  document.getElementById("hud").innerHTML = "";
+  const wordY = state.gender === "f" ? "woman" : "man";
+  const m = MISSING_INFO[state.gender];
+  document.getElementById("story").textContent =
+    `THE HOLLOW GATE\n\nA dark-fantasy interactive text adventure. The kingdom bleeds silence. A royal child has been taken through a door that shouldn't open.\n\nYou are an adventurer of the realm who must embark on a dangerous journey to save the lost royal heir.\n\nAs ${wordY} of the realm, which character will you be?\n\nChoose your role:`;
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+  for(const ch of CHARACTERS.filter(c => c.gender === state.gender)){
+    const b = document.createElement("button");
+    b.className = "primary";
+    b.textContent = `${ch.name} — ${ch.blurb}`;
+    b.onclick = () => pickCharacter(ch.key);
+    box.appendChild(b);
+  }
+  const back = document.createElement("button");
+  back.textContent = "← Back";
+  back.onclick = () => showGenderPick();
+  box.appendChild(back);
+  state.here = "select";
+}
+
+function resetToMenu(){
+  state = newState();
+  showGenderPick();
+}
+
+/* ---------- Light combat ---------- */
+let combat = null;
+function weaponBonus(){
+  let b = 0;
+  if(state.pack.includes("sword")) b += 2;
+  if(state.pack.includes("shadow_blade")) b += 3;
+  else if(state.pack.includes("knife")) b += 1;
+  return b;
+}
+function startCombat(sc){
+  const c = sc.combat;
+  combat = {sceneId: sc.id, enemy: c.enemy || "the foe", ehp: c.ehp || 8, emax: c.ehp || 8,
+            edmg: c.edmg || 3, win: c.win, lose: c.lose || "ending_sacrifice",
+            flee: c.flee || null, guarding: false, chapter: sc.chapter || "",
+            intro: fillSceneText(sc.text || `${c.enemy} bars your way.`)};
+  renderCombat(combat.intro);
+}
+function renderCombat(line){
+  document.getElementById("chapter").textContent = combat.chapter || "· BATTLE ·";
+  document.getElementById("story").textContent = line;
+  const pct = Math.max(0, Math.round(100 * combat.ehp / combat.emax));
+  document.getElementById("hud").innerHTML =
+    `<div class="foe"><b>${combat.enemy}</b><div class="bar"><span style="width:${pct}%"></span></div><span>${combat.ehp}/${combat.emax}</span></div>`+
+    `<div>Your HP: <b>${state.hp}/${state.max_hp}</b> &nbsp; Nerve: <b>${state.trust}</b></div>`;
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+  const add = (label, fn, primary) => { const b=document.createElement("button"); if(primary)b.className="primary"; b.textContent=label; b.onclick=fn; box.appendChild(b); };
+  add("Strike", ()=>combatRound("strike"), true);
+  add("Guard (halve next blow)", ()=>combatRound("guard"));
+  if(state.pack.includes("poultice")) add("Use Poultice (heal)", ()=>combatRound("heal"));
+  if(state.pack.includes("warding_draught")) add("Use Warding Draught (block a blow)", ()=>combatRound("ward"));
+  if(combat.flee) add("Flee", ()=>combatRound("flee"));
+}
+function combatRound(action){
+  let log = "";
+  if(action === "flee"){ const f = combat.flee; combat = null; goto(f); return; }
+  if(action === "strike"){
+    const dmg = 2 + weaponBonus() + Math.floor(Math.random()*3);
+    combat.ehp = Math.max(0, combat.ehp - dmg);
+    log += `You strike for ${dmg}. `;
+  } else if(action === "guard"){
+    combat.guarding = true; log += "You set your guard. ";
+  } else if(action === "heal"){
+    state.pack = state.pack.filter(x=>x!=="poultice");
+    const h = 4 + Math.floor(Math.random()*3);
+    state.hp = Math.min(state.max_hp, state.hp + h);
+    log += `The poultice knits ${h} HP. `;
+  } else if(action === "ward"){
+    state.pack = state.pack.filter(x=>x!=="warding_draught");
+    combat.warded = true; log += "The draught wraps you in cold light. ";
+  }
+  if(combat.ehp <= 0){
+    state.flags["_won_" + combat.sceneId] = true;
+    const win = combat.win; combat = null;
+    showRoll(`You have felled the enemy!`, true);
+    saveGame(); goto(win); return;
+  }
+  // enemy turn
+  let ed = combat.edmg + Math.floor(Math.random()*3) - 1;
+  if(combat.warded){ ed = 0; combat.warded = false; log += "The ward turns the blow aside. "; }
+  else if(combat.guarding){ ed = Math.ceil(ed/2); combat.guarding = false; }
+  ed = Math.max(0, ed);
+  state.hp = Math.max(0, state.hp - ed);
+  if(ed) log += `${combat.enemy} hits you for ${ed}.`;
+  if(state.hp <= 0){
+    const lose = combat.lose; combat = null;
+    showRoll("You fall.", false);
+    goto(lose); return;
+  }
+  saveGame();
+  renderCombat(log.trim());
+}
+
+/* ---------- Inventory / Map / Codex panels ---------- */
+function openPanel(kind){
+  const sheet = document.getElementById("sheet");
+  let h = `<button class="closeX" onclick="closePanel()">✕ Close</button>`;
+  if(kind === "inv") h += renderInventory();
+  else if(kind === "map") h += renderMap();
+  else if(kind === "codex") h += renderCodex();
+  sheet.innerHTML = h;
+  document.getElementById("overlay").classList.remove("hidden");
+}
+function closePanel(){ document.getElementById("overlay").classList.add("hidden"); }
+function renderInventory(){
+  let h = `<h2>Your Pack</h2>`;
+  h += `<div class="row muted">HP ${state.hp}/${state.max_hp} · Nerve ${state.trust} · Fear ${state.fear} · Gold ${state.gold}</div>`;
+  if(!state.pack.length) h += `<div class="row muted">Your pack is empty.</div>`;
+  for(const it of state.pack){
+    h += `<div class="row"><b>${ITEM_LABELS[it] || it.replace(/_/g," ")}</b><div class="muted">${ITEM_DESC[it] || ""}</div></div>`;
+  }
+  if(state.companions.length){
+    h += `<h2 style="margin-top:1.2rem">Party</h2>`;
+    for(const c of state.companions){
+      const rel = state.relationships[c] || 0;
+      const bond = rel>=60?"devoted":rel>=35?"warming":rel>=15?"wary":"distant";
+      h += `<div class="row"><b>${COMPANION_NAMES[c]||c}</b> <span class="muted">— ${bond} (${rel})</span></div>`;
+    }
+  }
+  return h;
+}
+function renderMap(){
+  let h = `<h2>The Realm & The Underland</h2>`;
+  let any=false;
+  for(const r of REGIONS){
+    const lit = !!state.flags[r.flag];
+    if(lit) any=true;
+    h += lit
+      ? `<div class="row"><b>${r.name}</b><div class="muted">${r.note}</div></div>`
+      : `<div class="row locked">??? — not yet walked</div>`;
+  }
+  if(!any) h += `<div class="row muted">Your journey has not yet been mapped.</div>`;
+  return h;
+}
+function renderCodex(){
+  let h = `<h2>Codex — Lore of the Gate</h2>`;
+  const entries = Object.values(CODEX || {});
+  if(!entries.length) return h + `<div class="row muted">No lore recorded yet.</div>`;
+  let unlocked=0;
+  for(const e of entries){
+    if(state.flags[e.flag]){ unlocked++;
+      h += `<div class="row"><b>${e.title}</b><div class="muted">${fillSceneText(e.text)}</div></div>`;
+    }
+  }
+  const locked = entries.length - unlocked;
+  if(!unlocked) h += `<div class="row muted">You have uncovered no lore yet. Explore, and it will fill.</div>`;
+  if(locked) h += `<div class="row locked">${locked} entr${locked===1?"y":"ies"} still hidden.</div>`;
+  return h;
+}
+
+async function init() {
+  try {
+    await loadData();
+    window.__debug = {routes, scenes, keys: Object.keys(scenes)};
+  } catch (err) {
+    document.getElementById('story').textContent = 'Failed to load story data: ' + err;
+    console.error(err);
+    return;
+  }
+  const preset = new URLSearchParams(location.search).get("screenshot");
+  if(preset){ applyScreenshotPreset(preset); return; }
+  showGenderPick();
+}
+
+function applyScreenshotPreset(preset){
+  clearSave();
+  const setupChar = (charKey, extras) => {
+    const ch = CHARACTERS.find(x => x.key === charKey);
+    const r = routes[ch.route];
+    state = Object.assign(newState(), {
+      route: ch.route, charKey: ch.key, charName: ch.name, gender: ch.gender,
+      trust: 70, fear: 20, gold: 25,
+      pack: (r.pack || []).slice().concat(["sword","poultice","seeing_draught","wardstone"]),
+      companions: ["ash","vale"],
+      relationships: {ash: 25, vale: 35},
+      flags: Object.assign({ ["gender_" + ch.gender]: true }, extras && extras.flags || {}),
+      journal: extras && extras.journal || ["Held Ser Vale's hand under a watch fire. He did not let go.", "Sat by the road and watched the wind move wrong."],
+      here: "intro",
+    });
+  };
+  if(preset === "title")            { showGenderPick(); }
+  else if(preset === "character_f") { state.gender = "f"; showCharacterPick(); }
+  else if(preset === "character_m") { state.gender = "m"; showCharacterPick(); }
+  else if(preset === "intro_lyra")  { setupChar("lyra");           state.here = "intro";          showScene(); }
+  else if(preset === "witch_grove") { setupChar("lyra");           state.here = "witch_grove";    showScene(); }
+  else if(preset === "tower_solar") { setupChar("lyra", {flags:{saw_vale_caged:true}}); state.here = "tower_solar"; showScene(); }
+  else if(preset === "camp_dream")  { setupChar("lyra", {flags:{dream_royal_1:true, dream_royal_2:true}}); state.here = "dream_royal_3"; showScene(); }
+  else if(preset === "wraith")      { setupChar("lyra");           state.here = "deep_wraith_road_2"; showScene(); }
+  else if(preset === "epilogue")    { setupChar("lyra", {flags:{rescued_cassian:true}}); state.here = "epilogue_clever"; showScene(); }
+  else { showGenderPick(); }
+}
+init();
+</script>
+</body>
+</html>

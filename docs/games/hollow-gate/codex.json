@@ -1,0 +1,32 @@
+{
+  "the_gate": {
+    "title": "The Hollow Gate",
+    "flag": "region_gate",
+    "text": "A door with no wall around it, standing in the deep places of the realm. It does not open for keys. It opens for grief, and for names spoken in the dark. What passes through does not come back the same — if it comes back at all."
+  },
+  "the_keeper": {
+    "title": "The Keeper",
+    "flag": "codex_keeper",
+    "text": "Not a monster. A post. Someone always keeps the Gate, and the keeping hollows them out until they are only the door's hunger wearing a face. The last Keeper was a person once, with a name they have spent centuries forgetting."
+  },
+  "the_underland": {
+    "title": "The Underland",
+    "flag": "region_threshold",
+    "text": "The far side of the Gate: the realm reflected in black water. Every place you know has a drowned twin here. The rules are the rules of dreams — distance lies, the dead speak, and what you carry in matters more than what you can do."
+  },
+  "mirror_law": {
+    "title": "The Mirror Law",
+    "flag": "codex_mirror",
+    "text": "In the Underland, a reflection can be truer than the thing it reflects. Break a mirror and you may free what it held — or loose it. The Mirror-Knight is bound by this law, and so, quietly, are you."
+  },
+  "true_names": {
+    "title": "On True Names",
+    "flag": "codex_truename",
+    "text": "Everything in the Underland has a name it has hidden even from itself. Learn one, say it aloud, and you can command the thing — once. The Keeper's true name is the only key the Gate has ever answered to."
+  },
+  "the_lantern_child": {
+    "title": "The Lantern-child",
+    "flag": "codex_lumen",
+    "text": "A small figure who carries a grey flame through the Ashen March, lighting the way for travelers who are already dead and don't know it. Whether the child is a ghost, a guide, or a trap depends entirely on how you treat them."
+  }
+}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Answering the Dark — Deepwatch Mission Control</title>
+<link rel="stylesheet" href="css/mc.css"/>
+</head>
+<body>
+
+<!-- boot / lobby (engine fills this) -->
+<div id="boot"></div>
+
+<!-- main mission-control HUD -->
+<div id="hud" class="hidden">
+  <div id="topbar">
+    <span class="brand" id="brand">DEEPWATCH</span>
+    <span class="mission" id="mission"></span>
+    <div class="gauges">
+      <div class="gauge g-signal">UNDERSTANDING<b>0%</b></div>
+      <div class="gauge g-power">SHIP POWER<b>100</b></div>
+      <div class="gauge g-morale">CREW MORALE<b>100</b></div>
+    </div>
+  </div>
+
+  <div id="stage">
+    <div id="main"></div>
+    <div id="side">
+      <div id="crew">
+        <h3>DEEPWATCH TEAM</h3>
+        <div id="crewlist"></div>
+      </div>
+      <div id="log">
+        <h3>MISSION FEED</h3>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottombar">
+    <span class="tag" id="act-tag">ACT I · CONTACT</span>
+    <span class="spacer"></span>
+    <span>Answering the Dark — no violence · just the dark, and a friend in it.</span>
+  </div>
+</div>
+
+<script src="mc/config.js"></script>
+<script src="mc/images.js"></script>
+<script src="mc/net.js"></script>
+<script src="mc/crew.js"></script>
+<script src="mc/act1.js"></script>
+<script src="mc/act2.js"></script>
+<script src="mc/act3.js"></script>
+<script src="mc/engine.js"></script>
+</body>
+</html>

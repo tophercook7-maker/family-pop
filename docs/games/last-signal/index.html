@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Answering the Dark — Deepwatch</title>
+<style>
+  :root{ --bg:#05070f; --panel:#0c1526; --edge:#1d2c48; --ink:#dfe9ff; --dim:#7f93b8; --cyan:#7fd4ff; --gold:#ffd27f; }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:radial-gradient(1200px 700px at 50% -12%,#0a1530 0,var(--bg) 60%),var(--bg);color:var(--ink);
+    font-family:"SF Mono",ui-monospace,Menlo,monospace;min-height:100vh;-webkit-tap-highlight-color:transparent}
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+  #app{max-width:1000px;margin:0 auto;padding:22px 18px 60px;position:relative;z-index:1}
+  .eyebrow{color:var(--cyan);letter-spacing:5px;font-size:11px;text-align:center}
+  h1{font-weight:600;letter-spacing:1.5px;text-align:center;font-size:24px;margin:8px 0}
+  .quiet{color:var(--dim);font-size:13px;text-align:center;max-width:640px;margin:6px auto 16px;line-height:1.6}
+  /* boot / buttons */
+  .dw-boot,.dw-lobby,.dw-ending{max-width:520px;margin:8vh auto 0;text-align:center}
+  .dw-in{font-family:inherit;background:#0a1428;border:1px solid var(--edge);color:var(--ink);
+    border-radius:10px;padding:12px 14px;font-size:15px;width:100%;margin:8px 0;text-align:center;letter-spacing:1px}
+  .dw-in.code{text-transform:uppercase;letter-spacing:4px}
+  .dw-big{display:block;width:100%;font-family:inherit;background:linear-gradient(180deg,#12233f,#0c1628);
+    border:1px solid var(--edge);color:var(--ink);border-radius:12px;padding:15px 16px;margin:10px 0;cursor:pointer;text-align:left}
+  .dw-big:hover{border-color:var(--cyan)} .dw-big b{font-size:15px} .dw-big small{display:block;color:var(--dim);font-size:12px;margin-top:3px}
+  .dw-big.go{text-align:center;background:linear-gradient(180deg,#183a2a,#0e2418);border-color:#2f6} .dw-big.go b{color:#bfffcf}
+  .dw-big.narrow{width:auto;margin:0}
+  .dw-row{display:flex;gap:8px;align-items:stretch} .dw-row .dw-in{margin:8px 0}
+  /* lobby */
+  .dw-code{color:var(--gold);letter-spacing:2px;font-size:15px;margin:6px 0} .dw-code b{font-size:22px;letter-spacing:6px}
+  .dw-consoles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+  .dw-console{font-family:inherit;background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:12px;cursor:pointer;text-align:center}
+  .dw-console b{color:var(--cyan);display:block} .dw-console span{color:var(--dim);font-size:11px;display:block;margin:4px 0} .dw-console em{color:var(--ink);font-size:12px;font-style:normal}
+  .dw-console.mine{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset} .dw-console.mine b{color:var(--gold)}
+  .dw-console.busy{opacity:.55}
+  .dw-flight{color:var(--dim);font-size:13px;margin:10px 0}
+  /* round */
+  .dw-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .dw-sig{color:var(--gold);font-size:12px;letter-spacing:1px}
+  .prompt{background:linear-gradient(180deg,#0e1a30,#081020);border:1px solid var(--edge);border-radius:12px;padding:13px 16px;margin:0 0 14px;text-align:center}
+  .prompt .lbl{color:var(--gold);letter-spacing:3px;font-size:11px} .prompt .msg{font-size:14px;margin-top:4px;color:#cfe0ff;line-height:1.5}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} .grid.solo1{grid-template-columns:1fr;max-width:520px;margin:0 auto}
+  .ch{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:12px;min-height:200px}
+  .ch-title{color:var(--cyan);font-size:12px;letter-spacing:1px;margin-bottom:8px}
+  .ch-canvas{width:100%;height:140px;background:#060a14;border-radius:8px;border:1px solid #14203a}
+  .ch-hint{color:var(--dim);font-size:12px;margin-top:8px;line-height:1.5}
+  .pace-strip{display:flex;gap:6px;justify-content:center;padding:26px 0}
+  .pdot{width:16px;height:16px;border-radius:50%;background:#1a2740;border:1px solid #263a5e}
+  .pdot.on{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  .pbtn{font-family:inherit;background:#13233f;border:1px solid var(--edge);color:var(--ink);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:13px}
+  .pbtn:hover{border-color:var(--cyan)}
+  .read{margin-top:16px;background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:14px}
+  .read.waiting{text-align:center;color:var(--dim)} .read h3{margin:0 0 4px;font-size:13px;color:var(--gold);letter-spacing:2px}
+  .read .sub{color:var(--dim);font-size:12px;margin-bottom:10px}
+  .reads{display:flex;flex-direction:column;gap:8px}
+  .readbtn{font-family:inherit;text-align:left;line-height:1.4;background:#13233f;border:1px solid var(--edge);color:var(--ink);border-radius:8px;padding:11px 13px;cursor:pointer;font-size:13px}
+  .readbtn:hover{border-color:var(--cyan)} .readbtn.good{border-color:#6de08a;background:#0e2417;color:#c9ffd8} .readbtn.bad{border-color:#e0896d;background:#241310;color:#ffd8cc}
+  .verdict{margin-top:12px;text-align:center;font-size:14px;min-height:20px;line-height:1.5} .verdict.win{color:#8fffa8} .verdict.miss{color:var(--gold)}
+  .qbright{color:var(--cyan)}
+  .dw-score{color:var(--gold);margin:14px 0;letter-spacing:1px}
+  /* compose */
+  .intent-chosen{color:var(--gold);font-size:14px;text-align:center}
+  .ctrl{margin:12px 0} .ctrl-lbl{color:var(--cyan);font-size:12px;margin-bottom:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:inherit;background:#13233f;border:1px solid var(--edge);color:var(--ink);border-radius:20px;padding:8px 15px;cursor:pointer;font-size:13px}
+  .chip:hover{border-color:var(--cyan)} .chip.on{background:#123020;border-color:#6de08a;color:#bfffcf;box-shadow:0 0 10px rgba(109,224,138,.3)}
+  .harmony{color:var(--gold);letter-spacing:2px;font-size:13px;display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:12px}
+  .hbar{flex:0 0 180px;height:8px;background:#13233f;border-radius:6px;overflow:hidden;border:1px solid var(--edge)}
+  .hbar i{display:block;height:100%;background:linear-gradient(90deg,#7fd4ff,#8fffa8);transition:width .35s ease}
+  .dw-big.dim{opacity:.5;cursor:default;border-color:var(--edge)} .dw-big.dim b{color:var(--dim)}
+  /* crew + reveal */
+  .crewlog{background:#0a1424;border:1px solid var(--edge);border-radius:12px;padding:12px 14px;margin-top:12px}
+  .crewline{color:var(--dim);font-size:12.5px;line-height:1.7}
+  .crewline{color:#9fb3d8}
+  .dw-rule{border:none;border-top:1px solid var(--edge);margin:22px 0}
+  .reveal-title{color:var(--gold);font-size:22px}
+  .dw-flight i{color:var(--cyan);font-style:italic}
+  .dw-alt{margin-top:16px} .dw-alt a{color:var(--dim);font-size:12.5px;text-decoration:none} .dw-alt a:hover{color:var(--cyan)}
+  /* screen transitions + the Quiet's presence */
+  .dw-round,.dw-lobby,.dw-ending{animation:fadein .5s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .presence{width:13px;height:13px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:7px;
+    background:radial-gradient(circle,hsl(calc(200 - var(--warm,0)*162),90%,calc(52% + var(--warm,0)*16%)),transparent 72%);
+    box-shadow:0 0 calc(6px + var(--warm,0)*16px) hsl(calc(200 - var(--warm,0)*162),92%,62%);
+    transition:background .8s,box-shadow .8s}
+  #mute{position:fixed;top:12px;right:12px;z-index:50;width:40px;height:40px;border-radius:50%;background:var(--panel);border:1px solid var(--edge);color:var(--ink);font-size:16px;cursor:pointer;opacity:.7}
+  #mute:hover{opacity:1;border-color:var(--cyan)}
+  /* first-time primer */
+  .dw-primer{max-width:560px} .primer-steps{text-align:left;margin:18px 0}
+  .pstep{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:14px;margin:10px 0}
+  .pstep .pnum{flex:0 0 28px;width:28px;height:28px;border-radius:50%;background:#13233f;border:1px solid var(--cyan);color:var(--cyan);display:flex;align-items:center;justify-content:center;font-size:14px}
+  .pstep div{font-size:13.5px;line-height:1.65;color:var(--ink)} .pstep b{color:var(--cyan)} .pstep i{color:var(--gold);font-style:normal}
+  /* mobile */
+  @media(max-width:640px){
+    #app{padding:14px 12px 54px}
+    h1{font-size:19px} .quiet{font-size:12.5px}
+    .dw-consoles,.grid{grid-template-columns:1fr}
+    .ch{min-height:auto}
+    .prompt .msg{font-size:13px} .readbtn,.chip{font-size:12.5px}
+    .dw-big{padding:14px} .dw-big b{font-size:14px}
+    .dw-hdr{flex-wrap:wrap;gap:4px} .harmony{flex-wrap:wrap} .hbar{flex:1 1 100px}
+    .dw-code b{font-size:19px;letter-spacing:4px}
+    #mute{top:8px;right:8px;width:36px;height:36px}
+  }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div id="app"></div>
+<button id="mute" title="sound on/off">🔊</button>
+<script src="mc/config.js"></script>
+<script src="mc/net.js"></script>
+<script src="mc/pool.js"></script>
+<script src="mc/sound.js"></script>
+<script src="mc/stars.js"></script>
+<script src="mc/pool-game.js"></script>
+<script>
+  MC.starfield(document.getElementById('stars'));
+  MC.GAME.mount(document.getElementById('app'));
+  // start the ambient bed on the first tap (autoplay policy); wire the mute toggle
+  document.addEventListener('pointerdown', () => MC.SOUND && MC.SOUND.start(), { once: true });
+  const mb = document.getElementById('mute');
+  mb.onclick = () => { const on = MC.SOUND.toggle(); mb.textContent = on ? '🔊' : '🔈'; };
+</script>
+</body>
+</html>

@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#2b1747">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Family Pop">
+<title>Family Pop</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Caveat:wght@700&display=swap">
+<style>
+/* Layout: a 7x7 square board (24 squares round the edge) with the bubble stage in the middle; players strip under it */
+:root{
+  --bg:#2b1747; --bg2:#3d2266; --card:#47297a; --card2:#5a3596; --ink:#fff7ee; --dim:#cbb8ea;
+  --pop:#ff5d9e; --teal:#3fd6c6; --sun:#ffc23d; --good:#43d17a; --bad:#ff5a5a;
+  --sq:#fff4e6; --sqInk:#2b1747;
+  --gTownA:#4fb3ff; --gFamA:#ff8a3d; --gTownB:#8f6bff; --gFamB:#ff5d9e; --gHome:#43d17a;
+  --font:"Nunito",ui-rounded,system-ui,sans-serif; --hand:"Caveat",cursive;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden;-webkit-user-select:none;user-select:none}
+body{background:radial-gradient(900px 600px at 50% -10%,var(--bg2),var(--bg))}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:12px;width:100%;font-size:17px;-webkit-user-select:text;user-select:text}
+input:focus,textarea:focus,select:focus{outline:3px solid var(--teal);outline-offset:1px}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;
+  padding:max(14px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom))}
+.screen.on{display:flex;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:560px;display:flex;flex-direction:column;gap:12px}
+h1,h2,h3{margin:0;line-height:1.15}
+.logo{font-size:clamp(46px,14vw,74px);font-weight:900;text-align:center;letter-spacing:-1px;margin-top:3vh}
+.logo .f{color:var(--sun)} .logo .p{color:var(--pop);display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
+.tag{text-align:center;color:var(--dim);margin-top:-4px}
+.big{width:100%;display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border-radius:18px;padding:16px 18px;font-weight:900;font-size:19px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.big:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.big .ico{font-size:30px;width:40px;text-align:center}
+.big small{display:block;font-weight:700;color:var(--dim);font-size:14px}
+.big.main{background:linear-gradient(135deg,var(--pop),#ff9a5d);color:#fff}
+.big.main small{color:#ffe9f1}
+.btn{width:100%;padding:16px;border-radius:16px;font-weight:900;font-size:18px;background:linear-gradient(135deg,var(--pop),#ff9a5d);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.btn.ghost{background:var(--card);color:var(--ink)}
+.btn.small{padding:10px 14px;font-size:15px;width:auto}
+.btn:active{transform:translateY(3px)}
+.card{background:var(--card);border-radius:18px;padding:14px 16px}
+.card h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.dim{color:var(--dim)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.counts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.counts button{background:var(--card);border-radius:16px;padding:18px 0;font-size:28px;font-weight:900}
+.counts button.on{background:var(--pop);color:#fff}
+.seat{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:12px 14px}
+.seat .pc{font-size:32px;width:44px;text-align:center}
+.seat .nm{flex:1;font-weight:900;font-size:18px}
+.seat .nm small{display:block;color:var(--dim);font-weight:700;font-size:13px}
+.seat select{width:auto;max-width:52%;padding:8px}
+.pieces{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.pieces button{font-size:30px;background:rgba(0,0,0,.2);border-radius:12px;padding:8px 0;border:2px solid transparent}
+.pieces button.on{border-color:var(--sun);background:rgba(255,194,61,.18)}
+label.f{display:flex;flex-direction:column;gap:6px;font-weight:800}
+label.f small{color:var(--dim);font-weight:700}
+.chk{display:flex;align-items:center;gap:10px;font-weight:800}
+.chk input{width:24px;height:24px}
+
+/* ---------- board ---------- */
+#game{padding-top:max(8px,env(safe-area-inset-top))}
+.hud{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.pill{background:var(--card);border-radius:99px;padding:7px 12px;font-weight:900;font-size:14px}
+.iconbtn{background:var(--card);border-radius:12px;width:40px;height:40px;font-size:18px;display:grid;place-items:center}
+.boardWrap{width:min(96vw,60vh,560px);aspect-ratio:1;position:relative}
+.board{position:absolute;inset:0;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(7,1fr);gap:2px;background:#1c0f30;border-radius:14px;padding:3px}
+.sq{background:var(--sq);color:var(--sqInk);border-radius:6px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:clamp(7px,1.9vw,10.5px);font-weight:900;text-align:center;line-height:1.05;padding:2px;cursor:pointer}
+.sq .band{position:absolute;left:0;right:0;top:0;height:18%}
+.sq .ic{font-size:clamp(13px,4vw,22px);line-height:1}
+.sq .nm{margin-top:1px;max-height:2.2em;overflow:hidden;word-break:break-word}
+.sq.corner{background:#ffe08a}
+.sq.photo{background-size:cover;background-position:center;color:#fff;text-shadow:0 1px 3px #000,0 0 6px #000}
+.sq .own{position:absolute;bottom:2px;right:2px;font-size:clamp(9px,2.6vw,14px)}
+.sq.lit{outline:3px solid var(--sun);outline-offset:-3px;z-index:2}
+.toks{position:absolute;left:1px;bottom:0;display:flex;flex-wrap:wrap;gap:0;font-size:clamp(11px,3.4vw,19px);line-height:1;z-index:3;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.mid{grid-column:2/7;grid-row:2/7;border-radius:10px;background:radial-gradient(circle at 50% 40%,#5a3596,#2b1747);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;text-align:center;position:relative;overflow:hidden}
+.mid .who{font-size:clamp(15px,4.4vw,22px);font-weight:900}
+.mid .hint{font-size:clamp(12px,3.2vw,15px);color:var(--dim);font-weight:800}
+.bubbles{display:flex;align-items:flex-end;justify-content:center;gap:clamp(8px,3vw,18px);margin:4px 0}
+.bub{border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;cursor:pointer;
+  background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.95) 0 10%,rgba(255,255,255,.25) 11% 45%,rgba(255,93,158,.35) 70%,rgba(255,255,255,.5) 100%);
+  border:2px solid rgba(255,255,255,.7);box-shadow:0 6px 16px rgba(0,0,0,.35);animation:float 3s ease-in-out infinite;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.bub small{display:block;font-size:.42em;font-weight:800;margin-top:-2px}
+.bub:nth-child(2){animation-delay:-1s} .bub:nth-child(3){animation-delay:-2s}
+@keyframes float{50%{transform:translateY(-8px)}}
+.bub.popped{animation:popOut .35s forwards}
+@keyframes popOut{40%{transform:scale(1.25)}100%{transform:scale(1.6);opacity:0}}
+.players{width:100%;max-width:560px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-top:8px}
+.pl{background:var(--card);border-radius:12px;padding:6px 8px;display:flex;align-items:center;gap:6px;font-weight:900;font-size:13px;border:2px solid transparent;min-width:0}
+.pl.cur{border-color:var(--sun)}
+.pl .p{font-size:22px}
+.pl .t{min-width:0;flex:1}
+.pl .t div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl .c{color:var(--sun)}
+.pl .fp{font-size:11px;color:var(--teal)}
+.log{width:100%;max-width:560px;color:var(--dim);font-size:13px;font-weight:700;text-align:center;min-height:18px;margin-top:6px}
+
+/* ---------- popups ---------- */
+.modal{position:fixed;inset:0;background:rgba(10,4,20,.72);display:none;place-items:center;z-index:50;padding:14px}
+.modal.on{display:grid;animation:fade .2s}
+.sheet{background:var(--card2);border-radius:22px;padding:18px;width:min(100%,460px);max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.sheet h2{font-size:24px}
+.cat{display:inline-block;align-self:center;background:rgba(0,0,0,.25);border-radius:99px;padding:5px 12px;font-size:13px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--teal)}
+.qtext{font-size:21px;font-weight:900;line-height:1.3}
+.qphoto{max-width:100%;max-height:38vh;border-radius:14px;align-self:center}
+.ans{display:flex;flex-direction:column;gap:8px}
+.ans button{background:var(--card);border-radius:14px;padding:14px;font-size:18px;font-weight:900;border:3px solid transparent}
+.ans button.right{border-color:var(--good);background:rgba(67,209,122,.25)}
+.ans button.wrong{border-color:var(--bad);background:rgba(255,90,90,.2)}
+.timer{height:8px;background:rgba(0,0,0,.3);border-radius:9px;overflow:hidden}
+.timer i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--pop));width:100%}
+.bigmoji{font-size:64px;line-height:1}
+.money{font-size:30px;font-weight:900;color:var(--sun)}
+.sqphoto{width:100%;max-height:30vh;object-fit:cover;border-radius:14px}
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%) translateY(140px);background:#000d;padding:12px 16px;border-radius:14px;font-weight:900;z-index:70;transition:transform .3s;max-width:92vw;text-align:center}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.particle{position:fixed;width:9px;height:9px;border-radius:50%;pointer-events:none;z-index:80}
+.hof{display:flex;flex-direction:column;gap:8px}
+.hof .r{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:10px 12px}
+.hof .r .p{font-size:28px}
+.hof .r .n{flex:1;font-weight:900}
+.hof .r .n small{display:block;color:var(--dim);font-weight:700;font-size:13px}
+.hof .r .w{font-weight:900;color:var(--sun);text-align:right}
+.book{display:flex;flex-direction:column;gap:8px}
+.book .e{background:var(--card);border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;text-align:left}
+.book .e img{width:52px;height:52px;object-fit:cover;border-radius:10px}
+.book .e .x{margin-left:auto;background:rgba(0,0,0,.25);border-radius:10px;padding:6px 10px;font-weight:900}
+@media (prefers-reduced-motion:reduce){.bub,.logo .p{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section class="screen on" id="home"><div class="wrap">
+  <div class="logo"><span class="f">Family</span> <span class="p">Pop</span></div>
+  <div class="tag">The board game all about us. Pick a bubble, know your family, go further.</div>
+  <button class="big main" id="bNew"><span class="ico">🎲</span><div>New game<small>Pass the phone, or play the computer</small></div></button>
+  <button class="big" id="bFamily"><span class="ico">👨‍👩‍👧</span><div>Our family<small>Add people and their trivia</small></div></button>
+  <button class="big" id="bBook"><span class="ico">📖</span><div>Family Book<small>Add memories, photos and questions</small></div></button>
+  <button class="big" id="bHof"><span class="ico">🏆</span><div>Bragging rights<small>Trophies, wins, and who knows the family best</small></div></button>
+  <button class="big" id="bHow"><span class="ico">❓</span><div>How to play</div></button>
+</div></section>
+
+<!-- SETUP -->
+<section class="screen" id="setup"><div class="wrap">
+  <h2 style="text-align:center;margin-top:8px">How many players?</h2>
+  <div class="counts" id="counts"></div>
+  <div id="seats" class="wrap" style="gap:8px"></div>
+  <div class="card"><h3>How long?</h3><div class="row" id="rounds"></div></div>
+  <button class="btn" id="bStart">Start the game</button>
+  <button class="btn ghost" id="bSetupBack">Back</button>
+</div></section>
+
+<!-- FAMILY -->
+<section class="screen" id="family"><div class="wrap">
+  <h2 style="text-align:center;margin-top:8px">Our family</h2>
+  <div class="dim" style="text-align:center">Everyone here can be picked as a player, and their answers become trivia questions.</div>
+  <div id="famList" class="wrap" style="gap:8px"></div>
+  <button class="btn" id="bAddPerson">+ Add a person</button>
+  <button class="btn ghost" id="bFamBack">Back</button>
+</div></section>
+
+<!-- BOOK -->
+<section class="screen" id="bookScr"><div class="wrap">
+  <h2 style="text-align:center;margin-top:8px">📖 Family Book</h2>
+  <div class="dim" style="text-align:center">Every memory you add here becomes a question in the game.</div>
+  <button class="btn" id="bAddMem">+ Add a memory or question</button>
+  <div class="book" id="bookList"></div>
+  <button class="btn ghost" id="bBookBack">Back</button>
+</div></section>
+
+<!-- HALL OF FAME -->
+<section class="screen" id="hofScr"><div class="wrap">
+  <h2 style="text-align:center;margin-top:8px">🏆 Bragging rights</h2>
+  <div class="hof" id="hofList"></div>
+  <div class="card"><h3>Pictures on the board</h3><div id="hofPics" class="dim">Win a game and your picture goes on a square.</div></div>
+  <button class="btn ghost" id="bHofBack">Back</button>
+</div></section>
+
+<!-- GAME -->
+<section class="screen" id="game">
+  <div class="hud">
+    <button class="iconbtn" id="bQuit" aria-label="Menu">☰</button>
+    <div class="pill" id="roundPill">Round 1 of 12</div>
+    <div class="pill" id="potPill">🥧 Pie Pot 0</div>
+  </div>
+  <div class="boardWrap"><div class="board" id="board"></div></div>
+  <div class="players" id="players"></div>
+  <div class="log" id="log"></div>
+</section>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ================= saved data (on this device) ================= */
+const store={get(k,d){try{const v=localStorage.getItem("fp_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("fp_"+k,JSON.stringify(v));return true}catch(e){toast("This phone is out of room for pictures. Try a smaller photo.");return false}}};
+let PEOPLE=store.get("people",[]);      // {id,name,piece,mom,birthday,nick,food,secret}
+let BOOK=store.get("book",[]);          // {id,cat,q,a,wrong:[],photo,by}
+let SQPICS=store.get("sqpics",{});      // {squareIndex:{photo,caption,name,by,date}}
+let STATS=store.get("stats",{});        // {personId:{games,wins,right,asked,banked,trophies:[]}}
+const saveAll=()=>{store.set("people",PEOPLE);store.set("book",BOOK);store.set("sqpics",SQPICS);store.set("stats",STATS)};
+const uid=()=>Math.random().toString(36).slice(2,9);
+
+/* ================= the world ================= */
+const PIECES=["🧁","🐢","🏎️","🚜","🫧","🐉","🌹","🦋","🐈","🐕","☕","🎸","⭐","🌻","🦄","🏈","🎣","👑"];
+const BOTS=[
+  {id:"bot1",name:"Granny Bot",piece:"👵",acc:.55,brave:.15,buy:.7,say:"sweet and steady"},
+  {id:"bot2",name:"Uncle Ace",piece:"🤠",acc:.72,brave:.45,buy:.85,say:"knows a thing or two"},
+  {id:"bot3",name:"Shark",piece:"🦈",acc:.86,brave:.8,buy:.95,say:"plays to win"}];
+const CATS=["Way Back When","Favorites","Who's in the Picture?","Then & Now"];
+const GROUPS={townA:{name:"Around Town",color:"var(--gTownA)"},famA:{name:"Family Places",color:"var(--gFamA)"},
+  townB:{name:"Downtown",color:"var(--gTownB)"},famB:{name:"Family Places",color:"var(--gFamB)"},home:{name:"Homes",color:"var(--gHome)"}};
+// 24 squares, clockwise from GO in the bottom-right corner. Mom asked for "a mix of all of these".
+const BASE=[
+ {t:"go",name:"GO",ic:"🫧"},
+ {t:"home",slot:0,name:"House",ic:"🏡",g:"home",price:150},
+ {t:"prop",name:"The Diner",ic:"🍔",g:"townA",price:100},
+ {t:"fine",name:"Oops!",ic:"😬"},
+ {t:"prop",name:"The Park",ic:"🌳",g:"townA",price:100},
+ {t:"prop",name:"Ball Field",ic:"⚾",g:"townA",price:120},
+ {t:"timeout",name:"Time Out",ic:"⏳"},
+ {t:"prop",name:"Mom's Kitchen",ic:"🍳",g:"famA",price:140},
+ {t:"lucky",name:"Lucky Bubble",ic:"🍀"},
+ {t:"prop",name:"Grandma's Porch",ic:"🪑",g:"famA",price:140},
+ {t:"prop",name:"The Back Yard",ic:"🌻",g:"famA",price:160},
+ {t:"home",slot:1,name:"House",ic:"🏡",g:"home",price:150},
+ {t:"pot",name:"Pie Pot",ic:"🥧"},
+ {t:"prop",name:"Church",ic:"⛪",g:"townB",price:180},
+ {t:"fine",name:"Oops!",ic:"😬"},
+ {t:"prop",name:"The Lake",ic:"🛶",g:"townB",price:180},
+ {t:"prop",name:"The Store",ic:"🛒",g:"townB",price:200},
+ {t:"home",slot:2,name:"House",ic:"🏡",g:"home",price:150},
+ {t:"gotimeout",name:"Go to Time Out",ic:"👉"},
+ {t:"prop",name:"Race Track",ic:"🏁",g:"famB",price:220},
+ {t:"lucky",name:"Lucky Bubble",ic:"🍀"},
+ {t:"prop",name:"The Old House",ic:"🏚️",g:"famB",price:240},
+ {t:"fine",name:"Oops!",ic:"😬"},
+ {t:"home",slot:3,name:"House",ic:"🏡",g:"home",price:150}];
+const cellOf=i=>i<=6?[6,6-i]:i<=11?[6-(i-6),0]:i<=18?[0,i-12]:[i-18,6];   // [row,col]
+// Mom's four fines
+const FINES=[
+ {k:"call",text:"Forgot to call your mom",sub:"Pay 50 Pop Bucks",amt:50},
+ {k:"dish",text:"Left the dishes in the sink",sub:"Pay 25 into the Pie Pot",amt:25},
+ {k:"thank",text:"Didn't say thank you",sub:"Pay 20 to the person before you",amt:20},
+ {k:"pie",text:"Ate the last piece of pie",sub:"Pay 10 to everyone else",amt:10}];
+const LUCKY=[
+ {text:"Grandma slipped you some cash",cash:100},
+ {text:"You found money in the couch cushions",cash:30},
+ {text:"FREE PASS! Keep it to skip a fine or get out of Time Out",pass:1},
+ {text:"It's your birthday! Everyone gives you 10",bday:10},
+ {text:"Bake sale. Put 30 in the Pie Pot",cash:-30,toPot:true},
+ {text:"You fixed the neighbor's mower. Collect 50",cash:50},
+ {text:"Ride with family. Move ahead 3 spaces",move:3},
+ {text:"FREE PASS! Somebody owed you one",pass:1}];
+// Starter questions so the game works on day one (family questions take over as people add them)
+const STARTER=[
+ {cat:"Way Back When",q:"What year did people first walk on the moon?",a:"1969",w:["1965","1972","1975"]},
+ {cat:"Way Back When",q:"Which toy had parents fighting in store aisles in 1983?",a:"Cabbage Patch Kids",w:["Furby","Beanie Babies","Tickle Me Elmo"]},
+ {cat:"Way Back When",q:"Which TV show had the Fonz?",a:"Happy Days",w:["M*A*S*H","Gilligan's Island","Cheers"]},
+ {cat:"Way Back When",q:"Which singer was called the Man in Black, and was born in Arkansas?",a:"Johnny Cash",w:["Elvis Presley","Glen Campbell","Conway Twitty"]},
+ {cat:"Way Back When",q:"Which president grew up in Hope and Hot Springs, Arkansas?",a:"Bill Clinton",w:["Jimmy Carter","Ronald Reagan","Lyndon Johnson"]},
+ {cat:"Way Back When",q:"What year did Arkansas become a state?",a:"1836",w:["1812","1861","1907"]},
+ {cat:"Way Back When",q:"Which Ford car came out in 1964 and became a legend?",a:"Mustang",w:["Model T","Thunderbird","Bronco"]},
+ {cat:"Way Back When",q:"Which TV family lived at 1313 Mockingbird Lane?",a:"The Munsters",w:["The Brady Bunch","The Addams Family","The Waltons"]},
+ {cat:"Way Back When",q:"What company made the video game Pong?",a:"Atari",w:["Nintendo","Sega","Sony"]},
+ {cat:"Way Back When",q:"Hot Springs is famous for its...",a:"Bathhouses and hot springs",w:["Gold mines","Beaches","Ski slopes"]},
+ {cat:"Way Back When",q:"What candy came in a dispenser with a character's head on top?",a:"PEZ",w:["Skittles","Tic Tac","Lemonheads"]},
+ {cat:"Way Back When",q:"What year did the first iPhone come out?",a:"2007",w:["2001","2004","2010"]},
+ {cat:"Then & Now",q:"THEN: a rotary phone on the kitchen wall. NOW:",a:"A smartphone in your pocket",w:["A fax machine","A pager","A CB radio"]},
+ {cat:"Then & Now",q:"THEN: a paper road map in the glove box. NOW:",a:"GPS on your phone",w:["A compass","A phone book","A globe"]},
+ {cat:"Then & Now",q:"THEN: a set of encyclopedias on the shelf. NOW:",a:"Searching the internet",w:["A dictionary","The newspaper","A library card"]},
+ {cat:"Then & Now",q:"THEN: renting a VHS tape for Friday night. NOW:",a:"Streaming a movie",w:["Buying a DVD","Going to a drive-in","Waiting for TV reruns"]},
+ {cat:"Then & Now",q:"THEN: a film camera and waiting a week for prints. NOW:",a:"Taking pictures on your phone",w:["A Polaroid","A camcorder","A sketchbook"]},
+ {cat:"Then & Now",q:"THEN: writing a letter and buying a stamp. NOW:",a:"Sending a text",w:["Sending a telegram","Calling the operator","Writing a postcard"]},
+ {cat:"Then & Now",q:"THEN: a cassette in a Walkman. NOW:",a:"Music on your phone",w:["A record player","An 8-track","A jukebox"]},
+ {cat:"Then & Now",q:"THEN: a TV with rabbit ears and 4 channels. NOW:",a:"Hundreds of shows on demand",w:["Radio dramas","Black-and-white only","Slide projectors"]},
+ {cat:"Favorites",q:"What's the most popular pie for Thanksgiving in America?",a:"Pumpkin",w:["Cherry","Key lime","Lemon meringue"]},
+ {cat:"Favorites",q:"What's the most popular ice cream flavor in America?",a:"Vanilla",w:["Rocky road","Mint chip","Strawberry"]}];
+const FOODS=["Fried chicken","Spaghetti","Pizza","Tacos","Meatloaf","Chicken and dumplings","Cheeseburgers","Catfish","Pot roast","Enchiladas","Lasagna","BBQ ribs"];
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+/* ================= sound + feel ================= */
+let AC;
+function tone(f,d=.08,type="sine",v=.12,when=0){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();
+  const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+when;o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);
+  g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+const sfx={pop:()=>{tone(900,.12,"sine",.3);for(let i=0;i<8;i++)tone(900+Math.random()*1400,.03,"square",.04,.08+Math.random()*.25)},
+  step:i=>tone(420+i*30,.05,"triangle",.07),right:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.14,"triangle",.12,i*.07)),
+  wrong:()=>tone(170,.22,"sawtooth",.06),cash:()=>[1046,1318].forEach((f,i)=>tone(f,.1,"triangle",.1,i*.06)),
+  pay:()=>[392,330].forEach((f,i)=>tone(f,.12,"triangle",.08,i*.08)),fan:()=>[523,659,784,1046,784,1046,1318].forEach((f,i)=>tone(f,.2,"triangle",.12,i*.09))};
+const TAURI=window.__TAURI__&&window.__TAURI__.core;
+function buzz(n){if(TAURI){TAURI.invoke("plugin:haptics|impact_feedback",{style:n>40?"heavy":n>20?"medium":"light"}).catch(()=>{});return}
+  if(navigator.vibrate)try{navigator.vibrate(n)}catch(e){}}
+function burst(x,y,n=24){const c=["#ffc23d","#ff5d9e","#3fd6c6","#ffffff","#8f6bff"];for(let i=0;i<n;i++){const p=document.createElement("div");p.className="particle";
+  p.style.left=x+"px";p.style.top=y+"px";p.style.background=c[i%c.length];document.body.appendChild(p);const a=Math.random()*6.28,d=50+Math.random()*120;
+  p.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+50}px)`,opacity:0}],{duration:700+Math.random()*400,easing:"cubic-bezier(.2,.8,.4,1)"}).onfinish=()=>p.remove()}}
+let toastT;function toast(m){const t=$("#toast");t.innerHTML=m;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),2600)}
+function show(id){$$(".screen").forEach(s=>s.classList.toggle("on",s.id===id))}
+function sheet(html){$("#sheet").innerHTML=html;$("#modal").classList.add("on");$("#sheet").scrollTop=0}
+function closeSheet(){$("#modal").classList.remove("on")}
+function ask(html,buttons){return new Promise(res=>{sheet(html+'<div class="ans" id="askBtns"></div>');const box=$("#askBtns");
+  buttons.forEach(([label,val,cls])=>{const b=document.createElement("button");b.innerHTML=label;if(cls)b.className=cls;b.onclick=()=>{closeSheet();res(val)};box.appendChild(b)})})}
+
+/* ================= photos: shrink so they fit on the phone ================= */
+function pickPhoto(){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept="image/*";
+  i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return res(null);const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{
+    const m=520,s=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.72))};img.onerror=()=>res(null);img.src=r.result};r.readAsDataURL(f)};i.click()})}
+
+/* ================= people ================= */
+function personForm(p,onDone){
+  p=p||{id:uid(),name:"",piece:PIECES[0],mom:false,birthday:"",nick:"",food:"",secret:""};
+  sheet(`<h2>${p.name?"Edit "+esc(p.name):"Add a person"}</h2>
+   <label class="f">Name<input id="pfName" value="${esc(p.name)}" placeholder="Like Mom, Kelsey, or Andrew" maxlength="18"></label>
+   <div style="text-align:left;font-weight:800">Game piece</div><div class="pieces" id="pfPieces">${PIECES.map(x=>`<button type="button" class="${x===p.piece?"on":""}" data-p="${x}">${x}</button>`).join("")}</div>
+   <div class="dim" style="text-align:left;font-weight:800">Quick trivia about this person. One short answer each, skip any.</div>
+   <label class="f">Birthday<small>Like June 10</small><input id="pfBday" value="${esc(p.birthday)}" placeholder="June 10"></label>
+   <label class="f">Nickname<input id="pfNick" value="${esc(p.nick)}" placeholder="What do people call them?"></label>
+   <label class="f">Favorite food<input id="pfFood" value="${esc(p.food)}" placeholder="Like chicken and dumplings"></label>
+   <label class="f">Something nobody knows about you<input id="pfSecret" value="${esc(p.secret)}" placeholder="A fun surprise fact"></label>
+   <label class="chk"><input type="checkbox" id="pfMom" ${p.mom?"checked":""}> This is Mom <span class="dim" style="font-weight:700">(she gets paid when someone forgets to call her)</span></label>
+   <button class="btn" id="pfSave">Save</button>
+   ${PEOPLE.some(x=>x.id===p.id)?'<button class="btn ghost" id="pfDel">Remove this person</button>':""}
+   <button class="btn ghost" id="pfCancel">Cancel</button>`);
+  let piece=p.piece;
+  $$("#pfPieces button").forEach(b=>b.onclick=()=>{piece=b.dataset.p;$$("#pfPieces button").forEach(x=>x.classList.toggle("on",x===b))});
+  $("#pfSave").onclick=()=>{const name=$("#pfName").value.trim();if(!name){toast("Please type a name");return}
+    Object.assign(p,{name,piece,mom:$("#pfMom").checked,birthday:$("#pfBday").value.trim(),nick:$("#pfNick").value.trim(),food:$("#pfFood").value.trim(),secret:$("#pfSecret").value.trim()});
+    if(p.mom)PEOPLE.forEach(x=>{if(x.id!==p.id)x.mom=false});
+    const i=PEOPLE.findIndex(x=>x.id===p.id);if(i>-1)PEOPLE[i]=p;else PEOPLE.push(p);saveAll();closeSheet();onDone&&onDone(p)};
+  if($("#pfDel"))$("#pfDel").onclick=()=>{PEOPLE=PEOPLE.filter(x=>x.id!==p.id);saveAll();closeSheet();onDone&&onDone(null)};
+  $("#pfCancel").onclick=()=>{closeSheet();onDone&&onDone(undefined)};
+}
+function renderFamily(){
+  $("#famList").innerHTML=PEOPLE.length?PEOPLE.map(p=>`<div class="seat"><div class="pc">${p.piece}</div><div class="nm">${esc(p.name)}${p.mom?" 💐":""}<small>${[p.birthday&&"🎂 "+esc(p.birthday),p.food&&"🍽️ "+esc(p.food)].filter(Boolean).join(" · ")||"No trivia yet"}</small></div><button class="btn small ghost" data-e="${p.id}">Edit</button></div>`).join("")
+    :'<div class="card dim" style="text-align:center">Nobody yet. Add yourself first!</div>';
+  $$("#famList [data-e]").forEach(b=>b.onclick=()=>personForm(PEOPLE.find(x=>x.id===b.dataset.e),renderFamily));
+}
+$("#bFamily").onclick=()=>{renderFamily();show("family")};
+$("#bAddPerson").onclick=()=>personForm(null,renderFamily);
+$("#bFamBack").onclick=()=>show("home");
+
+/* ================= Family Book ================= */
+function renderBook(){
+  $("#bookList").innerHTML=BOOK.length?BOOK.slice().reverse().map(e=>`<div class="e">${e.photo?`<img src="${e.photo}" alt="">`:'<div style="font-size:30px">💬</div>'}<div><div style="font-weight:900">${esc(e.q||"Who's in the picture?")}</div><div class="dim" style="font-size:14px">${esc(e.cat)} · ${esc(e.a)}</div></div><button class="x" data-d="${e.id}">✕</button></div>`).join("")
+    :'<div class="card dim" style="text-align:center">No memories yet. Add a photo of someone and the game will ask "Who\'s in the picture?"</div>';
+  $$("#bookList [data-d]").forEach(b=>b.onclick=()=>{BOOK=BOOK.filter(x=>x.id!==b.dataset.d);saveAll();renderBook()});
+}
+function memoryForm(){
+  let photo=null;
+  sheet(`<h2>Add a memory</h2>
+   <label class="f">Kind of question<select id="mCat">${CATS.map(c=>`<option>${c}</option>`).join("")}</select></label>
+   <button class="btn ghost" id="mPhoto">📷 Add a photo (optional)</button><img id="mPrev" class="qphoto" hidden alt="">
+   <label class="f">Question<small>Leave blank with a photo to ask "Who's in the picture?"</small><input id="mQ" placeholder="Where did we go every summer?"></label>
+   <label class="f">Right answer<input id="mA" placeholder="Lake Ouachita"></label>
+   <label class="f">Wrong answers (optional)<small>Separate with commas. Leave blank and the game picks some.</small><input id="mW" placeholder="Beaver Lake, Lake Hamilton"></label>
+   <button class="btn" id="mSave">Save to the Family Book</button><button class="btn ghost" id="mCancel">Cancel</button>`);
+  $("#mPhoto").onclick=async()=>{photo=await pickPhoto();if(photo){$("#mPrev").src=photo;$("#mPrev").hidden=false;if(!$("#mQ").value)$("#mCat").value="Who's in the Picture?"}};
+  $("#mSave").onclick=()=>{const a=$("#mA").value.trim(),q=$("#mQ").value.trim();if(!a){toast("Please add the right answer");return}if(!q&&!photo){toast("Add a question or a photo");return}
+    BOOK.push({id:uid(),cat:$("#mCat").value,q:q||"Who's in the picture?",a,wrong:$("#mW").value.split(",").map(s=>s.trim()).filter(Boolean),photo});
+    if(!saveAll()){} closeSheet();renderBook();toast("Saved. It'll show up in your next game!")};
+  $("#mCancel").onclick=closeSheet;
+}
+$("#bBook").onclick=()=>{renderBook();show("bookScr")};
+$("#bAddMem").onclick=memoryForm;
+$("#bBookBack").onclick=()=>show("home");
+
+/* ================= Bragging rights ================= */
+function st(id){return STATS[id]||(STATS[id]={games:0,wins:0,right:0,asked:0,banked:0,trophies:[]})}
+function renderHof(){
+  const rows=PEOPLE.map(p=>({p,s:st(p.id)})).sort((a,b)=>b.s.wins-a.s.wins||(b.s.right/(b.s.asked||1))-(a.s.right/(a.s.asked||1)));
+  $("#hofList").innerHTML=rows.length?rows.map(({p,s},i)=>`<div class="r"><div class="p">${p.piece}</div><div class="n">${i===0&&s.wins?"👑 ":""}${esc(p.name)}<small>🧠 Knows the family ${s.asked?Math.round(100*s.right/s.asked):0}% · 🫧 ${s.banked} Pop Bucks saved · ${s.trophies.length?s.trophies.slice(-4).join(" "):"no trophies yet"}</small></div><div class="w">${s.wins} win${s.wins===1?"":"s"}</div></div>`).join("")
+    :'<div class="card dim" style="text-align:center">Play a game to start the bragging.</div>';
+  const pics=Object.entries(SQPICS);
+  $("#hofPics").innerHTML=pics.length?pics.map(([i,v])=>`<div style="display:flex;gap:10px;align-items:center;margin:6px 0"><img src="${v.photo}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:10px"><div><b>${esc(v.name)}</b><div class="dim" style="font-size:13px">${esc(v.caption||"")} · won by ${esc(v.by)} ${esc(v.date)}</div></div></div>`).join(""):"Win a game and your picture goes on a square.";
+}
+$("#bHof").onclick=()=>{renderHof();show("hofScr")};
+$("#bHofBack").onclick=()=>show("home");
+$("#bHow").onclick=()=>sheet(`<h2>How to play</h2><div style="text-align:left;line-height:1.55">
+ 🫧 <b>Pick your bubble</b> on your turn. A <b>small</b> bubble is an easy family question and moves you <b>2</b>. <b>Medium</b> moves <b>4</b>. A <b>big</b> bubble is hard, has a timer, and moves you <b>6</b>.<br>
+ ✅ Answer right and you move that far, plus 20 Pop Bucks. Wrong, and you only move 1.<br>
+ 🏡 Land on a place nobody owns and you can <b>buy it</b>. When others land there, they <b>pay you rent</b>. Own a whole color and the rent doubles. Everyone's own house is theirs from the start.<br>
+ 😬 <b>Oops!</b> squares are family fines, like "Forgot to call your mom."<br>
+ 🍀 <b>Lucky Bubble</b> is a surprise. It might be a <b>Free Pass</b>, which skips a fine or gets you out of Time Out.<br>
+ 🥧 Fines go in the <b>Pie Pot</b>. Land on the Pie Pot corner and it's all yours.<br>
+ 🏆 Richest family member after the last round wins, and gets to put <b>their picture on a square</b> for good.</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Got it</button>`);
+
+/* ================= setup ================= */
+let SET={count:2,seats:[],rounds:12};
+function renderSetup(){
+  $("#counts").innerHTML=[2,3,4,5,6,7,8].map(n=>`<button class="${n===SET.count?"on":""}" data-n="${n}">${n}</button>`).join("")+`<button class="dim" style="font-size:13px" data-n="1">1 + computer</button>`;
+  $$("#counts button").forEach(b=>b.onclick=()=>{let n=+b.dataset.n;if(n===1){SET.count=2;SET.seats[1]="bot1";}else SET.count=n;sizeSeats();renderSetup()});
+  sizeSeats();
+  const opts=v=>`<option value="">Pick a person…</option>`+PEOPLE.map(p=>`<option value="${p.id}" ${v===p.id?"selected":""}>${p.piece} ${esc(p.name)}</option>`).join("")+
+    BOTS.map(b=>`<option value="${b.id}" ${v===b.id?"selected":""}>${b.piece} ${b.name} (computer)</option>`).join("")+`<option value="__new">+ Add a new person</option>`;
+  $("#seats").innerHTML=SET.seats.map((v,i)=>{const who=PEOPLE.find(p=>p.id===v)||BOTS.find(b=>b.id===v);
+    return `<div class="seat"><div class="pc">${who?who.piece:"❔"}</div><div class="nm">Player ${i+1}<small>${who?esc(who.name):"Not picked yet"}</small></div><select data-s="${i}" aria-label="Player ${i+1}">${opts(v)}</select></div>`}).join("");
+  $$("#seats select").forEach(s=>s.onchange=()=>{const i=+s.dataset.s;if(s.value==="__new"){personForm(null,p=>{if(p)SET.seats[i]=p.id;renderSetup()});return}SET.seats[i]=s.value;renderSetup()});
+  $("#rounds").innerHTML=[[8,"Quick · 8 rounds"],[12,"Regular · 12"],[16,"Long · 16"]].map(([n,l])=>`<button class="btn small ${SET.rounds===n?"":"ghost"}" data-r="${n}">${l}</button>`).join("");
+  $$("#rounds button").forEach(b=>b.onclick=()=>{SET.rounds=+b.dataset.r;renderSetup()});
+}
+function sizeSeats(){while(SET.seats.length<SET.count)SET.seats.push("");SET.seats.length=SET.count}
+$("#bNew").onclick=()=>{if(!PEOPLE.length){toast("First, add yourself to the family");personForm(null,p=>{if(p){SET.seats=[p.id];renderSetup();show("setup")}});return}
+  SET.seats=[PEOPLE[0].id];renderSetup();show("setup")};
+$("#bSetupBack").onclick=()=>show("home");
+$("#bStart").onclick=()=>{
+  const ids=SET.seats;if(ids.some(v=>!v)){toast("Pick someone for every player");return}
+  if(new Set(ids.filter(v=>!v.startsWith("bot"))).size!==ids.filter(v=>!v.startsWith("bot")).length){toast("Each person can only play once");return}
+  startGame(ids,SET.rounds)};
+
+/* ================= trivia: built from the family ================= */
+function famQuestions(){
+  const qs=[],ppl=PEOPLE;
+  const names=ppl.map(p=>p.name);
+  ppl.forEach(p=>{
+    if(p.food)qs.push({cat:"Favorites",about:p.id,q:`What's ${p.name}'s favorite food?`,a:p.food,pool:ppl.filter(x=>x.food&&x.id!==p.id).map(x=>x.food).concat(FOODS)});
+    if(p.birthday)qs.push({cat:"Way Back When",about:p.id,q:`Whose birthday is ${p.birthday}?`,a:p.name,pool:names});
+    if(p.nick)qs.push({cat:"Way Back When",about:p.id,q:`Who goes by the nickname "${p.nick}"?`,a:p.name,pool:names});
+    if(p.secret)qs.push({cat:"Way Back When",about:p.id,q:`Something nobody knew… whose secret is this? "${p.secret}"`,a:p.name,pool:names});
+    if(p.birthday){const m=MONTHS.find(m=>p.birthday.toLowerCase().startsWith(m.toLowerCase().slice(0,3)));
+      if(m)qs.push({cat:"Favorites",about:p.id,q:`What month is ${p.name}'s birthday?`,a:m,pool:MONTHS})}
+  });
+  BOOK.forEach(e=>qs.push({cat:e.cat,q:e.q,a:e.a,photo:e.photo,pool:e.wrong.length?e.wrong:(names.includes(e.a)?names:null),fixed:e.wrong.length>0}));
+  return qs;
+}
+let QUSED=new Set();
+function makeQuestion(asker,size){
+  const fam=famQuestions().filter(q=>!(asker.pid&&q.about===asker.pid)&&!(asker.pid&&q.a===asker.name));
+  const starters=STARTER.map(s=>({cat:s.cat,q:s.q,a:s.a,pool:s.w,fixed:true}));
+  let pool=fam.filter(q=>!QUSED.has(q.q));
+  if(!pool.length||Math.random()<.3)pool=pool.concat(starters.filter(q=>!QUSED.has(q.q)));
+  if(!pool.length){QUSED.clear();pool=fam.concat(starters)}
+  const q=rnd(pool);QUSED.add(q.q);
+  const nOpts=size===2?2:size===4?3:4;
+  let wrong=shuffle([...new Set((q.pool||[]).filter(x=>x&&x.toLowerCase()!==q.a.toLowerCase()))]);
+  const isName=PEOPLE.some(p=>p.name===q.a);   // never invent family members; fewer choices is fine
+  if(wrong.length<nOpts-1&&!isName){const extra=q.pool===MONTHS?MONTHS:FOODS;wrong=wrong.concat(shuffle(extra.filter(x=>x!==q.a&&!wrong.includes(x))))}
+  return {cat:q.cat,q:q.q,a:q.a,photo:q.photo,opts:shuffle([q.a].concat(wrong.slice(0,nOpts-1)))};
+}
+
+/* ================= the game ================= */
+let G=null;
+function startGame(ids,rounds){
+  const players=ids.map((id,i)=>{const p=PEOPLE.find(x=>x.id===id),b=BOTS.find(x=>x.id===id);
+    return {pid:p?p.id:null,bot:b||null,name:(p||b).name,piece:(p||b).piece,mom:!!(p&&p.mom),cash:1500,pos:0,pass:0,jail:false,jailTurns:0,right:0,asked:0,rent:0,streak:0,home:i<4?i:-1}});
+  const board=BASE.map((s,i)=>{const sq=Object.assign({i},s);
+    if(s.t==="home"){const pl=players.find(p=>p.home===s.slot);sq.name=pl?pl.name+"'s House":"Neighbor's House"}
+    if(SQPICS[i]&&s.t==="prop"){sq.name=SQPICS[i].name||sq.name;sq.photo=SQPICS[i].photo}
+    return sq});
+  const owners={};board.forEach(s=>{if(s.t==="home"){const pi=players.findIndex(p=>p.home===s.slot);if(pi>-1)owners[s.i]=pi}});
+  G={players,board,owners,pot:0,round:1,rounds,turn:0,busy:false,over:false};QUSED.clear();
+  renderBoard();renderPlayers();show("game");log("Everybody starts with 1,500 Pop Bucks. Good luck!");
+  setTimeout(()=>beginTurn(true),400);
+}
+function renderBoard(){
+  const b=$("#board");b.innerHTML="";
+  G.board.forEach(s=>{const [r,c]=cellOf(s.i),d=document.createElement("div");d.className="sq"+(["go","timeout","pot","gotimeout"].includes(s.t)?" corner":"")+(s.photo?" photo":"");
+    d.style.gridRow=r+1;d.style.gridColumn=c+1;d.dataset.i=s.i;if(s.photo)d.style.backgroundImage=`url(${s.photo})`;
+    d.innerHTML=(s.g?`<div class="band" style="background:${GROUPS[s.g].color}"></div>`:"")+(s.photo?"":`<div class="ic">${s.ic}</div>`)+`<div class="nm">${esc(s.name)}</div><div class="own" id="own${s.i}"></div><div class="toks" id="tok${s.i}"></div>`;
+    d.onclick=()=>squareInfo(s);b.appendChild(d)});
+  const m=document.createElement("div");m.className="mid";m.id="mid";b.appendChild(m);
+  paintTokens();paintOwners();
+}
+function paintTokens(){G.board.forEach(s=>{const t=$("#tok"+s.i);if(t)t.textContent=G.players.filter(p=>p.pos===s.i).map(p=>p.piece).join("")})}
+function paintOwners(){G.board.forEach(s=>{const o=$("#own"+s.i);if(o)o.textContent=G.owners[s.i]!=null&&s.t==="prop"?G.players[G.owners[s.i]].piece:""});
+  $("#potPill").textContent="🥧 Pie Pot "+G.pot}
+function renderPlayers(){
+  $("#players").innerHTML=G.players.map((p,i)=>`<div class="pl ${i===G.turn?"cur":""}"><div class="p">${p.piece}</div><div class="t"><div>${esc(p.name)}</div><div class="c">🫧 ${p.cash}</div>${p.pass?`<div class="fp">🎟️ Free Pass ×${p.pass}</div>`:""}${p.jail?`<div class="fp">⏳ Time Out</div>`:""}</div></div>`).join("");
+  $("#roundPill").textContent=`Round ${Math.min(G.round,G.rounds)} of ${G.rounds}`;
+}
+function log(t){$("#log").textContent=t}
+function squareInfo(s){
+  const own=G.owners[s.i]!=null?G.players[G.owners[s.i]]:null;
+  const info={go:"Pass GO and collect 200 Pop Bucks.",timeout:"Time Out. Get out with a Free Pass, 50 Pop Bucks, or a right answer on a big bubble.",pot:"Every fine goes in the Pie Pot. Land here and it's yours!",gotimeout:"Straight to Time Out!",fine:"A family fine. One of Mom's favorites.",lucky:"A surprise. Maybe a Free Pass!"}[s.t]||
+    (s.t==="home"&&own?`${esc(own.name)}'s house. Land here and pay ${esc(own.name)} 40 rent.`:`${GROUPS[s.g].name}. Costs ${s.price}. Rent ${rentOf(s)}.${own?" Owned by "+esc(own.name)+".":" Nobody owns it yet."}`);
+  if(G.busy&&$("#modal").classList.contains("on"))return;
+  sheet(`${s.photo?`<img class="sqphoto" src="${s.photo}" alt="">`:`<div class="bigmoji">${s.ic}</div>`}<h2>${esc(s.name)}</h2>${SQPICS[s.i]?`<div class="dim">📸 ${esc(SQPICS[s.i].caption||"")} · won by ${esc(SQPICS[s.i].by)}</div>`:""}<div>${info}</div><button class="btn" id="okInfo">OK</button>`);
+  $("#okInfo").onclick=closeSheet;
+}
+function rentOf(s){if(s.t==="home")return 40;const base=Math.round(s.price/5),own=G.owners[s.i];if(own==null)return base;
+  const set=G.board.filter(x=>x.g===s.g&&x.t==="prop");return set.every(x=>G.owners[x.i]===own)?base*2:base}
+
+async function beginTurn(first){
+  if(G.over)return;const p=G.players[G.turn];renderPlayers();
+  // pass-the-phone hand-off between people (not before the computer, not for the very first player on their own)
+  const humans=G.players.filter(x=>!x.bot).length;
+  if(!p.bot&&humans>1){await ask(`<div class="bigmoji">${p.piece}</div><h2>Pass the phone to ${esc(p.name)}</h2><div class="dim">${G.players.length} players · round ${G.round} of ${G.rounds}</div>`,[["I'm ready",1,"btn"]])}
+  if(p.jail){await timeOutTurn(p);if(p.jail){return endTurn()}}
+  pickBubble(p);
+}
+async function timeOutTurn(p){
+  p.jailTurns++;const out=()=>{p.jail=false;p.jailTurns=0};
+  if(p.bot){if(p.pass){p.pass--;out();log(`${p.name} used a Free Pass to get out of Time Out`)}
+    else if(p.cash>300||p.jailTurns>=3){pay(p,50,null);out();log(`${p.name} paid 50 to leave Time Out`)}
+    else{log(`${p.name} is waiting in Time Out`);await wait(900)}renderPlayers();return}
+  const last=p.jailTurns>=3,opts=[];
+  if(p.pass)opts.push(["🎟️ Use my Free Pass","pass","btn"]);
+  opts.push(["Pay 50 Pop Bucks and get out","pay",p.pass?"":"btn"]);
+  if(!last)opts.push(["Try a big bubble question. Right answer gets you out","try"]);
+  const c=await ask(`<div class="bigmoji">⏳</div><h2>${esc(p.name)}, you're in Time Out</h2><div class="dim">${last?"This is your 3rd turn, so it's time to get out.":"Turn "+p.jailTurns+" of 3."}</div>`,opts);
+  if(c==="pass"){p.pass--;out();toast("🎟️ Free Pass used. You're out!")}
+  else if(c==="pay"){pay(p,50,null);out()}
+  else{const q=makeQuestion(p,6);if(await askQuestion(p,q,6)){out();toast("Right! You're out of Time Out")}}
+  renderPlayers();
+}
+function pickBubble(p){
+  G.busy=false;const mid=$("#mid");
+  mid.innerHTML=`<div class="who">${p.piece} ${esc(p.name)}'s turn</div><div class="hint">${p.bot?"thinking…":"Pick a bubble. Bigger = harder = further"}</div>
+   <div class="bubbles">${[[2,"easy",.2],[4,"medium",.27],[6,"hard",.34]].map(([n,l,s])=>`<div class="bub" data-n="${n}" style="width:calc(${s}*min(96vw,60vh,560px)*.55);height:calc(${s}*min(96vw,60vh,560px)*.55);font-size:calc(${s}*min(96vw,60vh,560px)*.2)">${n}<small>${l}</small></div>`).join("")}</div>`;
+  const go=n=>{if(G.busy)return;G.busy=true;const b=mid.querySelector(`.bub[data-n="${n}"]`);const r=b.getBoundingClientRect();b.classList.add("popped");sfx.pop();buzz(40);burst(r.left+r.width/2,r.top+r.height/2,26);
+    setTimeout(()=>playBubble(p,n),380)};
+  if(p.bot){const r=Math.random();const n=r<p.bot.brave*.6?6:r<.35+p.bot.brave*.4?4:2;setTimeout(()=>go(n),1100)}
+  else mid.querySelectorAll(".bub").forEach(b=>b.onclick=()=>go(+b.dataset.n));
+}
+function askQuestion(p,q,size){return new Promise(res=>{
+  if(G.over)return res(false);
+  const timed=size===6;let left=15,iv=null,done=false;
+  sheet(`<div class="cat">${esc(q.cat)}</div>${q.photo?`<img class="qphoto" src="${q.photo}" alt="">`:""}<div class="qtext">${esc(q.q)}</div>${timed?'<div class="timer"><i id="tbar"></i></div>':""}
+   <div class="ans" id="qa">${q.opts.map(o=>`<button data-o="${esc(o)}">${esc(o)}</button>`).join("")}</div><div class="dim" id="qfoot">${p.bot?esc(p.name)+" is thinking…":"Move "+size+" if you're right"}</div>`);
+  const finish=pick=>{if(done)return;done=true;clearInterval(iv);const ok=pick===q.a;p.asked++;if(ok){p.right++;p.streak++}else p.streak=0;
+    $$("#qa button").forEach(b=>{if(b.dataset.o===q.a)b.classList.add("right");else if(b.dataset.o===pick)b.classList.add("wrong")});
+    $("#qfoot").innerHTML=ok?`<b style="color:var(--good)">Right! +20 Pop Bucks${p.streak===3?" · 🔥 3 in a row! +50 more":""}</b>`:`<b style="color:var(--bad)">${pick==null?"Time's up!":"Not quite."}</b> The answer is <b>${esc(q.a)}</b>.`;
+    if(ok){sfx.right();buzz(30);p.cash+=20;if(p.streak===3)p.cash+=50}else{sfx.wrong();buzz(15)}
+    setTimeout(()=>{closeSheet();res(ok)},ok?1300:2200)};
+  if(p.bot){const ok=Math.random()<p.bot.acc;setTimeout(()=>finish(ok?q.a:rnd(q.opts.filter(o=>o!==q.a))),1300+Math.random()*900)}
+  else $$("#qa button").forEach(b=>b.onclick=()=>finish(b.dataset.o));
+  if(timed){const t0=Date.now();iv=setInterval(()=>{const l=15-(Date.now()-t0)/1000;const bar=$("#tbar");if(bar)bar.style.width=Math.max(0,l/15*100)+"%";if(l<=0)finish(null)},100)}
+})}
+async function playBubble(p,size){
+  const q=makeQuestion(p,size);const ok=await askQuestion(p,q,size);if(G.over)return;
+  renderPlayers();const steps=ok?size:1;log(ok?`${p.name} got it right and moves ${steps}`:`${p.name} moves just 1`);
+  await moveBy(p,steps);await landOn(p);endTurn();
+}
+async function moveBy(p,n){
+  for(let k=0;k<n;k++){if(G.over)return;p.pos=(p.pos+1)%24;if(p.pos===0){p.cash+=200;sfx.cash();toast(`${p.piece} ${esc(p.name)} passed GO: +200`)}
+    sfx.step(k);paintTokens();$$(".sq").forEach(s=>s.classList.toggle("lit",+s.dataset.i===p.pos));await wait(220)}
+  renderPlayers();
+}
+function pay(p,amt,to){p.cash-=amt;if(to===null)G.pot+=0;else if(to==="pot")G.pot+=amt;else if(to)to.cash+=amt;sfx.pay();renderPlayers();paintOwners()}
+async function landOn(p){
+  if(G.over)return;
+  const s=G.board[p.pos],idx=G.players.indexOf(p);
+  if(s.t==="prop"||s.t==="home"){
+    const o=G.owners[s.i];
+    if(o==null){
+      if(p.cash<s.price){log(`${p.name} can't afford ${s.name} yet`);return}
+      let buy;if(p.bot)buy=Math.random()<p.bot.buy&&p.cash-s.price>200;
+      else buy=await ask(`${s.photo?`<img class="sqphoto" src="${s.photo}" alt="">`:`<div class="bigmoji">${s.ic}</div>`}<h2>${esc(s.name)}</h2><div>Nobody owns it. Buy it for <b>${s.price}</b>? Anyone who lands here pays you <b>${Math.round(s.price/5)}</b>, double if you own the whole color.</div><div class="dim">You have ${p.cash}</div>`,[["Buy it for "+s.price,true,"btn"],["No thanks",false]]);
+      if(buy){p.cash-=s.price;G.owners[s.i]=idx;sfx.cash();buzz(25);log(`${p.name} bought ${s.name}!`);paintOwners();renderPlayers();
+        const set=G.board.filter(x=>x.g===s.g&&x.t==="prop");if(set.every(x=>G.owners[x.i]===idx))toast(`${p.piece} owns all of ${GROUPS[s.g].name}! Rent doubles`)}
+    }else if(o!==idx){const owner=G.players[o],r=rentOf(s);pay(p,r,owner);owner.rent+=r;log(`${p.name} paid ${owner.name} ${r} rent at ${s.name}`);
+      if(!p.bot)await ask(`<div class="bigmoji">${owner.piece}</div><h2>${esc(owner.name)}'s place!</h2><div>You pay <b>${r}</b> rent at ${esc(s.name)}.</div>`,[["OK",1,"btn"]]);else await wait(800)}
+  }else if(s.t==="fine"){await doFine(p)}
+  else if(s.t==="lucky"){await doLucky(p)}
+  else if(s.t==="pot"){const won=G.pot;p.cash+=won;G.pot=0;sfx.fan();const r=$("#mid").getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,40);
+    log(`${p.name} grabbed the Pie Pot: +${won}!`);if(!p.bot)await ask(`<div class="bigmoji">🥧</div><h2>The Pie Pot!</h2><div class="money">+${won}</div>`,[["Yum",1,"btn"]]);else await wait(900);renderPlayers();paintOwners()}
+  else if(s.t==="gotimeout"){p.jail=true;p.jailTurns=0;p.pos=6;paintTokens();log(`${p.name} went to Time Out!`);
+    if(!p.bot)await ask(`<div class="bigmoji">⏳</div><h2>Go to Time Out!</h2><div>Talked back to Mom. Your next turn starts in Time Out.</div>`,[["Aww",1,"btn"]]);else await wait(800);renderPlayers()}
+}
+async function doFine(p){
+  const f=rnd(FINES),idx=G.players.indexOf(p);
+  let useP=false;
+  if(p.pass){if(p.bot)useP=f.amt>=25;else useP=await ask(`<div class="bigmoji">😬</div><h2>${f.text}</h2><div>${f.sub}</div><div class="dim">You have a Free Pass. Use it to skip this fine?</div>`,[["🎟️ Use my Free Pass",true,"btn"],["Just pay it",false]])}
+  if(useP){p.pass--;log(`${p.name} used a Free Pass on "${f.text}"`);toast("🎟️ Free Pass! No fine");renderPlayers();return}
+  if(f.k==="call"){const mom=G.players.find(x=>x.mom&&x!==p);pay(p,f.amt,mom||"pot");log(`${p.name} forgot to call Mom: -50${mom?" to "+mom.name:" into the Pie Pot"}`)}
+  else if(f.k==="dish"){pay(p,f.amt,"pot");log(`${p.name} left the dishes: -25 into the Pie Pot`)}
+  else if(f.k==="thank"){const prev=G.players[(idx-1+G.players.length)%G.players.length];pay(p,f.amt,prev===p?"pot":prev);log(`${p.name} forgot to say thank you: -20 to ${prev.name}`)}
+  else{G.players.forEach(x=>{if(x!==p){p.cash-=f.amt;x.cash+=f.amt}});sfx.pay();renderPlayers();log(`${p.name} ate the last piece of pie: 10 to everyone`)}
+  if(!p.bot)await ask(`<div class="bigmoji">😬</div><h2>${f.text}</h2><div>${f.sub}</div>`,[["OK",1,"btn"]]);else await wait(900);
+}
+async function doLucky(p){
+  const c=rnd(LUCKY);
+  if(c.cash){p.cash+=c.cash;if(c.toPot)G.pot+=-c.cash;c.cash>0?sfx.cash():sfx.pay()}
+  if(c.pass){p.pass++;sfx.fan();buzz(30)}
+  if(c.bday)G.players.forEach(x=>{if(x!==p){x.cash-=c.bday;p.cash+=c.bday}});
+  renderPlayers();paintOwners();log(`${p.name}: ${c.text}`);
+  if(!p.bot)await ask(`<div class="bigmoji">${c.pass?"🎟️":"🍀"}</div><h2>Lucky Bubble!</h2><div>${c.text}</div>`,[["Yay",1,"btn"]]);else await wait(1000);
+  if(c.move){await moveBy(p,c.move);await landOn(p)}
+}
+function endTurn(){
+  if(G.over)return;
+  $$(".sq").forEach(s=>s.classList.remove("lit"));
+  G.turn=(G.turn+1)%G.players.length;if(G.turn===0)G.round++;
+  if(G.round>G.rounds)return endGame();
+  setTimeout(()=>beginTurn(),500);
+}
+$("#bQuit").onclick=async()=>{if(!G)return;const c=await ask(`<h2>Game menu</h2>`,[["Keep playing","keep","btn"],["End the game now and see who won","end"],["Quit without saving","quit"]]);
+  if(c==="end"){G.round=G.rounds+1;endGame()}else if(c==="quit"){G.over=true;show("home")}else if(!G.busy&&!G.over){}};
+
+async function endGame(){
+  if(G.ended)return;G.ended=true;G.over=true;closeSheet();
+  const worth=p=>p.cash+G.board.filter(s=>G.owners[s.i]===G.players.indexOf(p)&&s.t==="prop").reduce((a,s)=>a+s.price,0);
+  const ranked=G.players.slice().sort((a,b)=>worth(b)-worth(a));const win=ranked[0];
+  const brain=G.players.slice().sort((a,b)=>(b.right/(b.asked||1))-(a.right/(a.asked||1))||b.right-a.right)[0];
+  const landlord=G.players.slice().sort((a,b)=>b.rent-a.rent)[0];
+  const date=new Date().toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+  G.players.forEach(p=>{if(!p.pid)return;const s=st(p.pid);s.games++;s.right+=p.right;s.asked+=p.asked;s.banked+=Math.max(0,Math.round(worth(p)/10));
+    if(p===win){s.wins++;s.trophies.push("🏆")}if(p===brain&&p.right)s.trophies.push("🧠");if(p===landlord&&p.rent)s.trophies.push("🏠")});
+  saveAll();sfx.fan();buzz(60);burst(innerWidth/2,innerHeight/3,70);
+  const medals=["🥇","🥈","🥉"];
+  sheet(`<div class="bigmoji">${win.piece}</div><h2>${esc(win.name)} wins!</h2>
+   <div class="card" style="text-align:left">${ranked.map((p,i)=>`<div style="display:flex;justify-content:space-between;padding:4px 0"><span>${medals[i]||"·"} ${p.piece} ${esc(p.name)}</span><b>${worth(p)}</b></div>`).join("")}</div>
+   <div class="card" style="text-align:left">
+     <div>🏆 <b>Winner:</b> ${esc(win.name)}</div>
+     ${brain.right?`<div>🧠 <b>Knows the family best:</b> ${esc(brain.name)} (${brain.right} of ${brain.asked} right)</div>`:""}
+     ${landlord.rent?`<div>🏠 <b>Top landlord:</b> ${esc(landlord.name)} (${landlord.rent} in rent)</div>`:""}
+   </div>
+   ${win.pid?`<button class="btn" id="winPic">📸 ${esc(win.name)}, put your picture on a square!</button>`:""}
+   <button class="btn ${win.pid?"ghost":""}" id="again">Play again</button><button class="btn ghost" id="toHome">Home</button>`);
+  $("#again").onclick=()=>{closeSheet();renderSetup();show("setup")};$("#toHome").onclick=()=>{closeSheet();show("home")};
+  if($("#winPic"))$("#winPic").onclick=()=>winnerPicture(win,date);
+}
+async function winnerPicture(win,date){
+  const props=BASE.map((s,i)=>Object.assign({i},s)).filter(s=>s.t==="prop");
+  const pick=await ask(`<h2>Which square gets your picture?</h2><div class="dim">It stays on the board for every game, with your name on it.</div>`,
+    props.map(s=>[`${s.ic} ${esc(SQPICS[s.i]?SQPICS[s.i].name:s.name)}${SQPICS[s.i]?" (replace)":""}`,s.i]).concat([["Not now",-1]]));
+  if(pick<0)return;
+  const photo=await pickPhoto();if(!photo){toast("No picture picked");return}
+  const nm=await new Promise(res=>{sheet(`<img class="sqphoto" src="${photo}" alt=""><label class="f">Name this square<input id="sqName" maxlength="16" value="${esc(SQPICS[pick]?SQPICS[pick].name:BASE[pick].name)}"></label>
+    <label class="f">A few words about the picture (optional)<input id="sqCap" maxlength="40" placeholder="Summer at the lake, 1998"></label><button class="btn" id="sqSave">Put it on the board</button>`);
+    $("#sqSave").onclick=()=>{const v={name:$("#sqName").value.trim()||BASE[pick].name,caption:$("#sqCap").value.trim()};closeSheet();res(v)}});
+  SQPICS[pick]={photo,name:nm.name,caption:nm.caption,by:win.name,date};
+  if(saveAll()!==false){sfx.fan();toast(`📸 ${esc(nm.name)} is on the board for good!`)}
+  show("home");
+}
+
+/* ================= start ================= */
+if(!window.__TAURI__&&'serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(!PEOPLE.length)setTimeout(()=>sheet(`<div class="bigmoji">🫧</div><h2>Welcome to Family Pop!</h2><div>The board game all about your family. Start by adding yourself. It takes a minute.</div><button class="btn" id="wAdd">Add me</button><button class="btn ghost" id="wLater">Look around first</button>`),300);
+document.addEventListener("click",e=>{if(e.target.id==="wAdd"){personForm(null,()=>{})}if(e.target.id==="wLater")closeSheet()});
+})();
+</script>
+</body>
+</html>

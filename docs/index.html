@@ -234,7 +234,11 @@ audio{width:220px;max-width:100%}
   <button class="big main" id="wStart"><span class="ico">🏡</span><div>Start our family<small>You'll get a link to invite everyone</small></div></button>
   <button class="big" id="wJoin"><span class="ico">✉️</span><div>I got an invite<small>Paste the link or code someone sent you</small></div></button>
   <button class="big" id="wRelink"><span class="ico">📱</span><div>I'm already in, on another phone<small>Use the code from Family → Me</small></div></button>
-  <div class="soon" id="wHomeTip" hidden>📲 <b>Already using Family Pop in Safari?</b><br>Open it in Safari once more, then tap <b>Share → Add to Home Screen</b> again. The new icon will open already signed in. You can delete this icon.</div>
+  <div class="card" id="wHomeTip" hidden style="text-align:center;display:flex;flex-direction:column;gap:10px">
+    <b style="font-size:18px">📲 Already in Family Pop in Safari?</b>
+    <div class="dim small">Open Family Pop in <b>Safari</b> and tap <b>"📲 Put Family Pop on my Home Screen"</b>. Then come back here. It should sign you in by itself. If it doesn't, type the code Safari shows:</div>
+    <input id="wHomeCode" maxlength="8" placeholder="Code" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-size:24px" autocapitalize="characters">
+    <button class="btn" id="wHomeGo">Sign me in</button></div>
 </div></section>
 
 <!-- WAITING FOR APPROVAL -->
@@ -252,6 +256,7 @@ audio{width:220px;max-width:100%}
     <img id="postPrev" class="sqphoto" hidden alt="">
     <div class="row"><button class="btn small ghost" id="postPhoto">📷 Photos</button><span style="flex:1"></span><button class="btn small" id="postGo">Post</button></div>
   </div>
+  <div id="homeScreenBox"></div>
   <div id="alertBox"></div>
   <div id="holidayBox"></div>
   <div id="champBox"></div>
@@ -311,6 +316,7 @@ audio{width:220px;max-width:100%}
   <div class="card"><h3>🍲 Recipe box</h3><button class="btn small" id="fAddRecipe">+ Add a recipe</button><div class="list" id="recipeList" style="margin-top:10px"></div></div>
   <div class="card"><h3>📖 Family Book</h3><div class="dim small" style="margin-bottom:8px">Memories and photos that turn into game questions.</div><button class="btn small" id="fAddMem">+ Add a memory</button><div class="list" id="bookList" style="margin-top:10px"></div></div>
   <div class="card"><h3>Me</h3><div class="list"><button class="li" id="fEditMe"><span class="p" id="mePiece">🫧</span><span class="n" id="meName">Me<small>Edit my piece and trivia answers</small></span>›</button>
+    <button class="li" id="fHomeScreen"><span class="p">📲</span><span class="n">Put Family Pop on my Home Screen<small>Opens like an app, already signed in</small></span>›</button>
     <button class="li" id="fAlerts"><span class="p">🔔</span><span class="n" id="fAlertsTxt">Phone alerts<small>Off</small></span>›</button>
     <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
   <div class="card" id="adminCard"><h3>Family settings</h3><label class="chk"><input type="checkbox" id="setApproval"> <span>New people need a yes first<br><small class="dim">From someone marked as an approver below</small></span></label>
@@ -570,7 +576,7 @@ function renderMemory(){ // "memory of the day": an older family photo comes bac
   if($("#memQ"))$("#memQ").onclick=()=>triviaForm({photoId:pk.id,cat:"Who's in the Picture?"});
 }
 function renderFeed(){
-  if(!S)return;renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();const f=S.feed.slice().reverse();
+  if(!S)return;renderHomeScreenBox();renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();const f=S.feed.slice().reverse();
   $("#feed").innerHTML=f.length?f.map(p=>{if(p.from==="system")return `<div class="post sys">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span>${p.audio?`<audio controls preload="none" src="${photoURL(p.audio)}"></audio>`:""}${p.story?`<div class="text" style="color:var(--ink);font-weight:700">${esc(p.story)}</div>`:""}</div>`;
     const a=mem(p.from)||{name:"Someone",piece:"🫧"};const liked=p.likes.includes(meId());
     return `<div class="post"><div class="who"><span class="pc">${a.piece}</span><span>${esc(a.name)}<br><small>${ago(p.ts)}</small></span></div>
@@ -657,6 +663,7 @@ $("#fInvite").onclick=inviteSheet;
 $("#fMap").onclick=openMap;$("#mapClose").onclick=()=>$("#mapView").classList.remove("on");
 $("#fBook").onclick=openBook;$("#bookClose").onclick=()=>$("#bookView").classList.remove("on");$("#bookPrint").onclick=()=>window.print();
 $("#fAddRecipe").onclick=()=>recipeForm();
+$("#fHomeScreen").onclick=()=>setupHome($("#fHomeScreen"));
 $("#fAlerts").onclick=()=>S.pushOn?disableAlerts($("#fAlerts")):enableAlerts($("#fAlerts"));
 function renderFamily(){
   if(!S)return;const me=S.me;
@@ -1135,6 +1142,21 @@ function renderAlertBox(){const box=$("#alertBox");if(!box)return;const dismisse
   box.innerHTML=!S.pushOn&&(pushReady()||isIOS)&&Date.now()-dismissed>3*864e5?`<div class="soon" style="display:flex;gap:10px;align-items:center;text-align:left"><span style="font-size:28px">🔔</span><span style="flex:1">Get a heads-up when it's your turn, someone messages you, or the daily question is up.</span><button class="btn small" id="alOn">Turn on alerts</button><button class="btn small ghost" id="alNo" aria-label="Not now">✕</button></div>`:"";
   if($("#alOn"))$("#alOn").onclick=()=>enableAlerts($("#alOn"));if($("#alNo"))$("#alNo").onclick=()=>{ls.set("alertDismiss",Date.now());renderAlertBox()}}
 
+/* ================= 📲 Home Screen setup ================= */
+const isPhone=isIOS||/Android/i.test(navigator.userAgent);
+async function setupHome(btn){
+  if(standalone())return toast("You're already in the Home Screen app 👍");
+  await busy(btn,async()=>{const r=await act("pairStart");
+    sheet(`<div class="bigmoji">📲</div><h2>Put Family Pop on your Home Screen</h2>
+      <div style="text-align:left;line-height:1.6">${isIOS?"1. Tap <b>Share</b> (or <b>•••</b> → <b>Share</b>) at the bottom of Safari.<br>2. Tap <b>Add to Home Screen</b>, then <b>Add</b>.":"1. Tap the browser's <b>⋮</b> menu.<br>2. Tap <b>Add to Home screen</b> or <b>Install app</b>."}<br>3. Open <b>Family Pop</b> from your Home Screen. It will sign you in by itself.</div>
+      <div class="dim small">If it asks for a code instead, type this (good for 30 minutes):</div><div class="money" style="letter-spacing:6px">${esc(r.code)}</div>
+      <button class="btn" onclick="document.getElementById('modal').classList.remove('on')">OK</button>`)});
+}
+function renderHomeScreenBox(){const box=$("#homeScreenBox");if(!box)return;
+  box.innerHTML=isPhone&&!standalone()&&!window.__TAURI__&&Date.now()-ls.get("hsDismiss",0)>2*864e5?`<div class="soon" style="display:flex;gap:10px;align-items:center;text-align:left"><span style="font-size:28px">📲</span><span style="flex:1">Put Family Pop on your Home Screen so it opens like an app.</span><button class="btn small" id="hsGo">Show me</button><button class="btn small ghost" id="hsNo" aria-label="Not now">✕</button></div>`:"";
+  if($("#hsGo"))$("#hsGo").onclick=()=>setupHome($("#hsGo"));if($("#hsNo"))$("#hsNo").onclick=()=>{ls.set("hsDismiss",Date.now());renderHomeScreenBox()}}
+async function tryPair(){ // Home Screen app with no sign-in: was this phone just set up from Safari?
+  try{const r=await api("/pair",{});if(r&&r.token){SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);return true}}catch(e){}return false}
 /* ================= 🎙️ recording helper (Ask Grandma) ================= */
 function recordSheet(title){return new Promise(async res=>{
   if(!navigator.mediaDevices||!window.MediaRecorder){toast("This phone can't record here. You can type it instead.");return res(null)}
@@ -1315,7 +1337,11 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)keepHomeLi
   if(!SES&&link){try{const r=await api("/relink",{code:link});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES)}
     catch(e){toast("That sign-in pass was already used. Open Family Pop in Safari and add it to your Home Screen again.")}
     history.replaceState(null,"",location.pathname+location.hash)}
-  if(!SES&&standalone())$("#wHomeTip").hidden=false;
+  if(!SES&&standalone()){if(!(await tryPair())){$("#wHomeTip").hidden=false;
+    const go=()=>busy($("#wHomeGo"),async()=>{const c=$("#wHomeCode").value.trim();if(!c)return toast("Type the code from Safari");
+      const r=await api("/relink",{code:c});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);await refresh();connect();tab("home")});
+    $("#wHomeGo").onclick=go;$("#wHomeCode").onkeydown=e=>{if(e.key==="Enter")go()};
+    document.addEventListener("visibilitychange",async()=>{if(!document.hidden&&!SES&&await tryPair()){await refresh();connect();tab("home")}})}}
   applyTheme();
   if(SES){const c=ls.get("cache",null);if(c&&!c.pending){S=c;renderAll();tab("home")}await refresh();connect();
     const h=location.hash.slice(1);if(["home","chat","play","games","bank","family"].includes(h))tab(h);

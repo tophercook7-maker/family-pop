@@ -64,6 +64,14 @@ export default {
         return stub.fetch(new Request(`https://do/init?fid=${fid}`, { method: "POST", body: JSON.stringify(body) }));
       }
       if (p[1] === "vapid") return json({ publicKey: env.VAPID_PUBLIC || "" });
+      if (p[1] === "pair" && req.method === "POST") {
+        const ip = req.headers.get("CF-Connecting-IP") || "";
+        const dir = env.DIR.get(env.DIR.idFromName("dir"));
+        const r = ip ? await (await dir.fetch(new Request("https://dir/getip", { method: "POST", body: JSON.stringify({ ip }) }))).json() : {};
+        if (!r.fid) return json({ none: true });
+        const stub = env.FAMILY.get(env.FAMILY.idFromName(r.fid));
+        return stub.fetch(new Request(`https://do/relink?fid=${r.fid}`, { method: "POST", body: JSON.stringify(r) }));
+      }
       if (p[1] === "relink" && req.method === "POST") {
         const { code } = await req.json();
         const dir = env.DIR.get(env.DIR.idFromName("dir"));
@@ -91,6 +99,8 @@ export class Directory extends DurableObject {
     const url = new URL(req.url), b = await req.json();
     if (url.pathname === "/put") { const ttl = Math.min(Math.max(+b.ttl || 15 * 60e3, 60e3), 7 * 864e5);
       await this.ctx.storage.put("c:" + b.code, { fid: b.fid, memberId: b.memberId, exp: Date.now() + ttl }); return json({ ok: true }); }
+    if (url.pathname === "/putip") { await this.ctx.storage.put("ip:" + b.ip, { fid: b.fid, memberId: b.memberId, exp: Date.now() + 15 * 60e3 }); return json({ ok: true }); }
+    if (url.pathname === "/getip") { const v = await this.ctx.storage.get("ip:" + b.ip); if (!v || v.exp < Date.now()) return json({}); await this.ctx.storage.delete("ip:" + b.ip); return json(v); }
     if (url.pathname === "/reg") { await this.ctx.storage.put("f:" + b.fid, 1); return json({ ok: true }); }
     if (url.pathname === "/list") { const m = await this.ctx.storage.list({ prefix: "f:" }); return json({ fids: [...m.keys()].map(k => k.slice(2)) }); }
     if (url.pathname === "/get") {
@@ -149,9 +159,13 @@ export class Family extends DurableObject {
     const t = req.headers.get("x-fp-token") || url.searchParams.get("t");
     if (!t) return null;
     const h = await sha(t);
-    return Object.values(this.d.members).find(m => m.tokenHash === h) || null;
+    return Object.values(this.d.members).find(m => m.tokenHash === h || (m.tokenHashes || []).includes(h)) || null;
   }
-  async issueToken(m) { const t = rid(24); m.tokenHash = await sha(t); return t; }
+  async issueToken(m) { // each phone/app keeps its own sign-in; adding a device never signs out the others
+    const t = rid(24), h = await sha(t);
+    m.tokenHashes = [...new Set([...(m.tokenHashes || []), ...(m.tokenHash ? [m.tokenHash] : []), h])].slice(-10);
+    m.tokenHash = h; return t;
+  }
   snapshot(me) {
     const d = this.d;
     if (me.status !== "member") return { meta: { name: d.meta.name }, me: this.publicMember(me, true), pending: true };
@@ -277,6 +291,14 @@ export class Family extends DurableObject {
         if (b.name) d.meta.name = clip(b.name, 40);
         if (b.newCode) d.meta.code = rid(6).toUpperCase();
         await this.save("meta"); this.broadcast("members", null); return json({ ok: true, code: d.meta.code });
+      }
+      case "pairStart": {
+        const dir = this.env.DIR.get(this.env.DIR.idFromName("dir"));
+        const ip = req.headers.get("CF-Connecting-IP") || "";
+        if (ip) await dir.fetch(new Request("https://dir/putip", { method: "POST", body: JSON.stringify({ ip, fid: d.meta.fid, memberId: me.id }) }));
+        const code = rid(6).toUpperCase();
+        await dir.fetch(new Request("https://dir/put", { method: "POST", body: JSON.stringify({ code, fid: d.meta.fid, memberId: me.id, ttl: 30 * 60e3 }) }));
+        return json({ code });
       }
       case "homeLink": { // a one-time pass that rides along when you add Family Pop to your Home Screen
         const code = rid(10).toUpperCase();

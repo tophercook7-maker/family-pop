@@ -276,7 +276,7 @@ audio{width:220px;max-width:100%}
   <div id="pendingBox"></div>
   <button class="btn" id="fInvite">✉️ Invite someone</button>
   <div class="card"><h3>Everyone</h3><div class="list" id="memberList"></div></div>
-  <div class="card"><h3>🌳 Mom's family tree</h3><div class="dim small" style="margin-bottom:8px">Mom's side of the family. Everyone can add who they know, and it all turns into "Way Back When" questions.</div><button class="btn small" id="fAddTree">+ Add someone</button><div class="list" id="treeList" style="margin-top:10px"></div></div>
+  <div class="card"><h3>🌳 Mom's family tree</h3><div class="dim small" style="margin-bottom:8px">Mom's side of the family. Everyone can add who they know, and it all turns into "Way Back When" questions.</div><button class="btn small" id="fAddTree">+ Add someone</button><div id="treeImport" style="margin-top:6px"></div><div class="list" id="treeList" style="margin-top:10px"></div></div>
   <div class="card"><h3>📖 Family Book</h3><div class="dim small" style="margin-bottom:8px">Memories and photos that turn into game questions.</div><button class="btn small" id="fAddMem">+ Add a memory</button><div class="list" id="bookList" style="margin-top:10px"></div></div>
   <div class="card"><h3>Me</h3><div class="list"><button class="li" id="fEditMe"><span class="p" id="mePiece">🫧</span><span class="n" id="meName">Me<small>Edit my piece and trivia answers</small></span>›</button>
     <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
@@ -632,12 +632,45 @@ function renderFamily(){
   renderTree();
   $("#adminCard").style.display=me.approver?"":"none";$("#setApproval").checked=!!S.meta.approval;
 }
-const RELATIONS=["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
+const RELATIONS=["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's ancestor","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
+/* Lucille's family, from Topher's research (Find A Grave + FamilySearch, Aug 2026) — "Days in Grannis" */
+const MOM_RESEARCH=[
+ {name:"Ira William Young Jr.",relation:"Mom's father",born:"1927",died:"1993",place:"Grannis, Arkansas",story:"U.S. Army veteran. Took the family to Arcata, California for timber work, and brought them home to Arkansas for good in 1963. Buried at Overturf Cemetery."},
+ {name:"Bertha Loretta Vaughn",relation:"Mom's mother",born:"1933",died:"2013",place:"Hot Springs, Arkansas",story:"The baby of 13 children. Married Ira Young Jr. in 1948. Later went by Loretta Vaughn Bishop."},
+ {name:"Sharon Ardena Young",relation:"Mom's sister",born:"1949",died:"1956",place:"Arcata, California",story:"Born in Arcata, California. Died when she was just 6."},
+ {name:"Jeanne Lawray Young Fields",relation:"Mom's sister",born:"1957",died:"2024",place:"Arcata, California",story:"Born in Arcata, California. Married Jack Fields."},
+ {name:"Ira William Young Sr.",relation:"Mom's grandfather",born:"1899",died:"1974",place:"Grannis, Arkansas",story:"Lost his mother when he was 3, and was raised by his grandmother Ardena."},
+ {name:"Vera Mae Bagley",relation:"Mom's grandmother",born:"1909",died:"1990",place:"Grannis, Arkansas",story:"Married Ira Young Sr. The family remembered her birth year as 1910, but her stone says 1909."},
+ {name:"Joseph Elmer Vaughn",relation:"Mom's grandfather",born:"1881",died:"1959",place:"Garland County, Arkansas",story:"Grandpa Vaughn. Father of 13 children with Cora, plus 3 with his first wife, Rosie Lee Clemons."},
+ {name:"Cora Ellen Neighbors",relation:"Mom's grandmother",born:"1898",died:"1976",place:"Hot Springs, Arkansas",story:"Grandma Vaughn. Raised 13 children in Hot Springs."},
+ {name:"Harry Young",relation:"Mom's great-grandparent",story:"A stranger in town. He married Rowena Duggan, then up and left the family one day."},
+ {name:"Rowena Duggan",relation:"Mom's great-grandparent",born:"1879",died:"1902",place:"Polk County, Arkansas",story:"Died at about 22, leaving two little ones, Ira Sr. and Lillian, for her mother Ardena to raise."},
+ {name:"David Alexander Bagley",relation:"Mom's great-grandparent",born:"1868",died:"1951",place:"Grannis, Arkansas",story:"Vera Mae Bagley's father. Buried at Overturf Cemetery."},
+ {name:"Ella Jane Sims",relation:"Mom's great-grandparent",born:"1886",died:"1922",place:"Greenville, Texas",story:"Called Jennie. Born in Greenville, Texas, and died in Grannis at 36."},
+ {name:"James Melton Vaughn",relation:"Mom's great-grandparent",born:"1844",died:"1900",story:"Grandpa Vaughn's father."},
+ {name:"Ruth Caroline Dodd",relation:"Mom's great-grandparent",story:"Grandpa Vaughn's mother."},
+ {name:"Archie Miller Neighbors",relation:"Mom's great-grandparent",born:"1867",died:"1923",place:"Garland County, Arkansas",story:"Grandma Vaughn's father."},
+ {name:"Rose Etta Harris",relation:"Mom's great-grandparent",born:"1869",died:"1949",story:"Called Rosetta. Grandma Vaughn's mother."},
+ {name:"Michael Charles Duggan",relation:"Mom's ancestor",born:"1822",died:"1902",place:"Maynooth, County Kildare, Ireland",story:"An Irish immigrant and Union Civil War soldier in the 3rd Illinois Cavalry, who settled in the Arkansas pines. The deepest root of the family."},
+ {name:"Ardena Frances Hays",relation:"Mom's ancestor",born:"1852",died:"1927",place:"Arkansas",story:"Outlived her daughter Rowena and raised her grandchildren, Ira Sr. and Lillian. The family name Ardena comes from her."},
+ {name:"Leven Savage Neighbors",relation:"Mom's ancestor",born:"1829",died:"1898",place:"Kentucky",story:"Born in Kentucky and died in Hot Springs."},
+ {name:"Elizabeth Jane Baxter",relation:"Mom's ancestor",born:"1840",died:"1925",story:"Married Leven Neighbors."},
+ {name:"James Neighbors",relation:"Mom's ancestor",born:"1801",died:"1851",story:"The Neighbors family's oldest known father, out of Kentucky."},
+ {name:"Mary Savage",relation:"Mom's ancestor",born:"1800",died:"1850",story:"James Neighbors' wife. Her family name became Leven Savage Neighbors' middle name."},
+ {name:"Martin Hays",relation:"Mom's ancestor",story:"Ardena Hays' father."},
+ {name:"Lillian Frances Young Gaines",relation:"Other family",born:"1900",died:"1984",place:"Hot Springs, Arkansas",story:"Aunt Lillian. Ira Sr.'s sister, raised by their grandmother Ardena. Married Victor Gaines."},
+ {name:"Linda Lucille Vaughn Clinton",relation:"Mom's aunt",born:"1921",died:"2004",story:"Bertha's sister. Mom was likely named after her."},
+ {name:"Carl Ray Vaughn",relation:"Mom's uncle",born:"1923",died:"2010",place:"Hot Springs, Arkansas",story:"Set breakers at the Reynolds Aluminum plant for 31 years."},
+ {name:"Johnnie Edward Vaughn",relation:"Mom's uncle",born:"1917",died:"2009",place:"Bonnerdale, Arkansas",story:"Lived to 91. The fourth of the 13 Vaughn children."}];
 function renderTree(){
   const t=(S.tree||[]).slice();const ord=r=>RELATIONS.indexOf(r);t.sort((a,b)=>ord(a.relation)-ord(b.relation));
   $("#treeList").innerHTML=t.length?t.map(e=>{const by=mem(e.by);return `<div class="li">${e.photo?`<img src="${photoURL(e.photo)}" alt="">`:'<span class="p">🌳</span>'}<span class="n">${esc(e.name)}<small>${esc(e.relation)}${e.born?" · born "+esc(e.born):""}${e.place?" · "+esc(e.place):""}${e.died?" · died "+esc(e.died):""}${e.story?'<br>"'+esc(e.story)+'"':""}${by?"<br>added by "+esc(by.name):""}</small></span>${(e.by===meId()||S.me.approver||S.me.mom)?`<button class="btn small ghost" data-td="${e.id}">✕</button>`:""}</div>`}).join("")
     :`<div class="dim small">Nobody yet. ${S.members.some(m=>m.mom)?"Mom":"Start with Mom's parents and grandparents"}: add their names, where they were born, and a story about them.</div>`;
   $$("[data-td]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("treeDel",{id:b.dataset.td});refresh()}));
+  const have=new Set(t.map(x=>x.name.toLowerCase())),missing=MOM_RESEARCH.filter(x=>!have.has(x.name.toLowerCase())).length;
+  $("#treeImport").innerHTML=(missing>5&&(S.me.approver||S.me.mom)?`<button class="btn small" id="trImp">🌳 Add our family research (${missing} people)</button>`:"")+
+    `<a class="btn small ghost" style="text-decoration:none;display:inline-block;margin-top:6px" href="https://tophercook7-maker.github.io/young-family/" target="_blank" rel="noopener">📖 Read "Days in Grannis"</a>`;
+  if($("#trImp"))$("#trImp").onclick=()=>busy($("#trImp"),async()=>{const r=await act("treeImport",{people:MOM_RESEARCH});sfx.fan();burst(innerWidth/2,innerHeight/2,50);toast(`🌳 ${r.added} family members added. They're game questions now!`);refresh()});
 }
 $("#fAddTree").onclick=()=>{let photo=null;
   sheet(`<h2>🌳 Add to Mom's family tree</h2>
@@ -738,10 +771,12 @@ function famQuestions(){
   (S.trivia||[]).forEach(t=>{const m=mem(t.about);if(m&&m.status==="member")qs.push({cat:t.cat,about:t.about,q:t.q,a:m.name,pool:names})});
   const tree=S.tree||[],tnames=tree.map(t=>t.name),momM=ppl.find(m=>m.mom),momName=momM?momM.name:"Mom";
   tree.forEach(t=>{
-    if(t.relation!=="Other family"&&tnames.length>1)qs.push({cat:"Way Back When",q:`Who was ${t.relation.replace("Mom's",momName+"'s")}?`,a:t.name,pool:tnames,photo:t.photo});
+    if(!["Other family","Mom's ancestor"].includes(t.relation)){const same=new Set(tree.filter(x=>x.relation===t.relation).map(x=>x.name));const pool=tnames.filter(n=>!same.has(n));
+      if(pool.length&&!(same.size>1&&!t.born))qs.push({cat:"Way Back When",q:`Who was ${t.relation.replace("Mom's",momName+"'s")}${same.size>1&&t.born?", born "+t.born:""}?`,a:t.name,pool,photo:t.photo})}
     if(t.place)qs.push({cat:"Way Back When",q:`Where was ${t.name} born or raised?`,a:t.place,pool:tree.map(x=>x.place).filter(Boolean).concat(["Hot Springs","Little Rock","Malvern","Arkadelphia","Mena","Texarkana","Hope","Benton"])});
     if(t.story&&tnames.length>1)qs.push({cat:"Way Back When",q:`Which family member is this story about? "${t.story}"`,a:t.name,pool:tnames});
     if(t.born&&/\d{4}/.test(t.born)){const y=+t.born.match(/\d{4}/)[0];qs.push({cat:"Then & Now",q:`About what year was ${t.name} born?`,a:String(y),pool:[y-10,y+10,y-20,y+20,y+5].map(String)})}
+    if(t.relation==="Mom's ancestor"&&t.place&&t.born)qs.push({cat:"Way Back When",q:`Which family ancestor was born in ${t.place} in ${t.born}?`,a:t.name,pool:tnames});
     if(t.photo&&tnames.length>1)qs.push({cat:"Who's in the Picture?",q:"Who's in this old family picture?",a:t.name,pool:tnames,photo:t.photo});
   });
   S.book.forEach(e=>qs.push({cat:e.cat,q:e.q,a:e.a,photo:e.photo,pool:e.wrong.length?e.wrong:(names.includes(e.a)?names:null)}));
@@ -757,7 +792,8 @@ function makeQuestion(p,size){
   const bdays=(S.today&&S.today.birthdays||[]).filter(id=>id!==p.memberId);
   const bpool=pool.filter(q=>bdays.includes(q.about));
   const q=bpool.length&&Math.random()<.45?rnd(bpool):rnd(pool);QUSED.add(q.q);const n=size===2?2:size===4?3:4;
-  let wrong=shuffle([...new Set((q.pool||[]).filter(x=>x&&x.toLowerCase()!==q.a.toLowerCase()))]);
+  const key=x=>String(x).toLowerCase().split(",")[0].trim(),seen=new Set([key(q.a)]);   // "Hot Springs" and "Hot Springs, Arkansas" count as the same
+  let wrong=shuffle((q.pool||[]).filter(x=>{if(!x)return false;const k=key(x);if(seen.has(k))return false;seen.add(k);return true}));
   const isName=S.members.some(m=>m.name===q.a);
   if(wrong.length<n-1&&!isName){const extra=q.pool===MONTHS?MONTHS:FOODS;wrong=wrong.concat(shuffle(extra.filter(x=>x!==q.a&&!wrong.includes(x))))}
   return {cat:q.cat,q:q.q,a:q.a,photo:q.photo,bday:bdays.includes(q.about),opts:shuffle([q.a].concat(wrong.slice(0,n-1)))};

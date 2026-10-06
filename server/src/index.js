@@ -32,7 +32,7 @@ function centralToday(offsetDays = 0) {
 }
 const BDAY_BUCKS = 250;
 const PROFILE_FIELDS = ["name", "piece", "birthday", "nick", "food", "secret", "chatTrivia", "mom", "fb"];
-const RELATIONS = ["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
+const RELATIONS = ["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's ancestor","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
 
 export default {
   async fetch(req, env) {
@@ -392,6 +392,17 @@ export class Family extends DurableObject {
         this.post(`🌳 ${me.piece} ${me.name} added ${name} (${e.relation}) to the family tree`);
         await this.save("tree", "feed"); this.broadcast("tree", null); this.broadcast("feed", null); return json({ ok: true });
       }
+      case "treeImport": { // load the family's researched tree in one go
+        if (!isApprover && !me.mom) return fail("Only Mom or an approver can load the family research", 403);
+        const have = new Set(d.tree.map(t => t.name.toLowerCase())); let n = 0;
+        for (const x of (b.people || []).slice(0, 80)) {
+          const name = clip(x.name, 60).trim(); if (!name || have.has(name.toLowerCase())) continue;
+          d.tree.push({ id: rid(8), name, relation: RELATIONS.includes(x.relation) ? x.relation : "Other family", born: clip(x.born, 40), died: clip(x.died, 40),
+            place: clip(x.place, 60), story: clip(x.story, 300), photo: null, by: me.id, ts: Date.now() }); have.add(name.toLowerCase()); n++;
+        }
+        if (n) this.post(`🌳 ${me.piece} ${me.name} added ${n} people from the family research to Mom's family tree: the Youngs, Vaughns, Bagleys, Duggans and Neighbors, all the way back to Ireland!`);
+        await this.save("tree", "feed"); this.broadcast("tree", null); this.broadcast("feed", null); return json({ ok: true, added: n });
+      }
       case "treeDel": {
         const e = d.tree.find(x => x.id === b.id); if (!e) return json({ ok: true });
         if (e.by !== me.id && !isApprover && !me.mom) return fail("Only the person who added it, Mom, or an approver can remove it", 403);
@@ -459,7 +470,8 @@ function makeDaily(d, date) {
   const r = seeded(date + (d.meta.fid || "")); const pick = a => a[Math.floor(r() * a.length)];
   const mix = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const ms = Object.values(d.members).filter(m => m.status === "member"), names = ms.map(m => m.name), qs = [];
-  const opts = (a, pool) => mix([a].concat(mix([...new Set(pool.filter(x => x && x.toLowerCase() !== a.toLowerCase()))]).slice(0, 3)));
+  const key = x => String(x).toLowerCase().split(",")[0].trim();
+  const opts = (a, pool) => { const seen = new Set([key(a)]); return mix([a].concat(mix(pool.filter(x => { if (!x) return false; const k = key(x); if (seen.has(k)) return false; seen.add(k); return true; })).slice(0, 3))); };
   for (const m of ms) {
     if (m.food) qs.push({ cat: "Favorites", about: m.id, q: `What's ${m.name}'s favorite food?`, a: m.food, opts: opts(m.food, ms.map(x => x.food).concat(FOODS)) });
     if (m.nick && names.length > 1) qs.push({ cat: "Way Back When", about: m.id, q: `Who goes by "${m.nick}"?`, a: m.name, opts: opts(m.name, names) });
@@ -467,7 +479,8 @@ function makeDaily(d, date) {
   }
   const tn = d.tree.map(t => t.name), mom = ms.find(m => m.mom);
   for (const t of d.tree) {
-    if (t.relation !== "Other family" && tn.length > 1) qs.push({ cat: "Way Back When", q: `Who was ${t.relation.replace("Mom's", mom ? mom.name + "'s" : "Mom's")}?`, a: t.name, opts: opts(t.name, tn) });
+    if (!["Other family", "Mom's ancestor"].includes(t.relation)) { const same = new Set(d.tree.filter(x => x.relation === t.relation).map(x => x.name));
+      if (tn.length - same.size >= 1 && !(same.size > 1 && !t.born)) qs.push({ cat: "Way Back When", q: `Who was ${t.relation.replace("Mom's", mom ? mom.name + "'s" : "Mom's")}${same.size > 1 && t.born ? ", born " + t.born : ""}?`, a: t.name, opts: opts(t.name, tn.filter(n => !same.has(n))) }); }
     if (t.place) qs.push({ cat: "Way Back When", q: `Where was ${t.name} born?`, a: t.place, opts: opts(t.place, d.tree.map(x => x.place).concat(TOWNS)) });
   }
   for (const e of d.book) if (!e.photo) qs.push({ cat: e.cat, q: e.q, a: e.a, opts: opts(e.a, (e.wrong || []).concat(names)) });

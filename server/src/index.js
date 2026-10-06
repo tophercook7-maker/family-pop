@@ -1,6 +1,7 @@
 // Family Pop server — one private "Family" per family (a Durable Object), so each family's
 // people, chat, feed, bank, Family Book and board games live together and update live.
 import { DurableObject } from "cloudflare:workers";
+import { sendPush } from "./push.js";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -31,10 +32,25 @@ function centralToday(offsetDays = 0) {
   return [+p.month, +p.day, +p.year];
 }
 const BDAY_BUCKS = 250;
+const GRANDMA_PROMPTS = [
+  "What was your house like when you were little?", "How did you and Dad meet?", "What's your favorite memory of your mama?",
+  "What did you do for fun when you were a kid?", "What was school like for you?", "What was your very first job?",
+  "What's the best meal you ever cooked?", "What do you remember about living in California?", "What was Christmas like when you were a girl?",
+  "Who was your best friend growing up, and what did you two do?", "What's something your daddy always said?", "What are you proudest of?",
+  "What was the hardest time in your life, and how did you get through it?", "What do you remember about the day each of your kids was born?",
+  "What song takes you right back to being young?", "What's a family recipe you learned, and who taught you?", "What advice would you give your grandkids?",
+  "What was the funniest thing that ever happened in our family?", "What do you remember about your grandparents?", "Where's the most beautiful place you've ever been?",
+  "What did a Saturday look like when you were 10?", "What was your first car?", "What's a prayer that was answered in your life?",
+  "What do you want the family to always remember?"];
 const PROFILE_FIELDS = ["name", "piece", "birthday", "nick", "food", "secret", "chatTrivia", "mom", "fb"];
 const RELATIONS = ["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's ancestor","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
 
 export default {
+  async scheduled(event, env, ctx) { // every morning: daily question, birthdays, Ask Grandma, Sunday dinner reminders
+    const dir = env.DIR.get(env.DIR.idFromName("dir"));
+    const { fids } = await (await dir.fetch(new Request("https://dir/list", { method: "POST", body: "{}" }))).json();
+    for (const fid of fids || []) ctx.waitUntil(env.FAMILY.get(env.FAMILY.idFromName(fid)).fetch(new Request(`https://do/tick?fid=${fid}`, { method: "POST", body: "{}" })).catch(() => {}));
+  },
   async fetch(req, env) {
     if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
     const url = new URL(req.url);
@@ -47,6 +63,7 @@ export default {
         const body = await req.json();
         return stub.fetch(new Request(`https://do/init?fid=${fid}`, { method: "POST", body: JSON.stringify(body) }));
       }
+      if (p[1] === "vapid") return json({ publicKey: env.VAPID_PUBLIC || "" });
       if (p[1] === "relink" && req.method === "POST") {
         const { code } = await req.json();
         const dir = env.DIR.get(env.DIR.idFromName("dir"));
@@ -59,6 +76,7 @@ export default {
         const fid = clip(p[2], 20);
         const stub = env.FAMILY.get(env.FAMILY.idFromName(fid));
         const rest = "/" + p.slice(3).join("/");
+        if (rest === "/tick" || rest === "/init" || rest === "/relink") return fail("Not found", 404); // internal only
         const u = new URL(`https://do${rest}`);
         u.search = url.search; u.searchParams.set("fid", fid);
         return stub.fetch(new Request(u, req));
@@ -72,6 +90,8 @@ export class Directory extends DurableObject {
   async fetch(req) {
     const url = new URL(req.url), b = await req.json();
     if (url.pathname === "/put") { await this.ctx.storage.put("c:" + b.code, { fid: b.fid, memberId: b.memberId, exp: Date.now() + 15 * 60e3 }); return json({ ok: true }); }
+    if (url.pathname === "/reg") { await this.ctx.storage.put("f:" + b.fid, 1); return json({ ok: true }); }
+    if (url.pathname === "/list") { const m = await this.ctx.storage.list({ prefix: "f:" }); return json({ fids: [...m.keys()].map(k => k.slice(2)) }); }
     if (url.pathname === "/get") {
       const v = await this.ctx.storage.get("c:" + b.code);
       if (!v || v.exp < Date.now()) return json({});
@@ -87,11 +107,11 @@ export class Family extends DurableObject {
 
   async load() {
     if (this.d) return this.d;
-    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily"];
+    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily", "stories", "recipes", "dinner", "prayers", "polls"];
     const got = await this.ctx.storage.get(keys);
     this.d = {
       meta: got.get("meta") || null, members: got.get("members") || {}, chat: got.get("chat") || [], feed: got.get("feed") || [],
-      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null,
+      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [],
     };
     return this.d;
   }
@@ -148,6 +168,8 @@ export class Family extends DurableObject {
       daily: d.daily && { date: d.daily.date, q: d.daily.q, cat: d.daily.cat, opts: d.daily.opts, about: d.daily.about, answers: d.daily.answers, first: d.daily.first,
         a: d.daily.answers[me.id] ? d.daily.a : undefined },
       champion: d.meta.champion || null, month: d.meta.monthKey,
+      grandma: this.grandmaNow(), stories: d.stories.list.slice(-60), recipes: d.recipes, dinner: this.dinnerNow(),
+      prayers: d.prayers.slice(-40), polls: d.polls.slice(-12).map(pl => this.pollView(pl, me)), pushOn: (me.push || []).length > 0,
       games: Object.values(d.games).map(g => ({ id: g.id, title: g.title, status: g.status, updated: g.updated, players: g.players, turnMember: g.turnMember, created: g.created })),
     };
   }
@@ -164,9 +186,12 @@ export class Family extends DurableObject {
       const m = this.newMember(b.me || {}, "member"); m.creator = true; m.approver = true;
       const token = await this.issueToken(m); d.members[m.id] = m;
       await this.save("meta", "members");
+      const dir = this.env.DIR.get(this.env.DIR.idFromName("dir")); await dir.fetch(new Request("https://dir/reg", { method: "POST", body: JSON.stringify({ fid: d.meta.fid }) }));
       return json({ fid: d.meta.fid, memberId: m.id, token, code: d.meta.code });
     }
     if (!d.meta) return fail("We couldn't find that family. Check the link.", 404);
+    if (!this.registered) { this.registered = true; const dir = this.env.DIR.get(this.env.DIR.idFromName("dir")); this.ctx.waitUntil(dir.fetch(new Request("https://dir/reg", { method: "POST", body: JSON.stringify({ fid: d.meta.fid }) })).catch(() => { this.registered = false; })); }
+    if (path === "/tick") { await this.tick(); return json({ ok: true }); }
 
     if (path === "/relink" && req.method === "POST") {
       const b = await req.json(); const m = d.members[b.memberId];
@@ -181,7 +206,8 @@ export class Family extends DurableObject {
       if (clip(b.code, 12).toUpperCase() !== d.meta.code) return fail("That invite code doesn't match. Ask for a new link.", 403);
       const m = this.newMember(b.me || {}, d.meta.approval ? "pending" : "member");
       const token = await this.issueToken(m); d.members[m.id] = m; await this.save("members");
-      if (m.status === "pending") this.broadcast("pending", { name: m.name, piece: m.piece }, Object.values(d.members).filter(x => x.approver).map(x => x.id));
+      if (m.status === "pending") { const ap = Object.values(d.members).filter(x => x.approver).map(x => x.id); this.broadcast("pending", { name: m.name, piece: m.piece }, ap);
+        this.notify(ap, null, { title: "💐 Someone wants to join", body: `${m.piece} ${m.name} is waiting for a yes`, tag: "pending", url: "./#family" }); }
       else this.broadcast("members", null);
       return json({ fid: d.meta.fid, memberId: m.id, token, status: m.status });
     }
@@ -270,6 +296,7 @@ export class Family extends DurableObject {
         }
         await this.save("chat", "trivia");
         this.broadcast("chat", msg, room === "all" ? null : room.split("~"));
+        this.notify(room === "all" ? null : room.split("~"), me.id, { title: `💬 ${me.piece} ${me.name}${room === "all" ? " · Family chat" : ""}`, body: text || (audio ? "🎤 Voice message" : "📷 Photo"), tag: "chat-" + room, url: "./#chat" });
         return json({ ok: true, msg });
       }
       case "makeTrivia": { // turn a message or post into a question by hand
@@ -289,7 +316,9 @@ export class Family extends DurableObject {
         if (!text && !photo && !photos.length) return fail("Write something or add a photo");
         const p = { id: rid(10), from: me.id, text, photo: photo || photos[0] || null, photos: photos.length > 1 ? photos : undefined, ts: Date.now(), likes: [], comments: [] };
         d.feed.push(p); if (d.feed.length > 400) d.feed.splice(0, d.feed.length - 400);
-        await this.save("feed"); this.broadcast("feed", p); return json({ ok: true, post: p });
+        await this.save("feed"); this.broadcast("feed", p);
+        this.notify(null, me.id, { title: `📸 ${me.piece} ${me.name} shared something`, body: text || "New pictures", tag: "feed", url: "./#home" });
+        return json({ ok: true, post: p });
       }
       case "like": {
         const p = d.feed.find(x => x.id === b.postId); if (!p) return fail("Post not found", 404);
@@ -310,6 +339,7 @@ export class Family extends DurableObject {
         const what = [bucks && `${bucks} Pop Bucks`, passes && `${passes} Free Pass${passes > 1 ? "es" : ""}`].filter(Boolean).join(" and ");
         const note = clip(b.note, 140);
         this.post(`🎁 ${me.piece} ${me.name} gave ${to.piece} ${to.name} ${what}${note ? `: "${note}"` : "!"}`);
+        this.notify([to.id], null, { title: `🎁 ${me.name} sent you a gift!`, body: what + (note ? ` · "${note}"` : ""), tag: "gift", url: "./#bank" });
         await this.save("members", "feed"); this.broadcast("members", null); this.broadcast("feed", null); return json({ ok: true });
       }
       case "earn": {
@@ -348,7 +378,9 @@ export class Family extends DurableObject {
           players: (b.players || []).slice(0, 8), state: b.state, turnMember: b.turnMember || null, rev: 1 };
         d.games[id] = g; this.prune(); await this.save("games");
         this.post(`🎲 ${me.piece} ${me.name} started a Family Pop game with ${g.players.map(p => p.name).join(", ")}`);
-        await this.save("feed"); this.broadcast("games", { id }); this.broadcast("feed", null); return json({ ok: true, id });
+        await this.save("feed"); this.broadcast("games", { id }); this.broadcast("feed", null);
+        this.notify(g.players.map(p => p.memberId).filter(Boolean), me.id, { title: "🎲 New Family Pop game!", body: `${me.name} started a game with you`, tag: "game-" + id, url: "./#play" });
+        return json({ ok: true, id });
       }
       case "gameUpdate": {
         const g = d.games[b.id]; if (!g) return fail("That game is gone", 404);
@@ -357,6 +389,7 @@ export class Family extends DurableObject {
         g.state = b.state; g.turnMember = b.turnMember || null; g.updated = Date.now(); g.rev++;
         if (b.over) g.status = "done";
         await this.save("games"); this.broadcast("game", { id: g.id, rev: g.rev, turnMember: g.turnMember, event: clip(b.event, 200) });
+        if (g.turnMember && g.turnMember !== me.id && !b.over) this.notify([g.turnMember], null, { title: "🔔 Your turn in Family Pop!", body: clip(b.event, 120) || "It's your move", tag: "game-" + g.id, url: "./#play" });
         return json({ ok: true, rev: g.rev });
       }
       case "gameEnd": { // award results once per game (or once per pass-the-phone game id)
@@ -418,6 +451,94 @@ export class Family extends DurableObject {
         await this.save("daily", "members"); this.broadcast("daily", null); this.broadcast("members", null);
         return json({ ok: true, right: ok, a: q.a, paid, first: q.first === me.id });
       }
+      case "pushSub": {
+        const sub = b.sub; if (!sub || !sub.endpoint || !sub.keys || !sub.keys.p256dh || !sub.keys.auth) return fail("Bad subscription");
+        if (!/^https:\/\//.test(sub.endpoint)) return fail("Bad subscription");
+        me.push = (me.push || []).filter(x => x.endpoint !== sub.endpoint).concat({ endpoint: clip(sub.endpoint, 600), keys: { p256dh: clip(sub.keys.p256dh, 200), auth: clip(sub.keys.auth, 60) } }).slice(-5);
+        await this.save("members");
+        this.ctx.waitUntil(this.pushTo(me, { title: "🔔 Alerts are on!", body: "Family Pop will let you know when it's your turn, and more.", tag: "hello", url: "./" }));
+        return json({ ok: true });
+      }
+      case "pushOff": { me.push = []; await this.save("members"); return json({ ok: true }); }
+      case "storyAnswer": { // Ask Grandma: Mom answers this week's question by voice or typing
+        if (!me.mom) return fail("Ask Grandma questions are for Mom to answer");
+        const g = this.grandmaNow(); if (!g) return fail("No question this week");
+        const text = clip(b.text, 3000).trim(), audio = await this.putPhoto(b.audio, "audio"); if (!text && !audio) return fail("Say or type an answer");
+        d.stories.list.push({ id: rid(8), week: g.week, prompt: g.prompt, by: me.id, text, audio, ts: Date.now() });
+        d.stories.queue = d.stories.queue.filter(x => x.q !== g.prompt);
+        d.feed.push({ id: rid(10), from: "system", kind: "story", text: `🎙️ ${me.piece} ${me.name} answered this week's Ask Grandma: "${g.prompt}"`, audio, story: text, ts: Date.now(), likes: [], comments: [] });
+        await this.save("stories", "feed"); this.broadcast("feed", null); this.broadcast("stories", null);
+        this.notify(null, me.id, { title: `🎙️ ${me.name} told a story`, body: g.prompt, tag: "story", url: "./#home" });
+        return json({ ok: true });
+      }
+      case "storySuggest": {
+        const q = clip(b.q, 200).trim(); if (q.length < 8) return fail("Type a question for Mom");
+        d.stories.queue.push({ q, by: me.id, ts: Date.now() }); if (d.stories.queue.length > 30) d.stories.queue.shift();
+        await this.save("stories"); this.broadcast("stories", null); return json({ ok: true });
+      }
+      case "recipeAdd": {
+        const title = clip(b.title, 80).trim(); if (!title) return fail("Name the dish");
+        const r = { id: rid(8), title, whose: clip(b.whose, 60).trim() || me.name, ingredients: clip(b.ingredients, 2000), steps: clip(b.steps, 4000), photo: await this.putPhoto(b.photo), by: me.id, ts: Date.now() };
+        d.recipes.push(r); this.post(`🍲 ${me.piece} ${me.name} added ${r.whose}'s ${title} to the family recipe box`);
+        await this.save("recipes", "feed"); this.broadcast("recipes", null); this.broadcast("feed", null); return json({ ok: true });
+      }
+      case "recipeDel": {
+        const r = d.recipes.find(x => x.id === b.id); if (r && (r.by === me.id || isApprover || me.mom)) { d.recipes = d.recipes.filter(x => x.id !== b.id); await this.save("recipes"); this.broadcast("recipes", null); }
+        return json({ ok: true });
+      }
+      case "dinner": { // Sunday dinner: who's hosting, what everyone's bringing
+        const dn = this.dinnerNow(true);
+        if (b.host !== undefined) { if (!isApprover && !me.mom) return fail("Mom or an approver sets the host"); dn.host = clip(b.host, 60); }
+        if (b.item !== undefined) { const it = clip(b.item, 80).trim(); if (it) dn.items[me.id] = it; else delete dn.items[me.id]; }
+        if (b.coming !== undefined) dn.coming[me.id] = !!b.coming;
+        await this.save("dinner"); this.broadcast("dinner", null); return json({ ok: true });
+      }
+      case "prayerAdd": {
+        const text = clip(b.text, 600).trim(); if (!text) return fail("Type your prayer request");
+        d.prayers.push({ id: rid(8), from: me.id, text, ts: Date.now(), praying: [], answered: false });
+        if (d.prayers.length > 200) d.prayers.shift();
+        await this.save("prayers"); this.broadcast("prayers", null);
+        this.notify(null, me.id, { title: `🙏 ${me.name} asked for prayer`, body: text.slice(0, 120), tag: "prayer", url: "./#home" });
+        return json({ ok: true });
+      }
+      case "pray": {
+        const pr = d.prayers.find(x => x.id === b.id); if (!pr) return fail("Not found", 404);
+        if (!pr.praying.includes(me.id)) { pr.praying.push(me.id); if (pr.from !== me.id) this.notify([pr.from], null, { title: `🙏 ${me.name} is praying for you`, body: pr.text.slice(0, 100), tag: "pray-" + pr.id, url: "./#home" }); }
+        await this.save("prayers"); this.broadcast("prayers", null); return json({ ok: true });
+      }
+      case "prayerAnswered": {
+        const pr = d.prayers.find(x => x.id === b.id); if (!pr || pr.from !== me.id) return fail("Only the person who asked can mark it answered", 403);
+        pr.answered = true; pr.answeredTs = Date.now(); this.post(`🙌 ${me.piece} ${me.name}'s prayer was answered: "${pr.text.slice(0, 120)}"`);
+        await this.save("prayers", "feed"); this.broadcast("prayers", null); this.broadcast("feed", null); return json({ ok: true });
+      }
+      case "pollAdd": {
+        const q = clip(b.q, 140).trim(); if (q.length < 6) return fail("Type the question");
+        const pl = { id: rid(8), q, by: me.id, ts: Date.now(), answers: {}, status: "collecting", top: null };
+        d.polls.push(pl); if (d.polls.length > 40) d.polls.shift();
+        await this.save("polls"); this.broadcast("polls", null);
+        this.notify(null, me.id, { title: "📊 New Family Feud question!", body: q, tag: "poll-" + pl.id, url: "./#play" });
+        return json({ ok: true });
+      }
+      case "pollAnswer": {
+        const pl = d.polls.find(x => x.id === b.id); if (!pl || pl.status !== "collecting") return fail("That one's closed");
+        const t = clip(b.text, 60).trim(); if (!t) return fail("Type an answer");
+        pl.answers[me.id] = t; const n = Object.keys(pl.answers).length, total = Object.values(d.members).filter(m => m.status === "member").length;
+        if (n >= total && n >= 3) this.closePoll(pl);
+        await this.save("polls", "feed"); this.broadcast("polls", null); return json({ ok: true });
+      }
+      case "pollClose": {
+        const pl = d.polls.find(x => x.id === b.id); if (!pl) return fail("Not found", 404);
+        if (pl.by !== me.id && !isApprover) return fail("Only the person who asked can close it", 403);
+        if (Object.keys(pl.answers).length < 2) return fail("Wait for at least 2 answers");
+        this.closePoll(pl); await this.save("polls", "feed"); this.broadcast("polls", null); this.broadcast("feed", null); return json({ ok: true });
+      }
+      case "pollPlayed": { // you played the board: earn a little
+        const pl = d.polls.find(x => x.id === b.id); if (!pl || pl.status !== "ready") return fail("Not ready");
+        pl.played = pl.played || {}; if (pl.played[me.id] != null) return json({ ok: true, already: true });
+        const score = Math.max(0, Math.min(100, Math.floor(+b.score || 0))); pl.played[me.id] = score;
+        me.bucks += score; me.mpts = (me.mpts || 0) + Math.round(score / 10);
+        await this.save("polls", "members"); this.broadcast("members", null); return json({ ok: true, earned: score });
+      }
       default: return fail("Unknown action");
     }
   }
@@ -453,6 +574,63 @@ export class Family extends DurableObject {
     if (this.d.daily && this.d.daily.date === date) return;
     const q = makeDaily(this.d, date); this.d.daily = q ? Object.assign(q, { date, answers: {}, first: null }) : { date, q: null, answers: {} };
     await this.save("daily");
+  }
+  closePoll(pl) {
+    const norm = t => t.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\b(a|an|the|my|her|his)\b/g, "").replace(/\s+/g, " ").trim();
+    const groups = {};
+    for (const t of Object.values(pl.answers)) { const k = norm(t); if (!k) continue; (groups[k] = groups[k] || { text: t, count: 0 }).count++; }
+    pl.top = Object.values(groups).sort((a, b) => b.count - a.count).slice(0, 6); pl.status = "ready";
+    this.post(`📊 Family Feud board is ready: "${pl.q}". Can you guess the top answers?`);
+    this.notify(null, null, { title: "📊 The Family Feud board is ready!", body: pl.q, tag: "poll-" + pl.id, url: "./#play" });
+  }
+  pollView(pl, me) {
+    return { id: pl.id, q: pl.q, by: pl.by, ts: pl.ts, status: pl.status, count: Object.keys(pl.answers).length, mine: pl.answers[me.id] || "",
+      top: pl.status === "ready" ? pl.top : null, played: pl.played ? pl.played[me.id] : undefined };
+  }
+  weekKey() { const [mo, da, yr] = centralToday(); const d = Date.UTC(yr, mo - 1, da); const monday = d - ((new Date(d).getUTCDay() + 6) % 7) * 864e5; return new Date(monday).toISOString().slice(0, 10); }
+  grandmaNow() {
+    const mom = Object.values(this.d.members).find(m => m.mom && m.status === "member"); if (!mom) return null;
+    const week = this.weekKey(), st = this.d.stories;
+    if (!st.current || st.current.week !== week) {
+      const used = new Set(st.list.map(x => x.prompt));
+      const next = (st.queue.find(x => !used.has(x.q)) || {}).q || GRANDMA_PROMPTS.find(p => !used.has(p)) || GRANDMA_PROMPTS[Math.floor(Date.now() / 6048e5) % GRANDMA_PROMPTS.length];
+      st.current = { week, prompt: next }; this.ctx.waitUntil(this.save("stories"));
+    }
+    const answered = st.list.find(x => x.week === week);
+    return { week, prompt: st.current.prompt, momId: mom.id, answered: answered ? answered.id : null, suggestions: st.queue.length };
+  }
+  dinnerNow(create) {
+    const [mo, da, yr] = centralToday(); const d = new Date(Date.UTC(yr, mo - 1, da)); const toSun = (7 - d.getUTCDay()) % 7;
+    const sunday = new Date(d.getTime() + toSun * 864e5).toISOString().slice(0, 10);
+    if (!this.d.dinner || this.d.dinner.date !== sunday) {
+      const fresh = { date: sunday, host: this.d.dinner ? this.d.dinner.host : "", items: {}, coming: {} };
+      if (!create) return fresh; this.d.dinner = fresh;
+    }
+    return this.d.dinner;
+  }
+  async pushTo(m, data) {
+    const v = this.env.VAPID_PRIVATE && this.env.VAPID_PUBLIC ? { publicKey: this.env.VAPID_PUBLIC, privateKey: this.env.VAPID_PRIVATE, subject: "mailto:topher@mixedmakershop.com" } : null;
+    if (!v || !(m.push || []).length) return;
+    let dead = false;
+    for (const sub of m.push.slice()) { try { const st = await sendPush(sub, data, v); if (st === 404 || st === 410) { m.push = m.push.filter(x => x.endpoint !== sub.endpoint); dead = true; } } catch (e) {} }
+    if (dead) await this.save("members");
+  }
+  notify(toIds, exceptId, data) { // phone alerts; toIds null = the whole family
+    const ms = Object.values(this.d.members).filter(m => m.status === "member" && m.id !== exceptId && (!toIds || toIds.includes(m.id)) && (m.push || []).length);
+    if (ms.length) this.ctx.waitUntil(Promise.all(ms.map(m => this.pushTo(m, data))));
+  }
+  async tick() { // runs every morning from the scheduler
+    const before = this.d.daily && this.d.daily.date;
+    await this.birthdays(); await this.monthly(); await this.ensureDaily();
+    const [mo, da, yr] = centralToday(); const dow = new Date(Date.UTC(yr, mo - 1, da)).getUTCDay();
+    for (const f of this.d.feed.filter(f => f.kind === "birthday" && Date.now() - f.ts < 20 * 3600e3)) {
+      const m = this.d.members[f.about]; if (m) this.notify(null, null, { title: `🎂 It's ${m.name}'s birthday!`, body: "Send a birthday wish in Family Pop", tag: "bday-" + m.id, url: "./#home" });
+    }
+    if (this.d.daily && this.d.daily.q && this.d.daily.date !== before) this.notify(null, null, { title: "⭐ Today's family question is up!", body: this.d.daily.q, tag: "daily", url: "./#home" });
+    const g = this.grandmaNow(); if (g && dow === 1 && !g.answered) this.notify([g.momId], null, { title: "🎙️ This week's Ask Grandma", body: g.prompt, tag: "grandma", url: "./#home" });
+    if (dow === 6) { const dn = this.dinnerNow(); this.notify(null, null, { title: "🍽️ Sunday dinner is tomorrow!", body: dn.host ? `At ${dn.host}'s. What are you bringing?` : "What are you bringing?", tag: "dinner", url: "./#home" }); }
+    for (const pl of this.d.polls) if (pl.status === "collecting" && Date.now() - pl.ts > 3 * 864e5 && Object.keys(pl.answers).length >= 2) this.closePoll(pl);
+    await this.save("polls", "feed");
   }
   prune() { const gs = Object.values(this.d.games).sort((a, b) => b.updated - a.updated); for (const g of gs.slice(30)) delete this.d.games[g.id]; }
   post(text) { this.d.feed.push({ id: rid(10), from: "system", text, ts: Date.now(), likes: [], comments: [] }); }

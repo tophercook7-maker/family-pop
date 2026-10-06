@@ -79,6 +79,29 @@ label.f small{color:var(--dim);font-weight:700}
 .bday b{font-size:22px}
 .bday .row{justify-content:center}
 .bday .btn{background:#2b1747;color:#fff}
+.overlay{position:fixed;inset:0;z-index:55;background:var(--bg);display:none;flex-direction:column}
+.overlay.on{display:flex}
+.overlay .bar{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 12px 10px;background:var(--bg2)}
+.overlay .bar b{flex:1;font-size:18px}
+#mapEl{flex:1}
+#bookView{overflow-y:auto;background:#fffaf2;color:#2b1747}
+#bookView .bar{color:var(--ink);position:sticky;top:0;z-index:2}
+#bookBody{max-width:760px;margin:0 auto;padding:16px}
+.bk{padding:22px 4px;border-bottom:2px dashed #e7d9c5;page-break-inside:avoid}
+.bk h1{font-size:46px;margin:6px 0} .bk h2{font-size:26px;margin-bottom:10px}
+.bk.cover{text-align:center;padding:60px 0;page-break-after:always}
+.bk p{line-height:1.5;margin:6px 0}
+.bkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;text-align:center}
+.bkpics{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.bkpics figure{margin:0;page-break-inside:avoid}.bkpics img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px}.bkpics figcaption{font-size:14px;margin-top:4px}
+#bookView .dim{color:#7a6a8e}
+@media print{body>*:not(#bookView){display:none!important}#bookView{position:static;display:block!important;overflow:visible}#bookView .bar{display:none}html,body{overflow:visible;height:auto;background:#fff}}
+#holidayFx{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+#holidayFx span{position:absolute;top:-30px;animation:fall 14s linear infinite;opacity:.55}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+body[data-holiday="xmas"]{--pop:#e63946;--sun:#ffd166;--teal:#52b788;--card:#3a2459;--bg2:#1f4d3a}
+body[data-holiday="thanks"]{--pop:#e07a2e;--sun:#ffc23d;--bg2:#5a3a1f}
+body[data-holiday="fall"]{--pop:#ff7a1a;--bg2:#3d1f4d}
 .daily{background:var(--card);border:2px solid var(--teal);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 .daily .ans button{padding:11px;font-size:16px}
 .mem{background:var(--card);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
@@ -228,10 +251,15 @@ audio{width:220px;max-width:100%}
     <img id="postPrev" class="sqphoto" hidden alt="">
     <div class="row"><button class="btn small ghost" id="postPhoto">📷 Photos</button><span style="flex:1"></span><button class="btn small" id="postGo">Post</button></div>
   </div>
+  <div id="alertBox"></div>
+  <div id="holidayBox"></div>
   <div id="champBox"></div>
   <div id="bdayBox" class="list"></div>
   <div id="dailyBox"></div>
+  <div id="grandmaBox"></div>
+  <div id="dinnerBox"></div>
   <div id="memBox"></div>
+  <div id="prayerBox"></div>
   <div id="feed" class="list"></div>
 </div></section>
 
@@ -248,6 +276,7 @@ audio{width:220px;max-width:100%}
   <div class="title">🎲 Family Pop</div>
   <button class="big main" id="pNew"><span class="ico">🫧</span><div>New game<small>On everyone's phones, or pass this phone around</small></div></button>
   <div class="card"><h3>Your games</h3><div class="list" id="gameList"></div></div>
+  <div class="card"><h3>📊 Family Feud</h3><div class="dim small" style="margin-bottom:8px">Everybody answers a question, then everyone tries to guess the family's top answers.</div><button class="btn small" id="feudNew">+ New question</button><div class="list" id="feudList" style="margin-top:10px"></div></div>
   <button class="big" id="pKids"><span class="ico">👶</span><div>Grandkids mode<small>Easy picture game for little ones, read out loud</small></div></button>
   <button class="big" id="pHow"><span class="ico">❓</span><div>How to play</div></button>
 </div></section>
@@ -275,10 +304,13 @@ audio{width:220px;max-width:100%}
   <div class="title">👨‍👩‍👧 Family</div>
   <div id="pendingBox"></div>
   <button class="btn" id="fInvite">✉️ Invite someone</button>
+  <div class="split"><button class="btn ghost" id="fMap">🗺️ Family map</button><button class="btn ghost" id="fBook">📖 Our yearbook</button></div>
   <div class="card"><h3>Everyone</h3><div class="list" id="memberList"></div></div>
   <div class="card"><h3>🌳 Mom's family tree</h3><div class="dim small" style="margin-bottom:8px">Mom's side of the family. Everyone can add who they know, and it all turns into "Way Back When" questions.</div><button class="btn small" id="fAddTree">+ Add someone</button><div id="treeImport" style="margin-top:6px"></div><div class="list" id="treeList" style="margin-top:10px"></div></div>
+  <div class="card"><h3>🍲 Recipe box</h3><button class="btn small" id="fAddRecipe">+ Add a recipe</button><div class="list" id="recipeList" style="margin-top:10px"></div></div>
   <div class="card"><h3>📖 Family Book</h3><div class="dim small" style="margin-bottom:8px">Memories and photos that turn into game questions.</div><button class="btn small" id="fAddMem">+ Add a memory</button><div class="list" id="bookList" style="margin-top:10px"></div></div>
   <div class="card"><h3>Me</h3><div class="list"><button class="li" id="fEditMe"><span class="p" id="mePiece">🫧</span><span class="n" id="meName">Me<small>Edit my piece and trivia answers</small></span>›</button>
+    <button class="li" id="fAlerts"><span class="p">🔔</span><span class="n" id="fAlertsTxt">Phone alerts<small>Off</small></span>›</button>
     <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
   <div class="card" id="adminCard"><h3>Family settings</h3><label class="chk"><input type="checkbox" id="setApproval"> <span>New people need a yes first<br><small class="dim">From someone marked as an approver below</small></span></label>
     <button class="btn small ghost" id="fNewCode" style="margin-top:10px">Make a new invite link (old ones stop working)</button></div>
@@ -297,6 +329,9 @@ audio{width:220px;max-width:100%}
   <div class="log" id="log"></div>
 </section>
 
+<div id="holidayFx" aria-hidden="true"></div>
+<div class="overlay" id="mapView"><div class="bar"><button class="btn small ghost" id="mapClose">✕ Back</button><b>🗺️ Where our family comes from</b></div><div id="mapEl"></div></div>
+<div class="overlay" id="bookView"><div class="bar"><button class="btn small ghost" id="bookClose">✕ Back</button><b>📖 Our yearbook</b><button class="btn small" id="bookPrint">🖨️ Print or save PDF</button></div><div id="bookBody"></div></div>
 <nav class="nav" id="nav">
   <button data-t="home" class="on"><span class="i">🏠</span>Home<span class="badge" id="nbHome" hidden></span></button>
   <button data-t="chat"><span class="i">💬</span>Chat<span class="badge" id="nbChat" hidden></span></button>
@@ -534,8 +569,8 @@ function renderMemory(){ // "memory of the day": an older family photo comes bac
   if($("#memQ"))$("#memQ").onclick=()=>triviaForm({photoId:pk.id,cat:"Who's in the Picture?"});
 }
 function renderFeed(){
-  if(!S)return;renderChamp();renderBirthdays();renderDaily();renderMemory();const f=S.feed.slice().reverse();
-  $("#feed").innerHTML=f.length?f.map(p=>{if(p.from==="system")return `<div class="post sys">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span></div>`;
+  if(!S)return;renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();const f=S.feed.slice().reverse();
+  $("#feed").innerHTML=f.length?f.map(p=>{if(p.from==="system")return `<div class="post sys">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span>${p.audio?`<audio controls preload="none" src="${photoURL(p.audio)}"></audio>`:""}${p.story?`<div class="text" style="color:var(--ink);font-weight:700">${esc(p.story)}</div>`:""}</div>`;
     const a=mem(p.from)||{name:"Someone",piece:"🫧"};const liked=p.likes.includes(meId());
     return `<div class="post"><div class="who"><span class="pc">${a.piece}</span><span>${esc(a.name)}<br><small>${ago(p.ts)}</small></span></div>
       ${p.text?`<div class="text">${esc(p.text)}</div>`:""}${p.photos&&p.photos.length>1?`<div class="grid">${p.photos.map(id=>`<img loading="lazy" src="${photoURL(id)}" alt="">`).join("")}</div>`:p.photo?`<img class="ph" loading="lazy" src="${photoURL(p.photo)}" alt="Photo from ${esc(a.name)}">`:""}
@@ -618,6 +653,10 @@ function inviteSheet(){
   $("#invCopy").onclick=()=>copyText(link);
 }
 $("#fInvite").onclick=inviteSheet;
+$("#fMap").onclick=openMap;$("#mapClose").onclick=()=>$("#mapView").classList.remove("on");
+$("#fBook").onclick=openBook;$("#bookClose").onclick=()=>$("#bookView").classList.remove("on");$("#bookPrint").onclick=()=>window.print();
+$("#fAddRecipe").onclick=()=>recipeForm();
+$("#fAlerts").onclick=()=>S.pushOn?disableAlerts($("#fAlerts")):enableAlerts($("#fAlerts"));
 function renderFamily(){
   if(!S)return;const me=S.me;
   $("#mePiece").textContent=me.piece;$("#meName").innerHTML=`${esc(me.name)}<small>Edit my piece and trivia answers</small>`;
@@ -629,7 +668,8 @@ function renderFamily(){
   $$("[data-mem]").forEach(b=>b.onclick=()=>memberSheet(mem(b.dataset.mem)));
   $("#bookList").innerHTML=S.book.length?S.book.slice().reverse().map(e=>{const by=mem(e.by);return `<div class="li">${e.photo?`<img src="${photoURL(e.photo)}" alt="">`:'<span class="p">💬</span>'}<span class="n">${esc(e.q)}<small>${esc(e.cat)} · ${esc(e.a)}${by?" · by "+esc(by.name):""}</small></span>${(e.by===meId()||me.approver)?`<button class="btn small ghost" data-bd="${e.id}">✕</button>`:""}</div>`}).join(""):'<div class="dim small">Nothing yet.</div>';
   $$("[data-bd]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("bookDel",{id:b.dataset.bd});refresh()}));
-  renderTree();
+  renderTree();renderRecipes();
+  $("#fAlertsTxt").innerHTML=`Phone alerts<small>${S.pushOn?"On · tap to turn off":"Off · tap to turn on"}</small>`;
   $("#adminCard").style.display=me.approver?"":"none";$("#setApproval").checked=!!S.meta.approval;
 }
 const RELATIONS=["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's ancestor","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
@@ -779,6 +819,8 @@ function famQuestions(){
     if(t.relation==="Mom's ancestor"&&t.place&&t.born)qs.push({cat:"Way Back When",q:`Which family ancestor was born in ${t.place} in ${t.born}?`,a:t.name,pool:tnames});
     if(t.photo&&tnames.length>1)qs.push({cat:"Who's in the Picture?",q:"Who's in this old family picture?",a:t.name,pool:tnames,photo:t.photo});
   });
+  const allNames=[...new Set(names.concat(tnames))];
+  (S.recipes||[]).forEach(r=>{if(r.whose&&allNames.length>1)qs.push({cat:"Favorites",q:`Whose famous ${r.title} is this?`,a:r.whose,pool:allNames,photo:r.photo})});
   S.book.forEach(e=>qs.push({cat:e.cat,q:e.q,a:e.a,photo:e.photo,pool:e.wrong.length?e.wrong:(names.includes(e.a)?names:null)}));
   return qs;
 }
@@ -802,7 +844,7 @@ function makeQuestion(p,size){
 /* ================= board game: setup ================= */
 let GAME=null;   // {mode:'local'|'online', id, rev, st:{...serializable...}}
 function renderPlay(){
-  if(!S)return;const gs=S.games.slice().sort((a,b)=>b.updated-a.updated);
+  if(!S)return;renderFeud();const gs=S.games.slice().sort((a,b)=>b.updated-a.updated);
   $("#gameList").innerHTML=gs.length?gs.map(g=>{const t=mem(g.turnMember);const mine=g.turnMember===meId();const inIt=g.players.some(p=>p.memberId===meId());
     return `<button class="li" data-gid="${g.id}"><span class="p">${g.status==="done"?"🏁":mine?"🔔":"🎲"}</span><span class="n">${g.players.map(p=>p.piece).join("")} ${esc(g.title)}<small>${g.status==="done"?"Finished":mine?"Your turn!":t?"Waiting for "+esc(t.name):"Computer's turn"} · ${ago(g.updated)}</small></span>${inIt?"›":"👀"}</button>`}).join("")
     :'<div class="dim small">No games yet. Start one!</div>';
@@ -855,6 +897,7 @@ function onGameEvent(e){if(!GAME||GAME.mode!=="online"||GAME.id!==e.id||!$("#gam
 const ST=()=>GAME.st;
 function boardSquares(){const st=ST();return BASE.map((s,i)=>{const sq=Object.assign({i},s);
   if(s.t==="home"){const pl=st.players.find(p=>p.home===s.slot);sq.name=pl?pl.name+"'s House":"Neighbor's House"}
+  if(THEME&&THEME.names[s.t])sq.name=THEME.names[s.t];
   const pic=S.sqpics&&S.sqpics[i];if(pic&&s.t==="prop"){sq.name=pic.name||sq.name;sq.photo=photoURL(pic.photo);sq.pic=pic}return sq})}
 function openBoard(){showScreen("game");$("#gChatBadge").style.display="none";paintAll()}
 function paintAll(){
@@ -1073,11 +1116,196 @@ $("#pHow").onclick=()=>sheet(`<h2>How to play</h2><div style="text-align:left;li
  🥧 Fines go in the <b>Pie Pot</b>. Land on it and it's yours.<br>
  🏆 Richest after the last round wins and puts <b>their picture on a square</b> for good. Everyone's money goes into the family bank.</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Got it</button>`);
 
+/* ================= 🔔 phone alerts ================= */
+const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const standalone=()=>navigator.standalone||matchMedia("(display-mode: standalone)").matches;
+const pushReady=()=>"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window&&location.protocol==="https:"&&!window.__TAURI__;
+function b64ToBytes(s){s=s.replace(/-/g,"+").replace(/_/g,"/");const raw=atob(s+"===".slice((s.length+3)%4));return Uint8Array.from(raw,c=>c.charCodeAt(0))}
+async function enableAlerts(btn){
+  if(isIOS&&!standalone())return sheet(`<div class="bigmoji">📲</div><h2>One quick step first</h2><div style="text-align:left;line-height:1.55">iPhones only send alerts to apps on the Home Screen:<br>1. In Safari, tap <b>Share</b> (or <b>•••</b> → <b>Share</b>).<br>2. Tap <b>Add to Home Screen</b>.<br>3. Open <b>Family Pop</b> from your Home Screen and tap <b>Turn on alerts</b> again.</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Got it</button>`);
+  if(!pushReady())return toast("This phone or browser can't do alerts here");
+  await busy(btn,async()=>{const perm=await Notification.requestPermission();if(perm!=="granted")return toast("Alerts are off. You can turn them on in your phone's Settings → Notifications.");
+    const reg=await navigator.serviceWorker.ready;const {publicKey}=await api("/vapid");
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToBytes(publicKey)});
+    await act("pushSub",{sub:sub.toJSON()});toast("🔔 Alerts are on!");refresh()});
+}
+async function disableAlerts(btn){await busy(btn,async()=>{try{const reg=await navigator.serviceWorker.ready;const s=await reg.pushManager.getSubscription();if(s)await s.unsubscribe()}catch(e){}await act("pushOff");toast("Alerts are off");refresh()})}
+function renderAlertBox(){const box=$("#alertBox");if(!box)return;const dismissed=ls.get("alertDismiss",0);
+  box.innerHTML=!S.pushOn&&(pushReady()||isIOS)&&Date.now()-dismissed>3*864e5?`<div class="soon" style="display:flex;gap:10px;align-items:center;text-align:left"><span style="font-size:28px">🔔</span><span style="flex:1">Get a heads-up when it's your turn, someone messages you, or the daily question is up.</span><button class="btn small" id="alOn">Turn on alerts</button><button class="btn small ghost" id="alNo" aria-label="Not now">✕</button></div>`:"";
+  if($("#alOn"))$("#alOn").onclick=()=>enableAlerts($("#alOn"));if($("#alNo"))$("#alNo").onclick=()=>{ls.set("alertDismiss",Date.now());renderAlertBox()}}
+
+/* ================= 🎙️ recording helper (Ask Grandma) ================= */
+function recordSheet(title){return new Promise(async res=>{
+  if(!navigator.mediaDevices||!window.MediaRecorder){toast("This phone can't record here. You can type it instead.");return res(null)}
+  let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast("Please allow the microphone");return res(null)}
+  const type=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(t=>MediaRecorder.isTypeSupported(t))||"";const chunks=[];
+  const rec=new MediaRecorder(stream,type?{mimeType:type,audioBitsPerSecond:40000}:{});rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  let cancelled=false;const t0=Date.now();
+  sheet(`<div class="bigmoji">🎙️</div><h2>${esc(title)}</h2><div class="money" id="recT">0:00</div><div class="dim">Talk as long as you like, up to 3 minutes.</div><button class="btn" id="recStop">■ Done, save it</button><button class="btn ghost" id="recCancel">Cancel</button>`);
+  const iv=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);$("#recT").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");if(s>=180)rec.stop()},250);
+  rec.onstop=()=>{clearInterval(iv);stream.getTracks().forEach(t=>t.stop());closeSheet();if(cancelled)return res(null);
+    const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(new Blob(chunks,{type:(type||"audio/webm").split(";")[0]}))};
+  $("#recStop").onclick=()=>rec.stop();$("#recCancel").onclick=()=>{cancelled=true;rec.stop()};rec.start(1000);
+})}
+
+/* ================= 🎙️ Ask Grandma ================= */
+function renderGrandma(){
+  const box=$("#grandmaBox");if(!box)return;const g=S.grandma;
+  if(!g){box.innerHTML=S.me.approver?`<div class="soon">🎙️ <b>Ask Grandma</b> starts once someone is marked as Mom. Family → tap her name → "This is Mom".</div>`:"";return}
+  const mom=mem(g.momId),story=S.stories.slice().reverse().find(x=>x.week===g.week),isMom=S.me.id===g.momId;
+  box.innerHTML=`<div class="mem"><div class="cat">🎙️ Ask Grandma · this week</div><div class="qtext" style="font-size:19px">"${esc(g.prompt)}"</div>
+    ${story?`${story.audio?`<audio controls preload="none" src="${photoURL(story.audio)}"></audio>`:""}${story.text?`<div class="text" style="white-space:pre-wrap">${esc(story.text)}</div>`:""}<div class="small dim">${isMom?"Thank you! Your story is saved for the whole family.":esc(mom.name)+" answered "+ago(story.ts)}</div>`
+      :isMom?`<div class="split"><button class="btn" id="gmTalk">🎤 Answer by talking</button><button class="btn ghost" id="gmType">⌨️ Type it</button></div>`:`<div class="dim small">Waiting for ${esc(mom.name)}'s answer…</div>`}
+    <div class="row">${S.stories.length?`<button class="btn small ghost" id="gmAll">📚 ${isMom?"My":esc(mom.name)+"'s"} stories (${S.stories.length})</button>`:""}${isMom?"":`<button class="btn small ghost" id="gmAsk">💡 Suggest a question for ${esc(mom.name)}</button>`}</div></div>`;
+  if($("#gmTalk"))$("#gmTalk").onclick=async()=>{const a=await recordSheet(g.prompt);if(a)busy(null,async()=>{await act("storyAnswer",{audio:a});sfx.fan();toast("🎙️ Saved! The family will love this.");refresh()})};
+  if($("#gmType"))$("#gmType").onclick=()=>{sheet(`<h2>${esc(g.prompt)}</h2><textarea id="gmTxt" style="min-height:160px" maxlength="3000" placeholder="Tell us…"></textarea><button class="btn" id="gmSave">Save my story</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+    $("#gmSave").onclick=()=>busy($("#gmSave"),async()=>{const t=$("#gmTxt").value.trim();if(!t)return toast("Type your answer");await act("storyAnswer",{text:t});closeSheet();sfx.fan();refresh()})};
+  if($("#gmAsk"))$("#gmAsk").onclick=()=>{sheet(`<h2>💡 A question for ${esc(mom.name)}</h2><div class="dim">She'll get it as a future Ask Grandma question.</div><input id="gmQ" maxlength="200" placeholder="What was Grandpa Vaughn like?"><button class="btn" id="gmQGo">Send it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+    $("#gmQGo").onclick=()=>busy($("#gmQGo"),async()=>{await act("storySuggest",{q:$("#gmQ").value});closeSheet();toast("💡 Added to Mom's questions");refresh()})};
+  if($("#gmAll"))$("#gmAll").onclick=()=>sheet(`<h2>📚 ${esc(mom.name)}'s stories</h2><div class="list">${S.stories.slice().reverse().map(x=>`<div class="post" style="text-align:left"><b>"${esc(x.prompt)}"</b>${x.audio?`<audio controls preload="none" src="${photoURL(x.audio)}"></audio>`:""}${x.text?`<div class="text">${esc(x.text)}</div>`:""}<div class="small dim">${new Date(x.ts).toLocaleDateString()}</div></div>`).join("")}</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
+}
+
+/* ================= 🍽️ Sunday dinner ================= */
+function renderDinner(){
+  const box=$("#dinnerBox");if(!box)return;const dn=S.dinner;if(!dn){box.innerHTML="";return}
+  const day=new Date(dn.date+"T12:00:00").toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
+  const items=Object.entries(dn.items||{}),coming=Object.keys(dn.coming||{}).filter(k=>dn.coming[k]),mine=(dn.items||{})[meId()]||"",amIn=!!(dn.coming||{})[meId()];
+  box.innerHTML=`<div class="mem"><div class="cat">🍽️ Sunday dinner · ${esc(day)}</div>
+    <div><b>${dn.host?"At "+esc(dn.host)+"'s":"Where's dinner this week?"}</b>${(S.me.approver||S.me.mom)?` <button class="btn small ghost" id="dnHost">${dn.host?"Change":"Set the place"}</button>`:""}</div>
+    ${items.length?`<div class="list">${items.map(([id,it])=>{const m=mem(id);return m?`<div class="small">${m.piece} <b>${esc(m.name)}</b> is bringing ${esc(it)}</div>`:""}).join("")}</div>`:'<div class="dim small">Nobody has said what they\'re bringing yet.</div>'}
+    <div class="row"><input id="dnItem" maxlength="80" placeholder="What are you bringing?" value="${esc(mine)}" style="flex:1;min-width:0"><button class="btn small" id="dnSave">Save</button></div>
+    <label class="chk"><input type="checkbox" id="dnIn" ${amIn?"checked":""}> I'll be there ${coming.length?`<span class="dim small">(${coming.map(id=>(mem(id)||{}).piece||"").join("")} coming)</span>`:""}</label></div>`;
+  $("#dnSave").onclick=()=>busy($("#dnSave"),async()=>{await act("dinner",{item:$("#dnItem").value});toast("🍽️ Saved");refresh()});
+  $("#dnIn").onchange=e=>busy(null,async()=>{await act("dinner",{coming:e.target.checked});refresh()});
+  if($("#dnHost"))$("#dnHost").onclick=()=>{sheet(`<h2>Where's Sunday dinner?</h2><input id="dnH" maxlength="60" placeholder="Mom" value="${esc(dn.host||"")}"><button class="btn" id="dnHGo">Save</button>`);$("#dnHGo").onclick=()=>busy($("#dnHGo"),async()=>{await act("dinner",{host:$("#dnH").value});closeSheet();refresh()})};
+}
+
+/* ================= 🙏 prayer requests ================= */
+function renderPrayers(){
+  const box=$("#prayerBox");if(!box)return;const open=S.prayers.filter(p=>!p.answered).slice().reverse(),done=S.prayers.filter(p=>p.answered).slice(-3).reverse();
+  const row=p=>{const m=mem(p.from)||{name:"Someone",piece:"🙏"},me=p.praying.includes(meId());
+    return `<div class="post" style="gap:6px"><div class="who"><span class="pc">${m.piece}</span><span>${esc(m.name)}<br><small>${ago(p.ts)}</small></span></div><div class="text">${esc(p.text)}</div>
+      <div class="acts">${p.answered?`<span class="small" style="color:var(--good);font-weight:900">🙌 Answered!</span>`:`<button class="${me?"on":""}" data-pray="${p.id}">🙏 ${me?"Praying":"I'll pray"} ${p.praying.length?"· "+p.praying.length:""}</button>${p.from===meId()?`<button data-ans="${p.id}">🙌 It was answered</button>`:""}`}</div></div>`};
+  box.innerHTML=`<div class="mem"><div class="cat">🙏 Prayer requests</div>${open.slice(0,3).map(row).join("")||'<div class="dim small">No prayer requests right now.</div>'}
+    ${done.length?`<details><summary class="small dim">Answered prayers</summary>${done.map(row).join("")}</details>`:""}<button class="btn small ghost" id="prAdd">🙏 Ask the family to pray</button></div>`;
+  $$("[data-pray]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("pray",{id:b.dataset.pray});buzz(15);refresh()}));
+  $$("[data-ans]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("prayerAnswered",{id:b.dataset.ans});sfx.fan();refresh()}));
+  $("#prAdd").onclick=()=>{sheet(`<h2>🙏 Ask for prayer</h2><textarea id="prTxt" maxlength="600" placeholder="What can the family pray for?"></textarea><button class="btn" id="prGo">Share with the family</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+    $("#prGo").onclick=()=>busy($("#prGo"),async()=>{const t=$("#prTxt").value.trim();if(!t)return toast("Type your request");await act("prayerAdd",{text:t});closeSheet();refresh()})};
+}
+
+/* ================= 🍲 recipe box ================= */
+function renderRecipes(){
+  const box=$("#recipeList");if(!box)return;
+  box.innerHTML=S.recipes.length?S.recipes.slice().reverse().map(r=>`<button class="li" data-rc="${r.id}">${r.photo?`<img src="${photoURL(r.photo)}" alt="">`:'<span class="p">🍲</span>'}<span class="n">${esc(r.title)}<small>${esc(r.whose)}'s</small></span>›</button>`).join(""):'<div class="dim small">No recipes yet. Add the family favorites!</div>';
+  $$("[data-rc]").forEach(b=>b.onclick=()=>{const r=S.recipes.find(x=>x.id===b.dataset.rc);
+    sheet(`${r.photo?`<img class="sqphoto" src="${photoURL(r.photo)}" alt="">`:'<div class="bigmoji">🍲</div>'}<h2>${esc(r.whose)}'s ${esc(r.title)}</h2>
+      ${r.ingredients?`<div class="card" style="text-align:left"><h3>What you need</h3><div style="white-space:pre-wrap">${esc(r.ingredients)}</div></div>`:""}${r.steps?`<div class="card" style="text-align:left"><h3>How to make it</h3><div style="white-space:pre-wrap">${esc(r.steps)}</div></div>`:""}
+      <button class="btn" id="rcShare">📤 Share it</button>${(r.by===meId()||S.me.approver||S.me.mom)?`<button class="btn ghost" id="rcDel">Remove</button>`:""}<button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
+    $("#rcShare").onclick=()=>shareOut(`${r.whose}'s ${r.title}\n\n${r.ingredients||""}\n\n${r.steps||""}`,r.photo);
+    if($("#rcDel"))$("#rcDel").onclick=()=>busy($("#rcDel"),async()=>{await act("recipeDel",{id:r.id});closeSheet();refresh()})});
+}
+function recipeForm(){let photo=null;const names=[...new Set(S.members.filter(m=>m.status==="member").map(m=>m.name).concat((S.tree||[]).map(t=>t.name)))];
+  sheet(`<h2>🍲 Add a family recipe</h2><label class="f">The dish<input id="rcT" maxlength="80" placeholder="Chicken and dumplings"></label>
+    <label class="f">Whose is it?<input id="rcW" maxlength="60" list="rcNames" placeholder="Grandma Vaughn"><datalist id="rcNames">${names.map(n=>`<option value="${esc(n)}">`).join("")}</datalist></label>
+    <button class="btn ghost" id="rcP">📷 Add a picture</button><img id="rcPrev" class="qphoto" hidden alt="">
+    <label class="f">What you need<textarea id="rcI" maxlength="2000" placeholder="One per line"></textarea></label><label class="f">How to make it<textarea id="rcS" maxlength="4000"></textarea></label>
+    <button class="btn" id="rcGo">Add to the recipe box</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  $("#rcP").onclick=async()=>{photo=await pickPhoto(800);if(photo){$("#rcPrev").src=photo;$("#rcPrev").hidden=false}};
+  $("#rcGo").onclick=()=>busy($("#rcGo"),async()=>{const t=$("#rcT").value.trim();if(!t)return toast("Name the dish");await act("recipeAdd",{title:t,whose:$("#rcW").value,ingredients:$("#rcI").value,steps:$("#rcS").value,photo});closeSheet();sfx.fan();refresh()})}
+
+/* ================= 📊 Family Feud ================= */
+const FEUD_PROMPTS=["Name something Mom always says","Name a food we always have at Sunday dinner","Name something you'd find in Grandma's kitchen","Name a place our family has gone together",
+  "Name something that makes Mom laugh","Name something you do on a lazy Sunday","Name a reason to call Mom today","Name a Christmas tradition in our family","Name the best kind of pie","Name a word that describes our family"];
+const fnorm=t=>String(t).toLowerCase().replace(/[^a-z0-9 ]/g,"").replace(/\b(a|an|the|my|her|his)\b/g,"").replace(/\s+/g," ").trim();
+function renderFeud(){
+  const box=$("#feudList");if(!box)return;const ps=S.polls.slice().reverse();
+  box.innerHTML=ps.length?ps.map(p=>`<div class="post" style="gap:6px"><b>${esc(p.q)}</b>${p.status==="collecting"
+      ?`<div class="row"><input data-fa="${p.id}" maxlength="60" placeholder="Your answer" value="${esc(p.mine)}" style="flex:1;min-width:0"><button class="btn small" data-fs="${p.id}">Save</button></div><div class="small dim">${p.count} answered so far${p.by===meId()||S.me.approver?` · <a href="#" data-fc="${p.id}" style="color:var(--teal)">close it and play</a>`:""}</div>`
+      :p.played!=null?`<div class="small">You scored <b style="color:var(--sun)">${p.played}</b>. Top answer: ${esc(p.top[0]?p.top[0].text:"")}</div>`:`<button class="btn small" data-fp="${p.id}">🎮 Play the board</button>`}</div>`).join("")
+    :'<div class="dim small">No questions yet. Start one and everyone answers!</div>';
+  $$("[data-fs]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("pollAnswer",{id:b.dataset.fs,text:$(`[data-fa="${b.dataset.fs}"]`).value});toast("Saved. Wait for everyone, then play!");refresh()}));
+  $$("[data-fc]").forEach(a=>a.onclick=e=>{e.preventDefault();busy(null,async()=>{await act("pollClose",{id:a.dataset.fc});refresh()})});
+  $$("[data-fp]").forEach(b=>b.onclick=()=>playFeud(S.polls.find(p=>p.id===b.dataset.fp)));
+}
+$("#feudNew").onclick=async()=>{const q=await ask(`<h2>📊 New Family Feud question</h2><div class="dim">Everybody answers. Then everyone tries to guess the top answers.</div>`,FEUD_PROMPTS.map(t=>[esc(t),t]).concat([["✏️ Write my own","__own"],["Cancel",null]]));
+  if(q===null)return;let text=q;if(q==="__own"){text=await new Promise(res=>{sheet(`<h2>Your question</h2><input id="fqIn" maxlength="140" placeholder="Name something…"><button class="btn" id="fqGo">Ask the family</button>`);$("#fqGo").onclick=()=>{const v=$("#fqIn").value.trim();closeSheet();res(v)}})}
+  if(text)busy(null,async()=>{await act("pollAdd",{q:text});toast("📊 Asked! Answer it yourself too.");refresh()})};
+function playFeud(p){
+  const top=p.top||[];let strikes=0,got=new Set(),score=0;
+  const draw=()=>{sheet(`<div class="cat">📊 Family Feud</div><div class="qtext">${esc(p.q)}</div>
+    <div class="list">${top.map((t,i)=>`<div class="li"><span class="p" style="font-size:20px">${i+1}</span><span class="n">${got.has(i)?esc(t.text):"? ? ?"}</span><b>${got.has(i)?t.count:""}</b></div>`).join("")}</div>
+    <div style="font-size:28px">${"❌".repeat(strikes)}${"⚪".repeat(3-strikes)}</div>
+    ${strikes<3&&got.size<top.length?`<div class="row"><input id="fgIn" maxlength="60" placeholder="Your guess" style="flex:1;min-width:0"><button class="btn small" id="fgGo">Guess</button></div>`:`<div class="money">${score}</div><button class="btn" id="fgDone">Collect ${score} Pop Bucks</button>`}`);
+    if($("#fgGo")){const go=()=>{const g=fnorm($("#fgIn").value);if(!g)return;const i=top.findIndex((t,k)=>!got.has(k)&&(fnorm(t.text)===g||(g.length>=3&&(fnorm(t.text).includes(g)||g.includes(fnorm(t.text))))));
+        if(i>-1){got.add(i);score=Math.min(100,score+top[i].count*10);sfx.right();buzz(25)}else{strikes++;sfx.wrong();buzz([20,30,20])}draw()};$("#fgGo").onclick=go;$("#fgIn").onkeydown=e=>{if(e.key==="Enter")go()};setTimeout(()=>$("#fgIn")&&$("#fgIn").focus(),50)}
+    if($("#fgDone"))$("#fgDone").onclick=()=>busy($("#fgDone"),async()=>{const r=await act("pollPlayed",{id:p.id,score});closeSheet();if(r.earned){sfx.cash();toast(`🫧 +${r.earned} Pop Bucks`)}refresh()})};
+  draw();
+}
+
+/* ================= 🗺️ family map ================= */
+const PLACES={"maynooth":[53.381,-6.592],"ireland":[53.35,-6.26],"kentucky":[37.84,-84.27],"greenville, texas":[33.138,-96.111],"texas":[31.0,-97.5],"grannis":[34.237,-94.334],"gillham":[34.169,-94.315],
+  "polk county":[34.49,-94.23],"mena":[34.586,-94.239],"arcata":[40.866,-124.083],"hot springs":[34.503,-93.055],"garland county":[34.58,-93.15],"bonnerdale":[34.38,-93.39],"jessieville":[34.70,-93.06],
+  "fountain lake":[34.62,-93.06],"little rock":[34.746,-92.289],"malvern":[34.362,-92.813],"arkadelphia":[34.121,-93.054],"benton":[34.564,-92.587],"texarkana":[33.425,-94.047],"hope":[33.667,-93.591],"wickes":[34.30,-94.34],"de queen":[34.038,-94.341],"arkansas":[34.8,-92.4]};
+async function geocode(place){
+  const k=place.toLowerCase();const hit=Object.keys(PLACES).find(p=>k.includes(p));if(hit)return PLACES[hit];
+  const cache=ls.get("geo",{});if(cache[k])return cache[k];
+  try{const r=await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(place));const j=await r.json();if(j[0]){cache[k]=[+j[0].lat,+j[0].lon];ls.set("geo",cache);return cache[k]}}catch(e){}
+  return null;
+}
+function loadLeaflet(){return new Promise((res,rej)=>{if(window.L)return res();const c=document.createElement("link");c.rel="stylesheet";c.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(c);
+  const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+let MAP=null;
+async function openMap(){
+  $("#mapView").classList.add("on");await loadLeaflet().catch(()=>toast("The map couldn't load. Check your internet."));if(!window.L)return;
+  if(!MAP){MAP=L.map("mapEl");L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap"}).addTo(MAP)}
+  MAP.eachLayer(l=>{if(!l._url)MAP.removeLayer(l)});setTimeout(()=>MAP.invalidateSize(),100);
+  const people=(S.tree||[]).filter(t=>t.place);if(!people.length){MAP.setView([34.5,-93.5],7);return toast("Add places to Mom's family tree to fill the map")}
+  const groups={};for(const t of people){const ll=await geocode(t.place);if(!ll)continue;const k=ll.join(",");(groups[k]=groups[k]||{ll,place:t.place,ppl:[]}).ppl.push(t)}
+  const gs=Object.values(groups);if(!gs.length)return;
+  gs.forEach(g=>L.marker(g.ll).addTo(MAP).bindPopup(`<b>${esc(g.place)}</b><br>${g.ppl.map(t=>`${esc(t.name)}${t.born?" ("+esc(t.born)+")":""}`).join("<br>")}`));
+  const yr=g=>Math.min(...g.ppl.map(t=>{const m=String(t.born||"").match(/\d{4}/);return m?+m[0]:9999}));
+  const path=gs.slice().sort((a,b)=>yr(a)-yr(b)).map(g=>g.ll);if(path.length>1)L.polyline(path,{color:"#ff5d9e",weight:3,dashArray:"6 8"}).addTo(MAP);
+  MAP.fitBounds(L.latLngBounds(gs.map(g=>g.ll)).pad(.2));
+}
+
+/* ================= 📖 the family yearbook ================= */
+function openBook(){
+  const y=new Date().getFullYear(),inYear=ts=>new Date(ts).getFullYear()===y;
+  const pics=S.feed.filter(p=>p.from!=="system"&&inYear(p.ts)&&(p.photo||p.photos)).slice(0,40);
+  const ms=S.members.filter(m=>m.status==="member");
+  const sec=(t,b)=>b?`<section class="bk"><h2>${t}</h2>${b}</section>`:"";
+  $("#bookBody").innerHTML=`<section class="bk cover"><div style="font-size:80px">🫧</div><h1>${esc(S.meta.name)}</h1><div style="font-size:28px">${y}</div><div class="dim">Our year together, from Family Pop</div></section>`
+    +sec("👨‍👩‍👧 Our family",`<div class="bkgrid">${ms.map(m=>`<div><div style="font-size:40px">${m.piece}</div><b>${esc(m.name)}</b>${m.birthday?`<div class="small">🎂 ${esc(m.birthday)}</div>`:""}</div>`).join("")}</div>`)
+    +sec("🏆 Champions & bragging rights",(S.champion?`<p>🥇 Family Champion of ${esc(S.champion.month)}: <b>${esc(S.champion.name)}</b></p>`:"")+ms.filter(m=>m.stats.wins||m.stats.trophies.length).map(m=>`<p>${m.piece} <b>${esc(m.name)}</b>: ${m.stats.wins} win${m.stats.wins===1?"":"s"} ${m.stats.trophies.join(" ")}</p>`).join(""))
+    +sec("📸 The year in pictures",pics.length?`<div class="bkpics">${pics.map(p=>`<figure><img src="${photoURL(p.photo||p.photos[0])}" alt=""><figcaption>${esc((mem(p.from)||{}).name||"")}${p.text?": "+esc(p.text.slice(0,90)):""}<br><span class="small">${new Date(p.ts).toLocaleDateString(undefined,{month:"long",day:"numeric"})}</span></figcaption></figure>`).join("")}</div>`:"")
+    +sec("🎙️ Mom's stories",S.stories.filter(x=>x.text&&inYear(x.ts)).map(x=>`<p><b>"${esc(x.prompt)}"</b><br>${esc(x.text)}</p>`).join(""))
+    +sec("🍲 Family recipes",S.recipes.map(r=>`<p><b>${esc(r.whose)}'s ${esc(r.title)}</b><br><span style="white-space:pre-wrap">${esc(r.ingredients||"")}</span></p>`).join(""))
+    +sec("🙌 Answered prayers",S.prayers.filter(p=>p.answered&&inYear(p.ts)).map(p=>`<p>${esc(p.text)} <span class="small">(${esc((mem(p.from)||{}).name||"")})</span></p>`).join(""))
+    +sec("🌳 Where we come from",(S.tree||[]).map(t=>`<p><b>${esc(t.name)}</b> · ${esc(t.relation)}${t.born?" · "+esc(t.born):""}${t.died?"–"+esc(t.died):""}${t.place?" · "+esc(t.place):""}${t.story?`<br><i>${esc(t.story)}</i>`:""}</p>`).join(""));
+  $("#bookView").classList.add("on");$("#bookView").scrollTop=0;
+}
+
+/* ================= 🎄 holiday themes ================= */
+function thanksgivingDay(y){const d=new Date(y,10,1);const first=(4-d.getDay()+7)%7+1;return first+21}
+const THEME=(()=>{const n=new Date(),m=n.getMonth()+1,d=n.getDate();
+  if(m===12)return{id:"xmas",emoji:["❄️","🎄","⭐","🎁"],names:{lucky:"Stocking Stuffer",pot:"Christmas Pie Pot",go:"GO 🎄"},banner:d===25?"🎄 Merry Christmas from all of us!":null};
+  if(m===11)return{id:"thanks",emoji:["🍂","🦃","🥧","🍁"],names:{pot:"Pumpkin Pie Pot",lucky:"Lucky Wishbone"},banner:d===thanksgivingDay(n.getFullYear())?"🦃 Happy Thanksgiving! What are you thankful for?":null,thanks:true};
+  if(m===10&&d>=15)return{id:"fall",emoji:["🎃","🍂","🍁"],names:{pot:"Pumpkin Pie Pot",lucky:"Treat Bubble"},banner:d===31?"🎃 Happy Halloween!":null};
+  return null})();
+function applyTheme(){if(!THEME)return;document.body.dataset.holiday=THEME.id;
+  const fx=$("#holidayFx");if(fx&&!fx.childElementCount&&!matchMedia("(prefers-reduced-motion: reduce)").matches)for(let i=0;i<14;i++){const e=document.createElement("span");e.textContent=rnd(THEME.emoji);e.style.left=Math.random()*100+"vw";e.style.animationDelay=(-Math.random()*14)+"s";e.style.fontSize=(14+Math.random()*16)+"px";fx.appendChild(e)}}
+function renderHolidayBanner(){const box=$("#holidayBox");if(!box)return;
+  box.innerHTML=THEME&&THEME.banner?`<div class="bday"><b>${esc(THEME.banner)}</b>${THEME.thanks?`<button class="btn small" id="thxGo">Share what you're thankful for</button>`:""}</div>`:"";
+  if($("#thxGo"))$("#thxGo").onclick=()=>{$("#postText").value="I'm thankful for ";$("#postText").focus()}}
+
 /* ================= start ================= */
 if(!window.__TAURI__&&"serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 (async()=>{
   const inv=parseInvite(location.search);
+  applyTheme();
   if(SES){const c=ls.get("cache",null);if(c&&!c.pending){S=c;renderAll();tab("home")}await refresh();connect();
+    const h=location.hash.slice(1);if(["home","chat","play","games","bank","family"].includes(h))tab(h);
     if(inv&&inv.fid!==SES.fid)toast("You're already in a family on this phone")}
   else{showScreen("welcome");if(inv)joinFlow(inv)}
 })();

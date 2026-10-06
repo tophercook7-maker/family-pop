@@ -67,7 +67,7 @@ export default {
       if (p[1] === "relink" && req.method === "POST") {
         const { code } = await req.json();
         const dir = env.DIR.get(env.DIR.idFromName("dir"));
-        const r = await (await dir.fetch(new Request("https://dir/get", { method: "POST", body: JSON.stringify({ code: clip(code, 12).toUpperCase() }) }))).json();
+        const r = await (await dir.fetch(new Request("https://dir/get", { method: "POST", body: JSON.stringify({ code: clip(code, 16).toUpperCase() }) }))).json();
         if (!r.fid) return fail("That code didn't work. Codes last 15 minutes.", 404);
         const stub = env.FAMILY.get(env.FAMILY.idFromName(r.fid));
         return stub.fetch(new Request(`https://do/relink?fid=${r.fid}`, { method: "POST", body: JSON.stringify(r) }));
@@ -89,7 +89,8 @@ export default {
 export class Directory extends DurableObject {
   async fetch(req) {
     const url = new URL(req.url), b = await req.json();
-    if (url.pathname === "/put") { await this.ctx.storage.put("c:" + b.code, { fid: b.fid, memberId: b.memberId, exp: Date.now() + 15 * 60e3 }); return json({ ok: true }); }
+    if (url.pathname === "/put") { const ttl = Math.min(Math.max(+b.ttl || 15 * 60e3, 60e3), 7 * 864e5);
+      await this.ctx.storage.put("c:" + b.code, { fid: b.fid, memberId: b.memberId, exp: Date.now() + ttl }); return json({ ok: true }); }
     if (url.pathname === "/reg") { await this.ctx.storage.put("f:" + b.fid, 1); return json({ ok: true }); }
     if (url.pathname === "/list") { const m = await this.ctx.storage.list({ prefix: "f:" }); return json({ fids: [...m.keys()].map(k => k.slice(2)) }); }
     if (url.pathname === "/get") {
@@ -276,6 +277,12 @@ export class Family extends DurableObject {
         if (b.name) d.meta.name = clip(b.name, 40);
         if (b.newCode) d.meta.code = rid(6).toUpperCase();
         await this.save("meta"); this.broadcast("members", null); return json({ ok: true, code: d.meta.code });
+      }
+      case "homeLink": { // a one-time pass that rides along when you add Family Pop to your Home Screen
+        const code = rid(10).toUpperCase();
+        const dir = this.env.DIR.get(this.env.DIR.idFromName("dir"));
+        await dir.fetch(new Request("https://dir/put", { method: "POST", body: JSON.stringify({ code, fid: d.meta.fid, memberId: me.id, ttl: 7 * 864e5 }) }));
+        return json({ code });
       }
       case "relinkCode": {
         const code = rid(6).toUpperCase();

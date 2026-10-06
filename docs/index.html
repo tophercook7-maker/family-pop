@@ -234,6 +234,7 @@ audio{width:220px;max-width:100%}
   <button class="big main" id="wStart"><span class="ico">🏡</span><div>Start our family<small>You'll get a link to invite everyone</small></div></button>
   <button class="big" id="wJoin"><span class="ico">✉️</span><div>I got an invite<small>Paste the link or code someone sent you</small></div></button>
   <button class="big" id="wRelink"><span class="ico">📱</span><div>I'm already in, on another phone<small>Use the code from Family → Me</small></div></button>
+  <div class="soon" id="wHomeTip" hidden>📲 <b>Already using Family Pop in Safari?</b><br>Open it in Safari once more, then tap <b>Share → Add to Home Screen</b> again. The new icon will open already signed in. You can delete this icon.</div>
 </div></section>
 
 <!-- WAITING FOR APPROVAL -->
@@ -1301,11 +1302,24 @@ function renderHolidayBanner(){const box=$("#holidayBox");if(!box)return;
 
 /* ================= start ================= */
 if(!window.__TAURI__&&"serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+async function keepHomeLink(){ // so "Add to Home Screen" carries your sign-in along
+  if(standalone()||window.__TAURI__||!SES)return;
+  let h=ls.get("homeLink",null);
+  if(!h||h.fid!==SES.fid||Date.now()-h.ts>20*60e3){try{const r=await act("homeLink");h={code:r.code,ts:Date.now(),fid:SES.fid};ls.set("homeLink",h)}catch(e){return}}
+  history.replaceState(null,"",location.pathname+"?link="+h.code+location.hash);
+}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)keepHomeLink()});
 (async()=>{
   const inv=parseInvite(location.search);
+  const link=new URLSearchParams(location.search).get("link");
+  if(!SES&&link){try{const r=await api("/relink",{code:link});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES)}
+    catch(e){toast("That sign-in pass was already used. Open Family Pop in Safari and add it to your Home Screen again.")}
+    history.replaceState(null,"",location.pathname+location.hash)}
+  if(!SES&&standalone())$("#wHomeTip").hidden=false;
   applyTheme();
   if(SES){const c=ls.get("cache",null);if(c&&!c.pending){S=c;renderAll();tab("home")}await refresh();connect();
     const h=location.hash.slice(1);if(["home","chat","play","games","bank","family"].includes(h))tab(h);
+    keepHomeLink();
     if(inv&&inv.fid!==SES.fid)toast("You're already in a family on this phone")}
   else{showScreen("welcome");if(inv)joinFlow(inv)}
 })();

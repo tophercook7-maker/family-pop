@@ -79,6 +79,17 @@ label.f small{color:var(--dim);font-weight:700}
 .bday b{font-size:22px}
 .bday .row{justify-content:center}
 .bday .btn{background:#2b1747;color:#fff}
+.daily{background:var(--card);border:2px solid var(--teal);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.daily .ans button{padding:11px;font-size:16px}
+.mem{background:var(--card);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.champ{background:linear-gradient(135deg,#ffc23d,#ff8a3d);color:#2b1747;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;font-weight:900}
+.champ .p{font-size:40px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:4px}
+.grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
+audio{width:220px;max-width:100%}
+.rec{background:var(--bad)!important;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.6}}
+.kid{font-size:64px;background:var(--card);border-radius:22px;padding:14px 0}
 .soon{background:rgba(255,194,61,.15);border:2px dashed var(--sun);border-radius:14px;padding:10px 12px;font-weight:800;text-align:center}
 .post.sys{background:rgba(255,255,255,.06);font-weight:800;color:var(--dim);font-size:15px}
 .who{display:flex;align-items:center;gap:8px;font-weight:900}
@@ -215,9 +226,12 @@ label.f small{color:var(--dim);font-weight:700}
   <div class="card compose">
     <textarea id="postText" placeholder="Share something with the family…" maxlength="2000"></textarea>
     <img id="postPrev" class="sqphoto" hidden alt="">
-    <div class="row"><button class="btn small ghost" id="postPhoto">📷 Photo</button><span style="flex:1"></span><button class="btn small" id="postGo">Post</button></div>
+    <div class="row"><button class="btn small ghost" id="postPhoto">📷 Photos</button><span style="flex:1"></span><button class="btn small" id="postGo">Post</button></div>
   </div>
+  <div id="champBox"></div>
   <div id="bdayBox" class="list"></div>
+  <div id="dailyBox"></div>
+  <div id="memBox"></div>
   <div id="feed" class="list"></div>
 </div></section>
 
@@ -226,7 +240,7 @@ label.f small{color:var(--dim);font-weight:700}
   <div class="rooms" id="rooms"></div>
   <div class="tip" id="chatTip"></div>
   <div class="msgs" id="msgs"></div>
-  <div class="chatbar"><button id="chatPhoto" aria-label="Send a photo">📷</button><textarea id="chatText" rows="1" placeholder="Message" maxlength="1000"></textarea><button class="send" id="chatSend" aria-label="Send">➤</button></div>
+  <div class="chatbar"><button id="chatPhoto" aria-label="Send a photo">📷</button><button id="chatMic" aria-label="Record a voice message">🎤</button><textarea id="chatText" rows="1" placeholder="Message" maxlength="1000"></textarea><button class="send" id="chatSend" aria-label="Send">➤</button></div>
 </section>
 
 <!-- PLAY -->
@@ -234,6 +248,7 @@ label.f small{color:var(--dim);font-weight:700}
   <div class="title">🎲 Family Pop</div>
   <button class="big main" id="pNew"><span class="ico">🫧</span><div>New game<small>On everyone's phones, or pass this phone around</small></div></button>
   <div class="card"><h3>Your games</h3><div class="list" id="gameList"></div></div>
+  <button class="big" id="pKids"><span class="ico">👶</span><div>Grandkids mode<small>Easy picture game for little ones, read out loud</small></div></button>
   <button class="big" id="pHow"><span class="ico">❓</span><div>How to play</div></button>
 </div></section>
 
@@ -251,6 +266,7 @@ label.f small{color:var(--dim);font-weight:700}
   <div class="split"><button class="btn" id="bGive">🎁 Give</button><button class="btn ghost" id="bPic">📸 My picture square</button></div>
   <div class="card"><h3>Spend Pop Bucks</h3><div class="list" id="shop"></div></div>
   <div class="card"><h3>Everybody's accounts</h3><div class="list" id="accounts"></div></div>
+  <div class="card"><h3>🥇 Champion of the month</h3><div class="dim small" style="margin-bottom:8px">Points for playing, winning, and right answers. The month's champion gets 300 Pop Bucks, their picture welcomes everyone, and a <b>real 3D-printed game piece</b>.</div><div class="list" id="monthList"></div></div>
   <div class="card"><h3>🏆 Bragging rights</h3><div class="list" id="brag"></div></div>
 </div></section>
 
@@ -260,6 +276,7 @@ label.f small{color:var(--dim);font-weight:700}
   <div id="pendingBox"></div>
   <button class="btn" id="fInvite">✉️ Invite someone</button>
   <div class="card"><h3>Everyone</h3><div class="list" id="memberList"></div></div>
+  <div class="card"><h3>🌳 Mom's family tree</h3><div class="dim small" style="margin-bottom:8px">Mom's side of the family. Everyone can add who they know, and it all turns into "Way Back When" questions.</div><button class="btn small" id="fAddTree">+ Add someone</button><div class="list" id="treeList" style="margin-top:10px"></div></div>
   <div class="card"><h3>📖 Family Book</h3><div class="dim small" style="margin-bottom:8px">Memories and photos that turn into game questions.</div><button class="btn small" id="fAddMem">+ Add a memory</button><div class="list" id="bookList" style="margin-top:10px"></div></div>
   <div class="card"><h3>Me</h3><div class="list"><button class="li" id="fEditMe"><span class="p" id="mePiece">🫧</span><span class="n" id="meName">Me<small>Edit my piece and trivia answers</small></span>›</button>
     <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
@@ -357,10 +374,13 @@ function sheet(html){$("#sheet").innerHTML=html;$("#modal").classList.add("on");
 function closeSheet(){$("#modal").classList.remove("on")}
 function ask(html,buttons){return new Promise(res=>{sheet(html+'<div class="ans" id="askBtns"></div>');const box=$("#askBtns");
   buttons.forEach(([label,val,cls])=>{const b=document.createElement("button");b.innerHTML=label;if(cls)b.className=cls;b.onclick=()=>{closeSheet();res(val)};box.appendChild(b)})})}
-function pickPhoto(max=900){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept="image/*";
-  i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return res(null);const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{
+function shrink(f,max){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{
     const s=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
-    c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.78))};img.onerror=()=>res(null);img.src=r.result};r.readAsDataURL(f)};i.click()})}
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.78))};img.onerror=()=>res(null);img.src=r.result};r.onerror=()=>res(null);r.readAsDataURL(f)})}
+function pickPhoto(max=900){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept="image/*";
+  i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return res(null);shrink(f,max).then(res)};i.click()})}
+function pickPhotos(max=900,limit=8){return new Promise(res=>{const i=document.createElement("input");i.type="file";i.accept="image/*";i.multiple=true;
+  i.onchange=async()=>{const fs=[...(i.files||[])].slice(0,limit);const out=[];for(const f of fs){const d=await shrink(f,max);if(d)out.push(d)}res(out)};i.click()})}
 async function busy(btn,fn){if(btn)btn.disabled=true;try{return await fn()}catch(e){toast(esc(e.message))}finally{if(btn)btn.disabled=false}}
 function copyText(t){try{navigator.clipboard.writeText(t).then(()=>toast("Copied"),()=>prompt("Copy this:",t))}catch(e){prompt("Copy this:",t)}}
 async function shareOut(text,photoId){ // send a family moment out to Facebook, groups, texts… through the phone's share menu
@@ -448,10 +468,11 @@ function profileFields(p,opts={}){
    <label class="f">Nickname<input id="pfNick" value="${esc(p.nick||"")}" placeholder="What do people call you?"></label>
    <label class="f">Favorite food<input id="pfFood" value="${esc(p.food||"")}" placeholder="Like chicken and dumplings"></label>
    <label class="f">Something nobody knows about you<input id="pfSecret" value="${esc(p.secret||"")}" placeholder="A fun surprise fact"></label>
+   <label class="f">Your Facebook page (optional)<small>So family can tap through to your pictures there</small><input id="pfFb" value="${esc(p.fb||"")}" placeholder="facebook.com/your.name" inputmode="url"></label>
    <label class="chk"><input type="checkbox" id="pfChat" ${p.chatTrivia===false?"":"checked"}> <span>Things I say in the family chat can become "Who said this?" questions<br><small class="dim">You can change this anytime</small></span></label>`;
 }
 function readProfile(){let piece=($(".pieces button.on")||{}).dataset;piece=piece?piece.p:"🧁";
-  return {name:$("#pfName").value.trim(),piece,birthday:$("#pfBday").value.trim(),nick:$("#pfNick").value.trim(),food:$("#pfFood").value.trim(),secret:$("#pfSecret").value.trim(),chatTrivia:$("#pfChat").checked}}
+  return {name:$("#pfName").value.trim(),piece,birthday:$("#pfBday").value.trim(),nick:$("#pfNick").value.trim(),food:$("#pfFood").value.trim(),secret:$("#pfSecret").value.trim(),fb:($("#pfFb")||{value:""}).value.trim(),chatTrivia:$("#pfChat").checked}}
 function wirePieces(){$$("#pfPieces button").forEach(b=>b.onclick=()=>{if(b.classList.contains("lock")){toast("Buy that piece in the Bank 🏦");return}$$("#pfPieces button").forEach(x=>x.classList.toggle("on",x===b))})}
 $("#wStart").onclick=()=>{sheet(`<h2>Start our family</h2><label class="f">Family name<input id="fmName" placeholder="The Cook Family" maxlength="40"></label>${profileFields()}<button class="btn" id="fmGo">Start it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);wirePieces();
   $("#fmGo").onclick=()=>busy($("#fmGo"),async()=>{const me=readProfile();if(!me.name)return toast("Please type your name");
@@ -472,10 +493,11 @@ $("#pendCheck").onclick=refresh;
 setInterval(()=>{if(SES&&$("#pending").classList.contains("on"))refresh()},15000);
 
 /* ================= feed ================= */
-let postPhoto=null;
-$("#postPhoto").onclick=async()=>{postPhoto=await pickPhoto();if(postPhoto){$("#postPrev").src=postPhoto;$("#postPrev").hidden=false}};
-$("#postGo").onclick=()=>busy($("#postGo"),async()=>{const text=$("#postText").value.trim();if(!text&&!postPhoto)return toast("Write something or add a photo");
-  await act("post",{text,photo:postPhoto});$("#postText").value="";postPhoto=null;$("#postPrev").hidden=true;buzz(20);refresh()});
+let postPhotos=[];
+$("#postPhoto").onclick=async()=>{const ph=await pickPhotos();if(ph.length){postPhotos=ph;$("#postPrev").src=ph[0];$("#postPrev").hidden=false;if(ph.length>1)toast(`${ph.length} photos ready to post`)}};
+$("#postGo").onclick=()=>busy($("#postGo"),async()=>{const text=$("#postText").value.trim();if(!text&&!postPhotos.length)return toast("Write something or add a photo");
+  if(postPhotos.length>4)toast("Sending your photos…");
+  await act("post",{text,photos:postPhotos});$("#postText").value="";postPhotos=[];$("#postPrev").hidden=true;buzz(20);refresh()});
 function renderBirthdays(){
   const t=(S.today||{birthdays:[],tomorrow:[]});const box=$("#bdayBox");if(!box)return;
   const today=t.birthdays.map(mem).filter(Boolean),soon=t.tomorrow.map(mem).filter(Boolean);
@@ -486,12 +508,37 @@ function renderBirthdays(){
   $$("[data-bgift]").forEach(b=>b.onclick=()=>giveSheet(b.dataset.bgift));
   $$("[data-bwish]").forEach(b=>b.onclick=()=>{ROOM="all";tab("chat");$("#chatText").value=`Happy Birthday, ${mem(b.dataset.bwish).name}! 🎂🎉`;$("#chatText").focus()});
 }
+function renderChamp(){
+  const c=S.champion,box=$("#champBox");if(!box)return;const m=c&&mem(c.memberId);
+  box.innerHTML=c?`<div class="champ"><span class="p">${(m||c).piece}</span><div>🥇 Family Champion of ${esc(c.month)}<br><span style="font-size:22px">${esc((m||c).name)}</span><div class="small">Wins a real 3D-printed ${(m||c).piece} game piece!</div></div></div>`:"";
+}
+function renderDaily(){
+  const box=$("#dailyBox");if(!box)return;const q=S.daily;if(!q||!q.q){box.innerHTML="";return}
+  const mine=q.answers[meId()],aboutMe=q.about===meId();const who=Object.entries(q.answers).map(([id,v])=>{const m=mem(id);return m?`${m.piece}${v.ok?"✅":"❌"}`:""}).join(" ");
+  box.innerHTML=`<div class="daily"><div class="cat">⭐ Today's family question · ${esc(q.cat)}</div><div class="qtext" style="font-size:19px">${esc(q.q)}</div>
+    ${aboutMe?'<div class="dim">This one is about you! See who knows you best.</div>':mine?`<div><b style="color:${mine.ok?"var(--good)":"var(--bad)"}">${mine.ok?"You got it!":"Not this time."}</b> The answer is <b>${esc(q.a)}</b>.</div>`
+      :`<div class="ans">${q.opts.map(o=>`<button data-dq="${esc(o)}">${esc(o)}</button>`).join("")}</div><div class="dim small">First right answer gets 50 Pop Bucks, everyone else who's right gets 15.</div>`}
+    ${who?`<div class="small">Answered: ${who}${q.first&&mem(q.first)?` · first right: ${mem(q.first).piece} ${esc(mem(q.first).name)}`:""}</div>`:""}</div>`;
+  $$("[data-dq]").forEach(b=>b.onclick=()=>busy(b,async()=>{const r=await act("daily",{pick:b.dataset.dq});
+    if(r.right){sfx.right();burst(innerWidth/2,innerHeight/3,30);toast(r.first?"🥇 First right answer! +50 Pop Bucks":`✅ Right! +${r.paid} Pop Bucks`)}else{sfx.wrong();toast(`It's ${esc(r.a)}. Tomorrow's a new one!`)}refresh()}));
+}
+function renderMemory(){ // "memory of the day": an older family photo comes back around
+  const box=$("#memBox");if(!box)return;const day=new Date().toDateString();
+  const pics=S.feed.filter(p=>p.photo&&p.from!=="system"&&Date.now()-p.ts>3*864e5).map(p=>({id:p.photo,from:p.from,ts:p.ts,text:p.text}))
+    .concat(S.book.filter(e=>e.photo).map(e=>({id:e.photo,from:e.by,ts:0,q:e.q,a:e.a})));
+  if(!pics.length){box.innerHTML="";return}
+  let h=0;for(const c of day)h=(h*31+c.charCodeAt(0))>>>0;const pk=pics[h%pics.length];const by=mem(pk.from);
+  box.innerHTML=`<div class="mem"><div class="cat">📸 Memory of the day</div><img class="ph" src="${photoURL(pk.id)}" alt="" style="width:100%;border-radius:14px;max-height:50vh;object-fit:cover">
+    <div class="small dim">${pk.ts?`${by?esc(by.name)+" shared this":"Shared"} ${ago(pk.ts)}${pk.text?': "'+esc(pk.text.slice(0,80))+'"':""}`:esc(pk.q||"")}</div>
+    ${pk.ts?`<button class="btn small ghost" id="memQ">💡 Who's in this picture? Make it a question</button>`:""}</div>`;
+  if($("#memQ"))$("#memQ").onclick=()=>triviaForm({photoId:pk.id,cat:"Who's in the Picture?"});
+}
 function renderFeed(){
-  if(!S)return;renderBirthdays();const f=S.feed.slice().reverse();
+  if(!S)return;renderChamp();renderBirthdays();renderDaily();renderMemory();const f=S.feed.slice().reverse();
   $("#feed").innerHTML=f.length?f.map(p=>{if(p.from==="system")return `<div class="post sys">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span></div>`;
     const a=mem(p.from)||{name:"Someone",piece:"🫧"};const liked=p.likes.includes(meId());
     return `<div class="post"><div class="who"><span class="pc">${a.piece}</span><span>${esc(a.name)}<br><small>${ago(p.ts)}</small></span></div>
-      ${p.text?`<div class="text">${esc(p.text)}</div>`:""}${p.photo?`<img class="ph" loading="lazy" src="${photoURL(p.photo)}" alt="Photo from ${esc(a.name)}">`:""}
+      ${p.text?`<div class="text">${esc(p.text)}</div>`:""}${p.photos&&p.photos.length>1?`<div class="grid">${p.photos.map(id=>`<img loading="lazy" src="${photoURL(id)}" alt="">`).join("")}</div>`:p.photo?`<img class="ph" loading="lazy" src="${photoURL(p.photo)}" alt="Photo from ${esc(a.name)}">`:""}
       <div class="acts"><button class="${liked?"on":""}" data-like="${p.id}">❤️ ${p.likes.length||""}</button><button data-cm="${p.id}">💬 ${p.comments.length||""}</button>
       <button data-share="${p.id}">📤 Share out</button><button data-q="${p.id}">💡 Make a question</button></div>
       ${p.comments.length?`<div class="cmts">${p.comments.map(c=>{const w=mem(c.from)||{name:"Someone"};return `<div><b>${esc(w.name)}</b> ${esc(c.text)}</div>`}).join("")}</div>`:""}</div>`}).join("")
@@ -514,10 +561,10 @@ function renderChat(fromEvent){
   const rk=roomKey(ROOM);const list=S.chat.filter(c=>c.room===rk);
   const box=$("#msgs");const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
   box.innerHTML=list.length?list.map(c=>{const a=mem(c.from)||{name:"Someone",piece:"🫧"};const mine=c.from===meId();
-    return `<div class="msg ${mine?"me":""}"><span class="pc">${a.piece}</span><div><div class="nm">${mine?"":esc(a.name)+" · "}${ago(c.ts)}</div><div class="bub2" data-m="${c.id}">${c.text?esc(c.text):""}${c.photo?`<img class="ph" loading="lazy" src="${photoURL(c.photo)}" alt="">`:""}</div></div></div>`}).join("")
+    return `<div class="msg ${mine?"me":""}"><span class="pc">${a.piece}</span><div><div class="nm">${mine?"":esc(a.name)+" · "}${ago(c.ts)}</div><div class="bub2" data-m="${c.id}">${c.text?esc(c.text):""}${c.photo?`<img class="ph" loading="lazy" src="${photoURL(c.photo)}" alt="">`:""}${c.audio?`<audio controls preload="none" src="${photoURL(c.audio)}"></audio>`:""}</div></div></div>`}).join("")
     :`<div class="dim" style="text-align:center;margin-top:20vh">${ROOM==="all"?"Say hi to the whole family!":"Start a private conversation."}</div>`;
   $("#chatTip").innerHTML=ROOM==="all"&&S.me.chatTrivia?'💡 Things you say here can turn into "Who said this?" game questions. Tap a message to make your own question.':"Tap a message to turn it into a game question.";
-  $$("#msgs .bub2").forEach(el=>el.onclick=()=>{const c=S.chat.find(x=>x.id===el.dataset.m);const a=mem(c.from)||{name:""};
+  $$("#msgs .bub2").forEach(el=>el.onclick=e=>{if(e.target.tagName==="AUDIO")return;const c=S.chat.find(x=>x.id===el.dataset.m);if(c.audio&&!c.text)return;const a=mem(c.from)||{name:""};
     triviaForm({photoId:c.photo,cat:c.photo?"Who's in the Picture?":"Way Back When",q:c.text?`Who said this? "${c.text.slice(0,120)}"`:"",a:c.text?a.name:""})});
   if($("#chat").classList.contains("on")){seen[rk]=Date.now();ls.set("seen",seen)}
   if(atBottom||!fromEvent)box.scrollTop=box.scrollHeight;badges();
@@ -526,6 +573,21 @@ let chatPhoto=null;
 $("#chatPhoto").onclick=async()=>{const ph=await pickPhoto();if(ph)busy(null,async()=>{await act("chat",{room:ROOM,photo:ph});refresh()})};
 async function sendChat(){const t=$("#chatText").value.trim();if(!t)return;$("#chatText").value="";await busy($("#chatSend"),async()=>{const r=await act("chat",{room:ROOM,text:t});if(!S.chat.some(c=>c.id===r.msg.id))S.chat.push(r.msg);renderChat()})}
 $("#chatSend").onclick=sendChat;
+let REC=null;
+$("#chatMic").onclick=async()=>{ // tap to start talking, tap again to send
+  const btn=$("#chatMic");
+  if(REC){REC.stop();return}
+  if(!navigator.mediaDevices||!window.MediaRecorder)return toast("This phone can't record here. Try the Family Pop app.");
+  let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){return toast("Please allow the microphone to send voice messages")}
+  const type=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(t=>MediaRecorder.isTypeSupported(t))||"";
+  const chunks=[];REC=new MediaRecorder(stream,type?{mimeType:type,audioBitsPerSecond:48000}:{});const t0=Date.now();
+  REC.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  REC.onstop=()=>{stream.getTracks().forEach(t=>t.stop());btn.classList.remove("rec");btn.textContent="🎤";clearTimeout(REC._cap);REC=null;
+    if(Date.now()-t0<700)return toast("Hold on a little longer, then tap again to send");
+    const blob=new Blob(chunks,{type:(type||"audio/webm").split(";")[0]});const fr=new FileReader();
+    fr.onload=()=>busy(null,async()=>{const r=await act("chat",{room:ROOM,audio:fr.result});if(!S.chat.some(c=>c.id===r.msg.id))S.chat.push(r.msg);renderChat();toast("🎤 Sent")});fr.readAsDataURL(blob)};
+  REC.start();REC._cap=setTimeout(()=>REC&&REC.stop(),60000);btn.classList.add("rec");btn.textContent="■";toast("🎤 Recording… tap ■ to send");
+};
 $("#chatText").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat()}});
 
 /* ================= trivia + Family Book ================= */
@@ -567,13 +629,35 @@ function renderFamily(){
   $$("[data-mem]").forEach(b=>b.onclick=()=>memberSheet(mem(b.dataset.mem)));
   $("#bookList").innerHTML=S.book.length?S.book.slice().reverse().map(e=>{const by=mem(e.by);return `<div class="li">${e.photo?`<img src="${photoURL(e.photo)}" alt="">`:'<span class="p">💬</span>'}<span class="n">${esc(e.q)}<small>${esc(e.cat)} · ${esc(e.a)}${by?" · by "+esc(by.name):""}</small></span>${(e.by===meId()||me.approver)?`<button class="btn small ghost" data-bd="${e.id}">✕</button>`:""}</div>`}).join(""):'<div class="dim small">Nothing yet.</div>';
   $$("[data-bd]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("bookDel",{id:b.dataset.bd});refresh()}));
+  renderTree();
   $("#adminCard").style.display=me.approver?"":"none";$("#setApproval").checked=!!S.meta.approval;
 }
+const RELATIONS=["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
+function renderTree(){
+  const t=(S.tree||[]).slice();const ord=r=>RELATIONS.indexOf(r);t.sort((a,b)=>ord(a.relation)-ord(b.relation));
+  $("#treeList").innerHTML=t.length?t.map(e=>{const by=mem(e.by);return `<div class="li">${e.photo?`<img src="${photoURL(e.photo)}" alt="">`:'<span class="p">🌳</span>'}<span class="n">${esc(e.name)}<small>${esc(e.relation)}${e.born?" · born "+esc(e.born):""}${e.place?" · "+esc(e.place):""}${e.died?" · died "+esc(e.died):""}${e.story?'<br>"'+esc(e.story)+'"':""}${by?"<br>added by "+esc(by.name):""}</small></span>${(e.by===meId()||S.me.approver||S.me.mom)?`<button class="btn small ghost" data-td="${e.id}">✕</button>`:""}</div>`}).join("")
+    :`<div class="dim small">Nobody yet. ${S.members.some(m=>m.mom)?"Mom":"Start with Mom's parents and grandparents"}: add their names, where they were born, and a story about them.</div>`;
+  $$("[data-td]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("treeDel",{id:b.dataset.td});refresh()}));
+}
+$("#fAddTree").onclick=()=>{let photo=null;
+  sheet(`<h2>🌳 Add to Mom's family tree</h2>
+   <label class="f">Name<input id="trName" maxlength="60" placeholder="Their full name"></label>
+   <label class="f">Who are they?<select id="trRel">${RELATIONS.map(r=>`<option>${r}</option>`).join("")}</select></label>
+   <div class="split"><label class="f">Born<input id="trBorn" maxlength="40" placeholder="1931"></label><label class="f">Died<input id="trDied" maxlength="40" placeholder="(if passed)"></label></div>
+   <label class="f">Where were they born or raised?<input id="trPlace" maxlength="60" placeholder="Mena, Arkansas"></label>
+   <label class="f">A story or something special about them<textarea id="trStory" maxlength="300" placeholder="Made the best biscuits in the county"></textarea></label>
+   <button class="btn ghost" id="trPhoto">📷 Add their picture (optional)</button><img id="trPrev" class="qphoto" hidden alt="">
+   <button class="btn" id="trSave">Add to the tree</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  $("#trPhoto").onclick=async()=>{photo=await pickPhoto(700);if(photo){$("#trPrev").src=photo;$("#trPrev").hidden=false}};
+  $("#trSave").onclick=()=>busy($("#trSave"),async()=>{const name=$("#trName").value.trim();if(!name)return toast("Please add a name");
+    await act("treeAdd",{name,relation:$("#trRel").value,born:$("#trBorn").value.trim(),died:$("#trDied").value.trim(),place:$("#trPlace").value.trim(),story:$("#trStory").value.trim(),photo});
+    closeSheet();sfx.fan();toast("🌳 Added to the tree!");refresh()})};
 function memberSheet(m){
   const me=S.me;const isMe=m.id===meId();
   sheet(`<div class="bigmoji">${m.piece}</div><h2>${esc(m.name)}${m.mom?" 💐":""}</h2>
    <div class="dim">🫧 ${m.bucks} Pop Bucks · 🎟️ ${m.passes} Free Pass${m.passes===1?"":"es"} · 🏆 ${m.stats.wins} win${m.stats.wins===1?"":"s"}</div>
    <div class="card" style="text-align:left">${[["🎂 Birthday",m.birthday],["😄 Nickname",m.nick],["🍽️ Favorite food",m.food]].map(([k,v])=>`<div>${k}: <b>${esc(v||"—")}</b></div>`).join("")}</div>
+   ${m.fb?`<a class="btn ghost" style="text-decoration:none;display:block" href="${esc(m.fb)}" target="_blank" rel="noopener">📘 See ${esc(m.name)} on Facebook</a>`:""}
    ${isMe?"":`<button class="btn" id="msGive">🎁 Give ${esc(m.name)} something</button><button class="btn ghost" id="msChat">💬 Message ${esc(m.name)}</button>`}
    ${me.approver&&!isMe?`<label class="chk"><input type="checkbox" id="msAppr" ${m.approver?"checked":""}> ${esc(m.name)} approves new people</label><label class="chk"><input type="checkbox" id="msMom" ${m.mom?"checked":""}> This is Mom (she gets paid when someone forgets to call her)</label>`:""}
    <button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
@@ -609,6 +693,8 @@ function renderBank(){
   $$("[data-buy]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("shop",{item:b.dataset.buy});sfx.cash();toast("Bought! 🎉");await refresh();if(b.dataset.buy==="square")squareFlow()}));
   const ms=S.members.filter(m=>m.status==="member");
   $("#accounts").innerHTML=ms.slice().sort((a,b)=>b.bucks-a.bucks).map(m=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${esc(m.name)}<small>🎟️ ${m.passes} Free Pass${m.passes===1?"":"es"}</small></span><b style="color:var(--sun)">${m.bucks.toLocaleString()}</b></div>`).join("");
+  $("#monthList").innerHTML=(S.champion?`<div class="li"><span class="p">🥇</span><span class="n">Last champion: ${esc(S.champion.name)}<small>${esc(S.champion.month)}</small></span></div>`:"")+
+    ms.slice().sort((a,b)=>(b.mpts||0)-(a.mpts||0)).map((m,i)=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${i===0&&m.mpts?"👑 ":""}${esc(m.name)}<small>this month</small></span><b>${m.mpts||0} pts</b></div>`).join("");
   $("#brag").innerHTML=ms.slice().sort((a,b)=>b.stats.wins-a.stats.wins||(b.stats.right/(b.stats.asked||1))-(a.stats.right/(a.stats.asked||1))).map((m,i)=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${i===0&&m.stats.wins?"👑 ":""}${esc(m.name)}<small>🧠 knows the family ${m.stats.asked?Math.round(100*m.stats.right/m.stats.asked):0}% · ${m.stats.trophies.slice(-6).join(" ")||"no trophies yet"}</small></span><b>${m.stats.wins} 🏆</b></div>`).join("");
 }
 async function squareFlow(){
@@ -650,6 +736,14 @@ function famQuestions(){
     if(p.secret)qs.push({cat:"Way Back When",about:p.id,q:`Something nobody knew… whose secret is this? "${p.secret}"`,a:p.name,pool:names});
   });
   (S.trivia||[]).forEach(t=>{const m=mem(t.about);if(m&&m.status==="member")qs.push({cat:t.cat,about:t.about,q:t.q,a:m.name,pool:names})});
+  const tree=S.tree||[],tnames=tree.map(t=>t.name),momM=ppl.find(m=>m.mom),momName=momM?momM.name:"Mom";
+  tree.forEach(t=>{
+    if(t.relation!=="Other family"&&tnames.length>1)qs.push({cat:"Way Back When",q:`Who was ${t.relation.replace("Mom's",momName+"'s")}?`,a:t.name,pool:tnames,photo:t.photo});
+    if(t.place)qs.push({cat:"Way Back When",q:`Where was ${t.name} born or raised?`,a:t.place,pool:tree.map(x=>x.place).filter(Boolean).concat(["Hot Springs","Little Rock","Malvern","Arkadelphia","Mena","Texarkana","Hope","Benton"])});
+    if(t.story&&tnames.length>1)qs.push({cat:"Way Back When",q:`Which family member is this story about? "${t.story}"`,a:t.name,pool:tnames});
+    if(t.born&&/\d{4}/.test(t.born)){const y=+t.born.match(/\d{4}/)[0];qs.push({cat:"Then & Now",q:`About what year was ${t.name} born?`,a:String(y),pool:[y-10,y+10,y-20,y+20,y+5].map(String)})}
+    if(t.photo&&tnames.length>1)qs.push({cat:"Who's in the Picture?",q:"Who's in this old family picture?",a:t.name,pool:tnames,photo:t.photo});
+  });
   S.book.forEach(e=>qs.push({cat:e.cat,q:e.q,a:e.a,photo:e.photo,pool:e.wrong.length?e.wrong:(names.includes(e.a)?names:null)}));
   return qs;
 }
@@ -912,6 +1006,29 @@ async function showEnd(award){
   if($("#winPic"))$("#winPic").onclick=()=>{closeSheet();squareFlow()};
   $("#endBack").onclick=()=>{closeSheet();GAME=null;tab("play")};
 }
+/* 👶 Grandkids mode: pictures only, read out loud, can't lose */
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=.9;u.pitch=1.15;speechSynthesis.speak(u)}catch(e){}}
+const KID_THINGS=[["🐶","dog"],["🐱","cat"],["🐮","cow"],["🐷","pig"],["🐴","horse"],["🐔","chicken"],["🦆","duck"],["🐸","frog"],["🍎","apple"],["🍌","banana"],["🍓","strawberry"],["🚗","car"],["🚜","tractor"],["🌞","sun"],["🌙","moon"],["⭐","star"],["🎈","balloon"],["🧁","cupcake"],["🐢","turtle"],["🦋","butterfly"]];
+const KID_COLORS=[["🟥","red"],["🟦","blue"],["🟩","green"],["🟨","yellow"],["🟪","purple"],["🟧","orange"]];
+function kidRound(){
+  const fam=S.members.filter(m=>m.status==="member");const kinds=["thing","color","count"].concat(fam.length>=2?["piece"]:[]);const k=rnd(kinds);
+  if(k==="thing"){const opts=shuffle(KID_THINGS).slice(0,3),a=rnd(opts);return{say:`Can you find the ${a[1]}?`,opts:opts.map(o=>o[0]),a:a[0]}}
+  if(k==="color"){const opts=shuffle(KID_COLORS).slice(0,3),a=rnd(opts);return{say:`Which one is ${a[1]}?`,opts:opts.map(o=>o[0]),a:a[0]}}
+  if(k==="count"){const n=1+Math.floor(Math.random()*5),t=rnd(KID_THINGS)[0];const opts=shuffle([n,n===1?2:n-1,n===5?4:n+1].filter((v,i,a)=>a.indexOf(v)===i));return{say:`How many? Count them!`,show:t.repeat(n),opts:opts.map(String),a:String(n)}}
+  const opts=shuffle(fam).slice(0,3),a=rnd(opts);return{say:`Which piece is ${a.name}'s?`,opts:opts.map(o=>o.piece),a:a.piece};
+}
+$("#pKids").onclick=async()=>{
+  let stars=0;
+  for(let i=0;i<8;i++){const r=kidRound();
+    const got=await new Promise(res=>{sheet(`<div class="dim">⭐ ${stars} stars</div><div class="qtext" style="font-size:26px">${esc(r.say)}</div>${r.show?`<div style="font-size:44px;letter-spacing:4px">${r.show}</div>`:""}
+      <div class="split" style="grid-template-columns:repeat(${r.opts.length},1fr)">${r.opts.map(o=>`<button class="kid" data-k="${esc(o)}">${esc(o)}</button>`).join("")}</div>
+      <button class="btn ghost small" id="kSay">🔊 Say it again</button><button class="btn ghost small" id="kStop">All done</button>`);say(r.say);
+      $("#kSay").onclick=()=>say(r.say);$("#kStop").onclick=()=>{closeSheet();res(null)};
+      $$("[data-k]").forEach(b=>b.onclick=()=>{if(b.dataset.k===r.a){sfx.right();buzz(30);burst(innerWidth/2,innerHeight/2,30);say(rnd(["Yay!","Great job!","You did it!","Super!"]));closeSheet();setTimeout(()=>res(true),700)}
+        else{b.style.opacity=.3;sfx.wrong();say("Try again!")}})});
+    if(got===null)break;stars++}
+  if(stars){sheet(`<div class="bigmoji">🌟</div><h2>${stars} star${stars>1?"s":""}!</h2><div class="dim">Great playing!</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Done</button>`);say(`You got ${stars} stars! Great playing!`)}
+};
 $("#pHow").onclick=()=>sheet(`<h2>How to play</h2><div style="text-align:left;line-height:1.55">
  🫧 <b>Pick your bubble</b>. <b>Small</b> = easy family question, move <b>2</b>. <b>Medium</b> = move <b>4</b>. <b>Big</b> = hard, timed, move <b>6</b>. Right answers also pay 20, and 3 in a row pays 50 more. Wrong, and you only move 1.<br>
  🏡 Buy places nobody owns. When others land there, they <b>pay you rent</b>, double if you own the whole color. Everyone's own house is theirs from the start.<br>

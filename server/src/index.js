@@ -31,7 +31,8 @@ function centralToday(offsetDays = 0) {
   return [+p.month, +p.day, +p.year];
 }
 const BDAY_BUCKS = 250;
-const PROFILE_FIELDS = ["name", "piece", "birthday", "nick", "food", "secret", "chatTrivia", "mom"];
+const PROFILE_FIELDS = ["name", "piece", "birthday", "nick", "food", "secret", "chatTrivia", "mom", "fb"];
+const RELATIONS = ["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
 
 export default {
   async fetch(req, env) {
@@ -86,18 +87,18 @@ export class Family extends DurableObject {
 
   async load() {
     if (this.d) return this.d;
-    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia"];
+    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily"];
     const got = await this.ctx.storage.get(keys);
     this.d = {
       meta: got.get("meta") || null, members: got.get("members") || {}, chat: got.get("chat") || [], feed: got.get("feed") || [],
-      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [],
+      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null,
     };
     return this.d;
   }
   async save(...keys) { const o = {}; for (const k of keys) o[k] = this.d[k]; await this.ctx.storage.put(o); }
-  async putPhoto(b64) {
-    if (!b64 || typeof b64 !== "string" || !b64.startsWith("data:image/")) return null;
-    if (b64.length > 900_000) throw new Error("That photo is too big");
+  async putPhoto(b64, kind = "image") {
+    if (!b64 || typeof b64 !== "string" || !b64.startsWith("data:" + kind + "/")) return null;
+    if (b64.length > (kind === "audio" ? 1_400_000 : 900_000)) throw new Error(kind === "audio" ? "That voice message is too long (about 1 minute max)" : "That photo is too big");
     const id = rid(12); await this.ctx.storage.put("photo:" + id, b64); return id;
   }
   broadcast(type, data, onlyTo) {
@@ -110,7 +111,8 @@ export class Family extends DurableObject {
   newMember(fields, status) {
     const m = { id: rid(8), status, joined: Date.now(), bucks: 500, passes: 1, pieces: [], sqCredits: 0,
       stats: { games: 0, wins: 0, right: 0, asked: 0, rent: 0, trophies: [] }, chatTrivia: true, mom: false, approver: false };
-    for (const f of PROFILE_FIELDS) if (fields[f] !== undefined) m[f] = typeof fields[f] === "boolean" ? fields[f] : clip(fields[f], f === "secret" ? 140 : 40);
+    for (const f of PROFILE_FIELDS) if (fields[f] !== undefined) m[f] = typeof fields[f] === "boolean" ? fields[f] : clip(fields[f], f === "secret" ? 140 : f === "fb" ? 200 : 40);
+    m.fb = fbLink(m.fb);
     if (!m.name) m.name = "Family member";
     if (!m.piece) m.piece = "🫧";
     return m;
@@ -118,6 +120,7 @@ export class Family extends DurableObject {
   publicMember(m, full) {
     const o = { id: m.id, name: m.name, piece: m.piece, status: m.status, approver: !!m.approver, mom: !!m.mom, creator: !!m.creator,
       bucks: m.bucks, passes: m.passes, stats: m.stats, pieces: m.pieces || [] };
+    o.fb = m.fb || ""; o.mpts = m.mpts || 0;
     if (full) Object.assign(o, { birthday: m.birthday || "", nick: m.nick || "", food: m.food || "", secret: m.secret || "", chatTrivia: m.chatTrivia !== false, sqCredits: m.sqCredits || 0 });
     return o;
   }
@@ -141,7 +144,10 @@ export class Family extends DurableObject {
       members: members.map(m => this.publicMember(m, m.status === "member")),
       chat: d.chat.filter(c => myRooms(c.room)).slice(-300),
       feed: d.feed.slice(-80),
-      book: d.book, trivia: d.trivia.slice(-200), sqpics: d.sqpics,
+      book: d.book, trivia: d.trivia.slice(-200), sqpics: d.sqpics, tree: d.tree,
+      daily: d.daily && { date: d.daily.date, q: d.daily.q, cat: d.daily.cat, opts: d.daily.opts, about: d.daily.about, answers: d.daily.answers, first: d.daily.first,
+        a: d.daily.answers[me.id] ? d.daily.a : undefined },
+      champion: d.meta.champion || null, month: d.meta.monthKey,
       games: Object.values(d.games).map(g => ({ id: g.id, title: g.title, status: g.status, updated: g.updated, players: g.players, turnMember: g.turnMember, created: g.created })),
     };
   }
@@ -191,7 +197,7 @@ export class Family extends DurableObject {
 
     const me = await this.who(req, url);
     if (!me) return fail("Please join the family first", 401);
-    await this.birthdays();
+    await this.birthdays(); await this.monthly(); await this.ensureDaily();
 
     if (path === "/ws") {
       if (req.headers.get("Upgrade") !== "websocket") return fail("Expected websocket");
@@ -215,7 +221,8 @@ export class Family extends DurableObject {
 
     switch (a) {
       case "profile": {
-        for (const f of PROFILE_FIELDS) if (b[f] !== undefined && f !== "mom") me[f] = typeof b[f] === "boolean" ? b[f] : clip(b[f], f === "secret" ? 140 : 40);
+        for (const f of PROFILE_FIELDS) if (b[f] !== undefined && f !== "mom") me[f] = typeof b[f] === "boolean" ? b[f] : clip(b[f], f === "secret" ? 140 : f === "fb" ? 200 : 40);
+        me.fb = fbLink(me.fb);
         await this.save("members"); this.broadcast("members", null); return json({ ok: true });
       }
       case "approve": case "deny": {
@@ -251,10 +258,10 @@ export class Family extends DurableObject {
         return json({ code });
       }
       case "chat": {
-        const text = clip(b.text, 1000).trim(); const photo = await this.putPhoto(b.photo);
-        if (!text && !photo) return fail("Empty message");
+        const text = clip(b.text, 1000).trim(); const photo = await this.putPhoto(b.photo); const audio = await this.putPhoto(b.audio, "audio");
+        if (!text && !photo && !audio) return fail("Empty message");
         const room = b.room === "all" || !b.room ? "all" : [me.id, member(b.room).id].sort().join("~");
-        const msg = { id: rid(10), room, from: me.id, text, photo, ts: Date.now() };
+        const msg = { id: rid(10), room, from: me.id, text, photo, audio, ts: Date.now() };
         d.chat.push(msg); if (d.chat.length > 2000) d.chat.splice(0, d.chat.length - 2000);
         // things said in the family chat can become "Who said this?" trivia, only if the person said that's okay
         if (room === "all" && me.chatTrivia !== false && text.length >= 20 && text.length <= 160 && !/https?:\/\//.test(text)) {
@@ -278,8 +285,9 @@ export class Family extends DurableObject {
       }
       case "post": {
         const text = clip(b.text, 2000).trim(); const photo = await this.putPhoto(b.photo);
-        if (!text && !photo) return fail("Write something or add a photo");
-        const p = { id: rid(10), from: me.id, text, photo, ts: Date.now(), likes: [], comments: [] };
+        const photos = []; for (const ph of (b.photos || []).slice(0, 8)) { const id = await this.putPhoto(ph); if (id) photos.push(id); }
+        if (!text && !photo && !photos.length) return fail("Write something or add a photo");
+        const p = { id: rid(10), from: me.id, text, photo: photo || photos[0] || null, photos: photos.length > 1 ? photos : undefined, ts: Date.now(), likes: [], comments: [] };
         d.feed.push(p); if (d.feed.length > 400) d.feed.splice(0, d.feed.length - 400);
         await this.save("feed"); this.broadcast("feed", p); return json({ ok: true, post: p });
       }
@@ -363,6 +371,7 @@ export class Family extends DurableObject {
           if (s.trophies.length > 60) s.trophies.splice(0, s.trophies.length - 60);
           const bank = Math.max(0, Math.min(400, Math.round((r.worth | 0) / 10)));
           m.bucks += bank; if (r.winner) { s.wins++; m.sqCredits = (m.sqCredits || 0) + 1; }
+          m.mpts = (m.mpts || 0) + 10 + (r.right | 0) * 2 + (r.winner ? 50 : 0);
           lines.push(`${m.piece} ${m.name} +${bank}`);
         }
         const win = (b.results || []).find(r => r.winner);
@@ -374,6 +383,29 @@ export class Family extends DurableObject {
       case "gameDelete": {
         const g = d.games[b.id]; if (g && (g.host === me.id || isApprover)) { delete d.games[b.id]; await this.save("games"); this.broadcast("games", null); }
         return json({ ok: true });
+      }
+      case "treeAdd": {
+        const name = clip(b.name, 60).trim(); if (!name) return fail("Please add a name");
+        const e = { id: rid(8), name, relation: RELATIONS.includes(b.relation) ? b.relation : "Other family", born: clip(b.born, 40), died: clip(b.died, 40), place: clip(b.place, 60),
+          story: clip(b.story, 300), photo: await this.putPhoto(b.photo), by: me.id, ts: Date.now() };
+        d.tree.push(e); if (d.tree.length > 500) d.tree.shift();
+        this.post(`🌳 ${me.piece} ${me.name} added ${name} (${e.relation}) to the family tree`);
+        await this.save("tree", "feed"); this.broadcast("tree", null); this.broadcast("feed", null); return json({ ok: true });
+      }
+      case "treeDel": {
+        const e = d.tree.find(x => x.id === b.id); if (!e) return json({ ok: true });
+        if (e.by !== me.id && !isApprover && !me.mom) return fail("Only the person who added it, Mom, or an approver can remove it", 403);
+        d.tree = d.tree.filter(x => x.id !== b.id); await this.save("tree"); this.broadcast("tree", null); return json({ ok: true });
+      }
+      case "daily": {
+        const q = d.daily; if (!q) return fail("No question today");
+        if (q.about === me.id) return fail("This one's about you! See who knows you");
+        if (q.answers[me.id]) return fail("You already answered today");
+        const ok = String(b.pick) === q.a; let paid = 0;
+        if (ok && !q.first) { q.first = me.id; paid = 50; } else if (ok) paid = 15;
+        q.answers[me.id] = { ok, ts: Date.now() }; me.bucks += paid; if (ok) me.mpts = (me.mpts || 0) + 5;
+        await this.save("daily", "members"); this.broadcast("daily", null); this.broadcast("members", null);
+        return json({ ok: true, right: ok, a: q.a, paid, first: q.first === me.id });
       }
       default: return fail("Unknown action");
     }
@@ -389,9 +421,56 @@ export class Family extends DurableObject {
     }
     if (changed) { await this.save("members", "feed"); this.broadcast("feed", null); this.broadcast("members", null); }
   }
+  async monthly() {
+    const [mo, , yr] = centralToday(); const key = `${yr}-${String(mo).padStart(2, "0")}`;
+    if (this.d.meta.monthKey === key) return;
+    const prev = this.d.meta.monthKey;
+    if (prev) {
+      const ms = Object.values(this.d.members).filter(m => m.status === "member" && (m.mpts || 0) > 0).sort((a, b) => b.mpts - a.mpts);
+      if (ms.length) {
+        const c = ms[0], label = new Date(prev + "-15").toLocaleString("en-US", { month: "long", year: "numeric" });
+        this.d.meta.champion = { memberId: c.id, name: c.name, piece: c.piece, month: label, pts: c.mpts };
+        c.bucks += 300; c.stats.trophies.push("🥇");
+        this.post(`🥇 ${c.piece} ${c.name} is the Family Champion of ${label}! +300 Pop Bucks, their picture welcomes everyone all month, and they win a REAL 3D-printed ${c.piece} game piece!`);
+      }
+      for (const m of Object.values(this.d.members)) m.mpts = 0;
+    }
+    this.d.meta.monthKey = key; await this.save("meta", "members", "feed"); this.broadcast("feed", null);
+  }
+  async ensureDaily() {
+    const [mo, da, yr] = centralToday(); const date = `${yr}-${mo}-${da}`;
+    if (this.d.daily && this.d.daily.date === date) return;
+    const q = makeDaily(this.d, date); this.d.daily = q ? Object.assign(q, { date, answers: {}, first: null }) : { date, q: null, answers: {} };
+    await this.save("daily");
+  }
   prune() { const gs = Object.values(this.d.games).sort((a, b) => b.updated - a.updated); for (const g of gs.slice(30)) delete this.d.games[g.id]; }
   post(text) { this.d.feed.push({ id: rid(10), from: "system", text, ts: Date.now(), likes: [], comments: [] }); }
   async webSocketMessage(ws, msg) { if (msg === "ping") ws.send("pong"); }
   async webSocketClose(ws) { try { ws.close(); } catch (e) {} }
 }
 function CATS(c) { return ["Way Back When", "Favorites", "Who's in the Picture?", "Then & Now"].includes(c) ? c : "Way Back When"; }
+
+function fbLink(u) { u = String(u || "").trim(); if (!u) return ""; if (!/^https?:\/\//.test(u)) u = "https://" + u;
+  try { const h = new URL(u).hostname.replace(/^www\.|^m\./, ""); return ["facebook.com", "fb.com"].includes(h) ? u : ""; } catch (e) { return ""; } }
+function seeded(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; }; }
+const FOODS = ["Fried chicken", "Spaghetti", "Pizza", "Tacos", "Meatloaf", "Chicken and dumplings", "Cheeseburgers", "Catfish", "Pot roast", "Enchiladas"];
+const TOWNS = ["Hot Springs", "Little Rock", "Malvern", "Arkadelphia", "Benton", "Mena", "Texarkana", "Hope"];
+function makeDaily(d, date) {
+  const r = seeded(date + (d.meta.fid || "")); const pick = a => a[Math.floor(r() * a.length)];
+  const mix = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const ms = Object.values(d.members).filter(m => m.status === "member"), names = ms.map(m => m.name), qs = [];
+  const opts = (a, pool) => mix([a].concat(mix([...new Set(pool.filter(x => x && x.toLowerCase() !== a.toLowerCase()))]).slice(0, 3)));
+  for (const m of ms) {
+    if (m.food) qs.push({ cat: "Favorites", about: m.id, q: `What's ${m.name}'s favorite food?`, a: m.food, opts: opts(m.food, ms.map(x => x.food).concat(FOODS)) });
+    if (m.nick && names.length > 1) qs.push({ cat: "Way Back When", about: m.id, q: `Who goes by "${m.nick}"?`, a: m.name, opts: opts(m.name, names) });
+    if (m.secret && names.length > 1) qs.push({ cat: "Way Back When", about: m.id, q: `Whose secret is this? "${m.secret}"`, a: m.name, opts: opts(m.name, names) });
+  }
+  const tn = d.tree.map(t => t.name), mom = ms.find(m => m.mom);
+  for (const t of d.tree) {
+    if (t.relation !== "Other family" && tn.length > 1) qs.push({ cat: "Way Back When", q: `Who was ${t.relation.replace("Mom's", mom ? mom.name + "'s" : "Mom's")}?`, a: t.name, opts: opts(t.name, tn) });
+    if (t.place) qs.push({ cat: "Way Back When", q: `Where was ${t.name} born?`, a: t.place, opts: opts(t.place, d.tree.map(x => x.place).concat(TOWNS)) });
+  }
+  for (const e of d.book) if (!e.photo) qs.push({ cat: e.cat, q: e.q, a: e.a, opts: opts(e.a, (e.wrong || []).concat(names)) });
+  const good = qs.filter(q => q.opts.length >= 2);
+  return good.length ? pick(good) : null;
+}

@@ -32,6 +32,7 @@ function centralToday(offsetDays = 0) {
   return [+p.month, +p.day, +p.year];
 }
 const BDAY_BUCKS = 250;
+const SN_DEFAULT = "Sarnaw"; // what the whole family calls Mom (GMA, as her youngest grandson said it)
 const centralDay = (off = 0) => { const [mo, da, yr] = centralToday(off); return `${yr}-${String(mo).padStart(2, "0")}-${String(da).padStart(2, "0")}`; };
 const HAND_BUCKS = 75;
 const TOURNEYS = [{ game: "word-popper", name: "Word Popper", icon: "🫧", mode: "best", rule: "Best single game score" }, { game: "pic-pop", name: "PIC POP", icon: "🖼️", mode: "sum", rule: "Most puzzle points all month" }];
@@ -190,7 +191,7 @@ export class Family extends DurableObject {
     const members = Object.values(d.members).filter(m => m.status === "member" || (me.approver && m.status === "pending"));
     const myRooms = (r) => r === "all" || r.split("~").includes(me.id);
     return {
-      meta: { name: d.meta.name, approval: d.meta.approval, fid: d.meta.fid, code: d.meta.code },
+      meta: { name: d.meta.name, approval: d.meta.approval, fid: d.meta.fid, code: d.meta.code, momName: d.meta.momName || SN_DEFAULT },
       me: this.publicMember(me, true),
       today: (() => { const t = centralToday(), n = centralToday(1); const on = d => Object.values(this.d.members).filter(m => m.status === "member" && (b => b && b[0] === d[0] && b[1] === d[1])(parseBday(m.birthday))).map(m => m.id);
         return { birthdays: on(t), tomorrow: on(n) }; })(),
@@ -307,6 +308,7 @@ export class Family extends DurableObject {
         await this.save("members"); this.broadcast("members", null); return json({ ok: true });
       }
       case "settings": {
+        if (b.momName !== undefined && (isApprover || me.mom)) { d.meta.momName = clip(b.momName, 24).trim() || SN_DEFAULT; await this.save("meta"); this.broadcast("members", null); this.broadcast("feed", null); if (Object.keys(b).length <= 2) return json({ ok: true }); }
         if (!isApprover) return fail("Only approvers can change settings", 403);
         if (b.approval !== undefined) d.meta.approval = !!b.approval;
         if (b.name) d.meta.name = clip(b.name, 40);
@@ -560,7 +562,7 @@ export class Family extends DurableObject {
           d.tree.push({ id: rid(8), name, relation: RELATIONS.includes(x.relation) ? x.relation : "Other family", born: clip(x.born, 40), died: clip(x.died, 40),
             place: clip(x.place, 60), story: clip(x.story, 300), photo: null, by: me.id, ts: Date.now() }); have.add(name.toLowerCase()); n++;
         }
-        if (n) this.post(`🌳 ${me.piece} ${me.name} added ${n} people from the family research to Mom's family tree: the Youngs, Vaughns, Bagleys, Duggans and Neighbors, all the way back to Ireland!`);
+        if (n) this.post(`🌳 ${me.piece} ${me.name} added ${n} people from the family research to ${d.meta.momName || SN_DEFAULT}'s family tree: the Youngs, Vaughns, Bagleys, Duggans and Neighbors, all the way back to Ireland!`);
         await this.save("tree", "feed"); this.broadcast("tree", null); this.broadcast("feed", null); return json({ ok: true, added: n });
       }
       case "treeDel": {
@@ -583,23 +585,28 @@ export class Family extends DurableObject {
         if (!/^https:\/\//.test(sub.endpoint)) return fail("Bad subscription");
         me.push = (me.push || []).filter(x => x.endpoint !== sub.endpoint).concat({ endpoint: clip(sub.endpoint, 600), keys: { p256dh: clip(sub.keys.p256dh, 200), auth: clip(sub.keys.auth, 60) } }).slice(-5);
         await this.save("members");
-        this.ctx.waitUntil(this.pushTo(me, { title: "🔔 Alerts are on!", body: "Family Pop will let you know when it's your turn, and more.", tag: "hello", url: "./" }));
-        return json({ ok: true });
+        const res = await this.pushTo(me, { title: "🔔 Alerts are on!", body: "Family Pop will let you know when it's your turn, and more.", tag: "hello", url: "./" });
+        return json({ ok: true, res });
+      }
+      case "pushTest": {
+        if (!(me.push || []).length) return json({ ok: true, res: [], none: true });
+        const res = await this.pushTo(me, { title: "🔔 Test alert", body: "If you can read this, alerts work!", tag: "test", url: "./" });
+        return json({ ok: true, res });
       }
       case "pushOff": { me.push = []; await this.save("members"); return json({ ok: true }); }
       case "storyAnswer": { // Ask Grandma: Mom answers this week's question by voice or typing
-        if (!me.mom) return fail("Ask Grandma questions are for Mom to answer");
+        if (!me.mom) return fail(`These questions are for ${d.meta.momName || SN_DEFAULT} to answer`);
         const g = this.grandmaNow(); if (!g) return fail("No question this week");
         const text = clip(b.text, 3000).trim(), audio = await this.putPhoto(b.audio, "audio"); if (!text && !audio) return fail("Say or type an answer");
         d.stories.list.push({ id: rid(8), week: g.week, prompt: g.prompt, by: me.id, text, audio, ts: Date.now() });
         d.stories.queue = d.stories.queue.filter(x => x.q !== g.prompt);
-        d.feed.push({ id: rid(10), from: "system", kind: "story", text: `🎙️ ${me.piece} ${me.name} answered this week's Ask Grandma: "${g.prompt}"`, audio, story: text, ts: Date.now(), likes: [], comments: [] });
+        d.feed.push({ id: rid(10), from: "system", kind: "story", text: `🎙️ ${me.piece} ${me.name} answered this week's Ask ${d.meta.momName || SN_DEFAULT}: "${g.prompt}"`, audio, story: text, ts: Date.now(), likes: [], comments: [] });
         await this.save("stories", "feed"); this.broadcast("feed", null); this.broadcast("stories", null);
         this.notify(null, me.id, { title: `🎙️ ${me.name} told a story`, body: g.prompt, tag: "story", url: "./#home" });
         return json({ ok: true });
       }
       case "storySuggest": {
-        const q = clip(b.q, 200).trim(); if (q.length < 8) return fail("Type a question for Mom");
+        const q = clip(b.q, 200).trim(); if (q.length < 8) return fail(`Type a question for ${d.meta.momName || SN_DEFAULT}`);
         d.stories.queue.push({ q, by: me.id, ts: Date.now() }); if (d.stories.queue.length > 30) d.stories.queue.shift();
         await this.save("stories"); this.broadcast("stories", null); return json({ ok: true });
       }
@@ -737,10 +744,17 @@ export class Family extends DurableObject {
   }
   async pushTo(m, data) {
     const v = this.env.VAPID_PRIVATE && this.env.VAPID_PUBLIC ? { publicKey: this.env.VAPID_PUBLIC, privateKey: this.env.VAPID_PRIVATE, subject: "mailto:topher@mixedmakershop.com" } : null;
-    if (!v || !(m.push || []).length) return;
-    let dead = false;
-    for (const sub of m.push.slice()) { try { const st = await sendPush(sub, data, v); if (st === 404 || st === 410) { m.push = m.push.filter(x => x.endpoint !== sub.endpoint); dead = true; } } catch (e) {} }
+    if (!v || !(m.push || []).length) return [];
+    let dead = false; const out = [];
+    for (const sub of m.push.slice()) {
+      const host = (() => { try { return new URL(sub.endpoint).host; } catch (e) { return "?"; } })();
+      try { const { status, text } = await sendPush(sub, data, v); out.push({ host, status, text });
+        console.log(`push ${host} ${status} ${text}`);
+        if (status === 404 || status === 410) { m.push = m.push.filter(x => x.endpoint !== sub.endpoint); dead = true; } }
+      catch (e) { out.push({ host, status: 0, text: String(e.message || e) }); console.log(`push ${host} ERR ${e.message || e}`); }
+    }
     if (dead) await this.save("members");
+    return out;
   }
   notify(toIds, exceptId, data) { // phone alerts; toIds null = the whole family
     const ms = Object.values(this.d.members).filter(m => m.status === "member" && m.id !== exceptId && (!toIds || toIds.includes(m.id)) && (m.push || []).length);
@@ -754,7 +768,7 @@ export class Family extends DurableObject {
       const m = this.d.members[f.about]; if (m) this.notify(null, null, { title: `🎂 It's ${m.name}'s birthday!`, body: "Send a birthday wish in Family Pop", tag: "bday-" + m.id, url: "./#home" });
     }
     if (this.d.daily && this.d.daily.q && this.d.daily.date !== before) this.notify(null, null, { title: "⭐ Today's family question is up!", body: this.d.daily.q, tag: "daily", url: "./#home" });
-    const g = this.grandmaNow(); if (g && dow === 1 && !g.answered) this.notify([g.momId], null, { title: "🎙️ This week's Ask Grandma", body: g.prompt, tag: "grandma", url: "./#home" });
+    const g = this.grandmaNow(); if (g && dow === 1 && !g.answered) this.notify([g.momId], null, { title: `🎙️ This week's Ask ${this.d.meta.momName || SN_DEFAULT}`, body: g.prompt, tag: "grandma", url: "./#home" });
     if (dow === 6) { const dn = this.dinnerNow(); this.notify(null, null, { title: "🍽️ Sunday dinner is tomorrow!", body: dn.host ? `At ${dn.host}'s. What are you bringing?` : "What are you bringing?", tag: "dinner", url: "./#home" }); }
     await this.tourneyRoll(); await this.remembering(); if (dow === 0) await this.recap();
     const td = centralDay(), tm = centralDay(1);
@@ -830,7 +844,7 @@ export class Family extends DurableObject {
       wins.length && `🎲 ${n("board game", wins)} played. ${wins.map(w => w.text.match(/^🏆 (.*?) won/)[1]).join(", ")} won`,
       d.hands.filter(h => h.status === "done" && h.doneTs > since).length && `🤝 ${d.hands.filter(h => h.status === "done" && h.doneTs > since).length} helping hand(s) given`,
       d.prayers.filter(p => p.answered && p.answeredTs > since).length && `🙌 ${d.prayers.filter(p => p.answered && p.answeredTs > since).length} prayer(s) answered`,
-      d.stories.list.filter(mine).length && `🎙️ A new Ask Grandma story`,
+      d.stories.list.filter(mine).length && `🎙️ A new Ask ${d.meta.momName || SN_DEFAULT} story`,
       d.recipes.filter(mine).length && `🍲 ${n("new recipe", d.recipes.filter(mine))}`,
       tm && `⭐ Most active: ${tm.piece} ${tm.name}`,
       d.meta.tourney && Object.keys(d.meta.tourney.scores).length && (() => { const [id] = Object.entries(d.meta.tourney.scores).sort((a, b) => b[1] - a[1])[0]; const m = d.members[id]; return m ? `🏆 Leading the ${d.meta.tourney.name} tournament: ${m.piece} ${m.name}` : ""; })(),
@@ -866,7 +880,7 @@ function makeDaily(d, date) {
   const tn = d.tree.map(t => t.name), mom = ms.find(m => m.mom);
   for (const t of d.tree) {
     if (!["Other family", "Mom's ancestor"].includes(t.relation)) { const same = new Set(d.tree.filter(x => x.relation === t.relation).map(x => x.name));
-      if (tn.length - same.size >= 1 && !(same.size > 1 && !t.born)) qs.push({ cat: "Way Back When", q: `Who was ${t.relation.replace("Mom's", mom ? mom.name + "'s" : "Mom's")}${same.size > 1 && t.born ? ", born " + t.born : ""}?`, a: t.name, opts: opts(t.name, tn.filter(n => !same.has(n))) }); }
+      if (tn.length - same.size >= 1 && !(same.size > 1 && !t.born)) qs.push({ cat: "Way Back When", q: `Who was ${t.relation.replace("Mom's", (d.meta.momName || SN_DEFAULT) + "'s")}${same.size > 1 && t.born ? ", born " + t.born : ""}?`, a: t.name, opts: opts(t.name, tn.filter(n => !same.has(n))) }); }
     if (t.place) qs.push({ cat: "Way Back When", q: `Where was ${t.name} born?`, a: t.place, opts: opts(t.place, d.tree.map(x => x.place).concat(TOWNS)) });
   }
   for (const e of d.book) if (!e.photo) qs.push({ cat: e.cat, q: e.q, a: e.a, opts: opts(e.a, (e.wrong || []).concat(names)) });

@@ -46,5 +46,6 @@ export async function sendPush(sub, data, vapid) {
   const r = await fetch(sub.endpoint, { method: "POST", body, headers: {
     "Content-Encoding": "aes128gcm", "Content-Type": "application/octet-stream", TTL: "86400", Urgency: "normal",
     Authorization: await vapidHeader(sub.endpoint, vapid) } });
-  return r.status;
+  let text = ""; try { text = (await r.text()).slice(0, 300); } catch (e) {}
+  return { status: r.status, text };
 }

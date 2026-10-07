@@ -264,7 +264,7 @@ export class Family extends DurableObject {
       this.ctx.acceptWebSocket(pair[1], [me.id]);
       return new Response(null, { status: 101, webSocket: pair[0] });
     }
-    if (path === "/me") return json(this.snapshot(me));
+    if (path === "/me") { if (me.status === "member") await this.tourneyRoll(); return json(this.snapshot(me)); }
     if (path === "/game") {
       const g = d.games[url.searchParams.get("id")];
       if (!g) return fail("That game is gone", 404);

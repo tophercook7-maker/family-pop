@@ -224,6 +224,16 @@ audio{width:220px;max-width:100%}
 .bankbig{text-align:center;padding:18px}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media (prefers-reduced-motion:reduce){.bub,.logo .p{animation:none}}
+body.big .screen:not(#game) .wrap,body.big #msgs,body.big .chatbar,body.big #modal .sheet{zoom:1.22}
+body.big #nav{zoom:1.12}
+.post.sys.recap{white-space:pre-line;color:var(--ink);font-size:16px;line-height:1.5}
+.post.remember{background:linear-gradient(180deg,rgba(255,214,140,.12),rgba(255,255,255,.04));border:1px solid rgba(255,214,140,.35)}
+.post.remember .text{font-weight:800;line-height:1.45}
+.hand{display:flex;gap:10px;align-items:flex-start}.hand .t{flex:1;min-width:0}
+.tboard .li b{min-width:28px;display:inline-block}
+.fix{position:relative;border-radius:14px;overflow:hidden;touch-action:none;user-select:none}.fix img{display:block;width:100%}
+.fix .aft{position:absolute;inset:0;overflow:hidden;border-right:3px solid #fff}.fix .aft img{width:auto;height:100%;max-width:none}
+.fix .lbl{position:absolute;top:8px;padding:2px 8px;border-radius:8px;background:rgba(0,0,0,.55);color:#fff;font-weight:900;font-size:13px}
 </style>
 </head>
 <body>
@@ -245,7 +255,7 @@ audio{width:220px;max-width:100%}
   <div class="dim small" id="wNewHdr" style="display:none;text-align:center;margin-top:6px">New to Family Pop?</div>
   <button class="big main" id="wStart"><span class="ico">🏡</span><div>Start our family<small>You'll get a link to invite everyone</small></div></button>
   <button class="big" id="wJoin"><span class="ico">✉️</span><div>I got an invite<small>Paste the link or code someone sent you</small></div></button>
-  <button class="big" id="wRelink"><span class="ico">📱</span><div>I'm already in, on another phone<small>Use the code from Family → Me</small></div></button>
+  <button class="big" id="wRelink"><span class="ico">📱</span><div>I'm already in<small>Sign in on this phone or Home Screen app</small></div></button>
 </div></section>
 
 <!-- WAITING FOR APPROVAL -->
@@ -266,12 +276,14 @@ audio{width:220px;max-width:100%}
   <div id="homeScreenBox"></div>
   <div id="alertBox"></div>
   <div id="holidayBox"></div>
+  <div id="rememberBox"></div>
   <div id="champBox"></div>
   <div id="bdayBox" class="list"></div>
   <div id="dailyBox"></div>
   <div id="grandmaBox"></div>
   <div id="dinnerBox"></div>
   <div id="memBox"></div>
+  <div id="handBox"></div>
   <div id="prayerBox"></div>
   <div id="feed" class="list"></div>
 </div></section>
@@ -297,6 +309,7 @@ audio{width:220px;max-width:100%}
 <!-- GAMES SHELF -->
 <section class="screen" id="games"><div class="wrap">
   <div class="title">🕹️ Games <small>Every game pays Pop Bucks</small></div>
+  <div id="tourneyBox"></div>
   <div class="shelf" id="shelf"></div>
   <div class="dim small" style="text-align:center">Pop Bucks from games go straight into your family bank, up to a daily limit per game.</div>
 </div></section>
@@ -318,6 +331,7 @@ audio{width:220px;max-width:100%}
   <div id="pendingBox"></div>
   <button class="btn" id="fInvite">✉️ Invite someone</button>
   <div class="split"><button class="btn ghost" id="fMap">🗺️ Family map</button><button class="btn ghost" id="fBook">📖 Our yearbook</button></div>
+  <button class="btn ghost" id="fFix">🪄 Fix up an old photo</button>
   <div class="card"><h3>Everyone</h3><div class="list" id="memberList"></div></div>
   <div class="card"><h3>🌳 Mom's family tree</h3><div class="dim small" style="margin-bottom:8px">Mom's side of the family. Everyone can add who they know, and it all turns into "Way Back When" questions.</div><button class="btn small" id="fAddTree">+ Add someone</button><div id="treeImport" style="margin-top:6px"></div><div class="list" id="treeList" style="margin-top:10px"></div></div>
   <div class="card"><h3>🍲 Recipe box</h3><button class="btn small" id="fAddRecipe">+ Add a recipe</button><div class="list" id="recipeList" style="margin-top:10px"></div></div>
@@ -325,6 +339,7 @@ audio{width:220px;max-width:100%}
   <div class="card"><h3>Me</h3><div class="list"><button class="li" id="fEditMe"><span class="p" id="mePiece">🫧</span><span class="n" id="meName">Me<small>Edit my piece and trivia answers</small></span>›</button>
     <button class="li" id="fHomeScreen"><span class="p">📲</span><span class="n">Put Family Pop on my Home Screen<small>Opens like an app, already signed in</small></span>›</button>
     <button class="li" id="fAlerts"><span class="p">🔔</span><span class="n" id="fAlertsTxt">Phone alerts<small>Off</small></span>›</button>
+    <button class="li" id="fBig"><span class="p">🔍</span><span class="n" id="fBigTxt">Bigger text<small>Off</small></span>›</button>
     <button class="li" id="fLetIn"><span class="p">📲</span><span class="n">Let a phone in<small>Someone sees a sign-in code? Type it here</small></span>›</button>
     <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
   <div class="card" id="adminCard"><h3>Family settings</h3><label class="chk"><input type="checkbox" id="setApproval"> <span>New people need a yes first<br><small class="dim">From someone marked as an approver below</small></span></label>
@@ -607,8 +622,8 @@ function renderMemory(){ // "memory of the day": an older family photo comes bac
   if($("#memQ"))$("#memQ").onclick=()=>triviaForm({photoId:pk.id,cat:"Who's in the Picture?"});
 }
 function renderFeed(){
-  if(!S)return;renderHomeScreenBox();renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();const f=S.feed.slice().reverse();
-  $("#feed").innerHTML=f.length?f.map(p=>{if(p.from==="system")return `<div class="post sys">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span>${p.audio?`<audio controls preload="none" src="${photoURL(p.audio)}"></audio>`:""}${p.story?`<div class="text" style="color:var(--ink);font-weight:700">${esc(p.story)}</div>`:""}</div>`;
+  if(!S)return;renderHomeScreenBox();renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();renderHands();renderRemember();const f=S.feed.slice().reverse();
+  $("#feed").innerHTML=f.length?f.map(p=>{if(p.kind==="remember")return rememberPost(p);if(p.from==="system")return `<div class="post sys${p.kind==="recap"?" recap":""}">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span>${p.audio?`<audio controls preload="none" src="${photoURL(p.audio)}"></audio>`:""}${p.story?`<div class="text" style="color:var(--ink);font-weight:700">${esc(p.story)}</div>`:""}</div>`;
     const a=mem(p.from)||{name:"Someone",piece:"🫧"};const liked=p.likes.includes(meId());
     return `<div class="post"><div class="who"><span class="pc">${a.piece}</span><span>${esc(a.name)}<br><small>${ago(p.ts)}</small></span></div>
       ${p.text?`<div class="text">${esc(p.text)}</div>`:""}${p.photos&&p.photos.length>1?`<div class="grid">${p.photos.map(id=>`<img loading="lazy" src="${photoURL(id)}" alt="">`).join("")}</div>`:p.photo?`<img class="ph" loading="lazy" src="${photoURL(p.photo)}" alt="Photo from ${esc(a.name)}">`:""}
@@ -665,10 +680,10 @@ $("#chatText").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e
 
 /* ================= trivia + Family Book ================= */
 function triviaForm(pre={}){
-  let photo=null;
+  let photo=pre.photoData||null;
   sheet(`<h2>💡 Make a game question</h2>
    <label class="f">Kind<select id="tCat">${CATS.map(c=>`<option ${c===pre.cat?"selected":""}>${c}</option>`).join("")}</select></label>
-   ${pre.photoId?`<img class="qphoto" src="${photoURL(pre.photoId)}" alt="">`:`<button class="btn ghost" id="tPhoto">📷 Add a photo (optional)</button><img id="tPrev" class="qphoto" hidden alt="">`}
+   ${pre.photoData?`<img class="qphoto" src="${pre.photoData}" alt="">`:pre.photoId?`<img class="qphoto" src="${photoURL(pre.photoId)}" alt="">`:`<button class="btn ghost" id="tPhoto">📷 Add a photo (optional)</button><img id="tPrev" class="qphoto" hidden alt="">`}
    ${pre.hint?`<div class="dim small">"${esc(pre.hint.slice(0,140))}"</div>`:""}
    <label class="f">Question<small>Leave blank with a photo to ask "Who's in the picture?"</small><input id="tQ" value="${esc(pre.q||"")}" placeholder="Where did we go every summer?"></label>
    <label class="f">Right answer<input id="tA" value="${esc(pre.a||"")}" placeholder="Lake Ouachita"></label>
@@ -743,9 +758,15 @@ const MOM_RESEARCH=[
  {name:"Johnnie Edward Vaughn",relation:"Mom's uncle",born:"1917",died:"2009",place:"Bonnerdale, Arkansas",story:"Lived to 91. The fourth of the 13 Vaughn children."}];
 function renderTree(){
   const t=(S.tree||[]).slice();const ord=r=>RELATIONS.indexOf(r);t.sort((a,b)=>ord(a.relation)-ord(b.relation));
-  $("#treeList").innerHTML=t.length?t.map(e=>{const by=mem(e.by);return `<div class="li">${e.photo?`<img src="${photoURL(e.photo)}" alt="">`:'<span class="p">🌳</span>'}<span class="n">${esc(e.name)}<small>${esc(e.relation)}${e.born?" · born "+esc(e.born):""}${e.place?" · "+esc(e.place):""}${e.died?" · died "+esc(e.died):""}${e.story?'<br>"'+esc(e.story)+'"':""}${by?"<br>added by "+esc(by.name):""}</small></span>${(e.by===meId()||S.me.approver||S.me.mom)?`<button class="btn small ghost" data-td="${e.id}">✕</button>`:""}</div>`}).join("")
+  $("#treeList").innerHTML=t.length?t.map(e=>{const by=mem(e.by);return `<div class="li">${e.photo?`<img src="${photoURL(e.photo)}" alt="">`:'<span class="p">🌳</span>'}<span class="n">${esc(e.name)}<small>${esc(e.relation)}${e.born?" · born "+esc(e.born):""}${e.place?" · "+esc(e.place):""}${e.died?" · died "+esc(e.died):""}${e.story?'<br>"'+esc(e.story)+'"':""}${by?"<br>added by "+esc(by.name):""}</small></span><button class="btn small ghost" data-te="${e.id}" aria-label="Add dates">✏️</button>${(e.by===meId()||S.me.approver||S.me.mom)?`<button class="btn small ghost" data-td="${e.id}">✕</button>`:""}</div>`}).join("")
     :`<div class="dim small">Nobody yet. ${S.members.some(m=>m.mom)?"Mom":"Start with Mom's parents and grandparents"}: add their names, where they were born, and a story about them.</div>`;
   $$("[data-td]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("treeDel",{id:b.dataset.td});refresh()}));
+  $$("[data-te]").forEach(b=>b.onclick=()=>{const e=S.tree.find(x=>x.id===b.dataset.te);
+    sheet(`<h2>🌳 ${esc(e.name)}</h2><div class="dim small">Put in the whole date (like 3/14/1933) and the family will remember them on that day every year.</div>
+      <div class="split"><label class="f">Born<input id="teB" maxlength="40" value="${esc(e.born||"")}" placeholder="3/14/1933"></label><label class="f">Died<input id="teD" maxlength="40" value="${esc(e.died||"")}" placeholder="6/2/1993"></label></div>
+      <label class="f">A story about them<textarea id="teS" maxlength="300">${esc(e.story||"")}</textarea></label>
+      <button class="btn" id="teGo">Save</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+    $("#teGo").onclick=()=>busy($("#teGo"),async()=>{await act("treeEdit",{id:e.id,born:$("#teB").value.trim(),died:$("#teD").value.trim(),story:$("#teS").value.trim()});closeSheet();toast("🌳 Saved");refresh()})});
   const have=new Set(t.map(x=>x.name.toLowerCase())),missing=MOM_RESEARCH.filter(x=>!have.has(x.name.toLowerCase())).length;
   $("#treeImport").innerHTML=(missing>5&&(S.me.approver||S.me.mom)?`<button class="btn small" id="trImp">🌳 Add our family research (${missing} people)</button>`:"")+
     `<a class="btn small ghost" style="text-decoration:none;display:inline-block;margin-top:6px" href="https://tophercook7-maker.github.io/young-family/" target="_blank" rel="noopener">📖 Read "Days in Grannis"</a>`;
@@ -755,7 +776,7 @@ $("#fAddTree").onclick=()=>{let photo=null;
   sheet(`<h2>🌳 Add to Mom's family tree</h2>
    <label class="f">Name<input id="trName" maxlength="60" placeholder="Their full name"></label>
    <label class="f">Who are they?<select id="trRel">${RELATIONS.map(r=>`<option>${r}</option>`).join("")}</select></label>
-   <div class="split"><label class="f">Born<input id="trBorn" maxlength="40" placeholder="1931"></label><label class="f">Died<input id="trDied" maxlength="40" placeholder="(if passed)"></label></div>
+   <div class="split"><label class="f">Born<input id="trBorn" maxlength="40" placeholder="3/14/1931 or 1931"></label><label class="f">Died<input id="trDied" maxlength="40" placeholder="date, if passed"></label></div>
    <label class="f">Where were they born or raised?<input id="trPlace" maxlength="60" placeholder="Mena, Arkansas"></label>
    <label class="f">A story or something special about them<textarea id="trStory" maxlength="300" placeholder="Made the best biscuits in the county"></textarea></label>
    <button class="btn ghost" id="trPhoto">📷 Add their picture (optional)</button><img id="trPrev" class="qphoto" hidden alt="">
@@ -824,7 +845,7 @@ async function squareFlow(){
 }
 
 /* ================= games shelf (all of Topher's games, paying Pop Bucks) ================= */
-function renderShelf(){
+function renderShelf(){renderTourney();
   $("#shelf").innerHTML=GAMES.map((g,i)=>`<button class="game" data-g="${i}"><span class="gi">${g.icon}</span><b>${g.name}</b><small>${g.desc}</small><span class="earn">🫧 ${g.earn}</span></button>`).join("");
   $$("#shelf .game").forEach(b=>b.onclick=()=>openGame(GAMES[+b.dataset.g]));
 }
@@ -832,13 +853,14 @@ let FRAME=null;
 function openGame(g){FRAME={g,earned:0};$("#frameTitle").textContent=g.name;$("#frameEarn").textContent="🫧 +0";$("#frameIf").src=g.url+(g.url.includes("?")?"&":"?")+"family=1";$("#frame").classList.add("on");
   if(g.id==="story")setTimeout(()=>earn("story",60,g.name),20000)}   // stay 20 seconds in a story game: daily play bonus
 $("#frameClose").onclick=()=>{$("#frame").classList.remove("on");$("#frameIf").src="about:blank";if(FRAME&&FRAME.earned)toast(`🫧 You earned ${FRAME.earned} Pop Bucks!`);FRAME=null;refresh()};
-async function earn(game,amount,label){
-  if(!SES||!amount)return;try{const r=await act("earn",{game,amount:Math.round(amount)});
+async function earn(game,amount,label,tscore){
+  if(!SES||!amount)return;try{const r=await act("earn",{game,amount:Math.round(amount),tscore});
+    if(r.tPlace&&S.tourney&&S.tourney.game===game){setTimeout(()=>toast(`🏆 You're #${r.tPlace} in this month's ${esc(S.tourney.name)} tournament!`),1600)}
     if(r.earned){if(FRAME){FRAME.earned+=r.earned;$("#frameEarn").textContent="🫧 +"+FRAME.earned}sfx.cash();buzz(20);toast(`🫧 +${r.earned} Pop Bucks${label?" from "+esc(label):""}`)}
     else if(r.capLeft===0)toast(`You've earned the most for today from ${esc(label||"this game")}. Come back tomorrow!`)}catch(e){}}
 window.addEventListener("message",e=>{const d=e.data;if(!d||d.fp!=="earn")return;
-  if(d.game==="word-popper")earn("word-popper",d.score||0,"Word Popper");
-  else if(d.game==="pic-pop")earn("pic-pop",(d.amount||25),"PIC POP")});
+  if(d.game==="word-popper")earn("word-popper",d.score||0,"Word Popper",d.score||0);
+  else if(d.game==="pic-pop")earn("pic-pop",(d.amount||25),"PIC POP",d.amount||25)});
 
 /* ================= board game: questions from the family ================= */
 function famQuestions(){
@@ -1222,6 +1244,78 @@ function renderGrandma(){
     $("#gmQGo").onclick=()=>busy($("#gmQGo"),async()=>{await act("storySuggest",{q:$("#gmQ").value});closeSheet();toast("💡 Added to Mom's questions");refresh()})};
   if($("#gmAll"))$("#gmAll").onclick=()=>sheet(`<h2>📚 ${esc(mom.name)}'s stories</h2><div class="list">${S.stories.slice().reverse().map(x=>`<div class="post" style="text-align:left"><b>"${esc(x.prompt)}"</b>${x.audio?`<audio controls preload="none" src="${photoURL(x.audio)}"></audio>`:""}${x.text?`<div class="text">${esc(x.text)}</div>`:""}<div class="small dim">${new Date(x.ts).toLocaleDateString()}</div></div>`).join("")}</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
 }
+
+/* ================= 🕯️ remembering ================= */
+function rememberPost(p){const e=p.about&&(S.tree||[]).find(x=>x.id===p.about);
+  return `<div class="post remember">${p.photo?`<img class="ph" loading="lazy" src="${photoURL(p.photo)}" alt="">`:""}<div class="text">${esc(p.text)}</div><div class="small dim">${ago(p.ts)}</div>
+    <div class="acts"><button class="${p.likes.includes(meId())?"on":""}" data-like="${p.id}">🕯️ ${p.likes.length||""}</button><button data-cm="${p.id}">💬 Share a memory ${p.comments.length?"· "+p.comments.length:""}</button></div>
+    ${p.comments.length?`<div class="cmts">${p.comments.map(c=>{const w=mem(c.from)||{name:"Someone"};return `<div><b>${esc(w.name)}</b> ${esc(c.text)}</div>`}).join("")}</div>`:""}</div>`}
+function renderRemember(){const box=$("#rememberBox");if(!box)return;
+  const today=S.feed.filter(p=>p.kind==="remember"&&Date.now()-p.ts<20*3600e3);box.innerHTML=today.map(rememberPost).join("")}
+
+/* ================= 🤝 need a hand ================= */
+function renderHands(){
+  const box=$("#handBox");if(!box)return;const hs=(S.hands||[]).slice().reverse(),open=hs.filter(h=>h.status!=="done"),done=hs.filter(h=>h.status==="done").slice(0,3);
+  const row=h=>{const m=mem(h.from)||{name:"Someone",piece:"🫧"},hp=h.helper&&mem(h.helper),mine=h.from===meId();
+    return `<div class="post" style="gap:6px"><div class="hand"><span class="pc">${m.piece}</span><div class="t"><b>${esc(m.name)}</b> could use a hand<div class="text">${esc(h.text)}</div>${h.when?`<div class="small dim">🗓️ ${esc(h.when)}</div>`:""}</div></div>
+      <div class="acts">${h.status==="done"?`<span class="small" style="color:var(--good);font-weight:900">✅ ${hp?esc(hp.name)+" helped":"Taken care of"}</span>`
+        :mine?`${hp?`<span class="small" style="font-weight:900">🤝 ${esc(hp.name)} is helping</span>`:`<span class="small dim">Waiting for a helper…</span>`}<button data-hdone="${h.id}">✅ Done${hp?", thank "+esc(hp.name):""}</button><button data-hdel="${h.id}">✕</button>`
+        :hp?(h.helper===meId()?`<button class="on" data-htake="${h.id}">🤝 You're helping (tap to back out)</button>`:`<span class="small">🤝 ${esc(hp.name)} is helping</span>`)
+        :`<button data-htake="${h.id}">🤝 I'll help (+75 🫧)</button>`}</div></div>`};
+  box.innerHTML=`<div class="mem"><div class="cat">🤝 Need a hand</div>${open.slice(0,4).map(row).join("")||'<div class="dim small">Need a ride, a hand moving something, or someone to check on the dog? Ask here. Helpers earn Pop Bucks.</div>'}
+    ${done.length?`<details><summary class="small dim">Recently helped</summary>${done.map(row).join("")}</details>`:""}<button class="btn small ghost" id="hdAdd">🤝 I could use a hand</button></div>`;
+  $$("[data-htake]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("handTake",{id:b.dataset.htake});buzz(15);refresh()}));
+  $$("[data-hdone]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("handDone",{id:b.dataset.hdone});sfx.fan();refresh()}));
+  $$("[data-hdel]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("handDel",{id:b.dataset.hdel});refresh()}));
+  $("#hdAdd").onclick=()=>{sheet(`<h2>🤝 What do you need a hand with?</h2><textarea id="hdTxt" maxlength="300" placeholder="Ride to the doctor, help moving a couch, someone to feed the cat…"></textarea>
+    <label class="f">When? (optional)<input id="hdWhen" maxlength="60" placeholder="Tuesday morning"></label><button class="btn" id="hdGo">Ask the family</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+    $("#hdGo").onclick=()=>busy($("#hdGo"),async()=>{const t=$("#hdTxt").value.trim();if(t.length<4)return toast("Say what you need");await act("handAdd",{text:t,when:$("#hdWhen").value});closeSheet();toast("🤝 The family's been asked");refresh()})};
+}
+
+/* ================= 🏆 monthly tournament ================= */
+function renderTourney(){const box=$("#tourneyBox");if(!box||!S)return;const t=S.tourney;
+  if(!t){box.innerHTML=`<div class="soon">🏆 This month's tournament starts the first time someone plays Word Popper or PIC POP.</div>`;return}
+  const gi=GAMES.findIndex(g=>g.id===t.game),me=t.board.findIndex(r=>r.id===meId());
+  box.innerHTML=`<div class="card tboard"><h3>🏆 ${t.icon} ${esc(t.name)} tournament</h3><div class="dim small">${esc(t.rule)} wins. 🏆 ${t.prizes[0]} · 🥈 ${t.prizes[1]} · 🥉 ${t.prizes[2]} Pop Bucks. ${t.daysLeft===0?"<b>Last day!</b>":t.daysLeft+" day"+(t.daysLeft===1?"":"s")+" left."}</div>
+    <div class="list" style="margin:8px 0">${t.board.length?t.board.map((r,i)=>{const m=mem(r.id)||{name:"?",piece:"🫧"};return `<div class="li"><b>${["🏆","🥈","🥉"][i]||"#"+(i+1)}</b><span class="p">${m.piece}</span><span class="n">${esc(m.name)}${r.id===meId()?" (you)":""}</span><b>${r.sc}</b></div>`}).join(""):'<div class="dim small">Nobody has played yet. First score takes the lead!</div>'}</div>
+    ${gi>=0?`<button class="btn small" id="tPlay">${me<0?"Get on the board":"Play again"}</button>`:""}
+    ${t.last?`<div class="small dim" style="margin-top:8px">Last time (${esc(t.last.month)} ${esc(t.last.name)}): ${t.last.top.map((r,i)=>["🏆","🥈","🥉"][i]+" "+esc((mem(r.id)||{name:"?"}).name)).join(" · ")}</div>`:""}</div>`;
+  if($("#tPlay"))$("#tPlay").onclick=()=>openGame(GAMES[gi]);
+}
+
+/* ================= 🪄 fix up an old photo (all on the phone, free) ================= */
+function restorePhoto(src){return new Promise(res=>{const im=new Image();im.onload=()=>{
+  const k=Math.min(1,1400/Math.max(im.width,im.height)),w=Math.round(im.width*k),h=Math.round(im.height*k);
+  const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.drawImage(im,0,0,w,h);
+  const id=x.getImageData(0,0,w,h),d=id.data,n=w*h,hist=[new Uint32Array(256),new Uint32Array(256),new Uint32Array(256)];let sat=0;
+  for(let i=0;i<d.length;i+=4){hist[0][d[i]]++;hist[1][d[i+1]]++;hist[2][d[i+2]]++;sat+=Math.max(d[i],d[i+1],d[i+2])-Math.min(d[i],d[i+1],d[i+2])}
+  const gray=sat/n<14; // black & white photo: keep it black & white, just clean the yellowing
+  const cut=(H,p)=>{let a=0,t=n*p;for(let v=0;v<256;v++){a+=H[v];if(a>=t)return v}return 255};
+  const lo=[0,1,2].map(ch=>cut(hist[ch],.006)),hi=[0,1,2].map(ch=>cut(hist[ch],.994));
+  if(gray){const L=Math.min(...lo),Hh=Math.max(...hi);lo.fill(L);hi.fill(Hh)}
+  const lut=[0,1,2].map(ch=>{const t=new Uint8ClampedArray(256),r=Math.max(1,hi[ch]-lo[ch]);for(let v=0;v<256;v++){let y=(v-lo[ch])/r;y=Math.max(0,Math.min(1,y));y=Math.pow(y,.92);t[v]=y*255}return t});
+  for(let i=0;i<d.length;i+=4){let r=lut[0][d[i]],g=lut[1][d[i+1]],b=lut[2][d[i+2]];
+    if(gray){const l=.3*r+.59*g+.11*b;r=g=b=l}else{const l=.3*r+.59*g+.11*b;r=l+(r-l)*1.15;g=l+(g-l)*1.15;b=l+(b-l)*1.15}
+    d[i]=r;d[i+1]=g;d[i+2]=b}
+  const src2=new Uint8ClampedArray(d),amt=.55; // gentle sharpen
+  for(let yy=1;yy<h-1;yy++)for(let xx=1;xx<w-1;xx++){const i=(yy*w+xx)*4;for(let ch=0;ch<3;ch++){const v=src2[i+ch],avg=(src2[i+ch-4]+src2[i+ch+4]+src2[i+ch-w*4]+src2[i+ch+w*4])/4;d[i+ch]=v+(v-avg)*amt}}
+  x.putImageData(id,0,0);res({url:c.toDataURL("image/jpeg",.86),gray})};im.src=src})}
+$("#fFix").onclick=async()=>{const before=await pickPhoto(1400);if(!before)return;toast("🪄 Fixing it up…");const {url:after,gray}=await restorePhoto(before);
+  sheet(`<h2>🪄 Fixed up${gray?" (kept black & white)":""}</h2><div class="dim small">Slide to compare.</div>
+    <div class="fix" id="fxBox"><img src="${before}" alt="Before"><div class="aft" id="fxAft" style="width:50%"><img src="${after}" alt="After"></div><span class="lbl" style="left:8px">After</span><span class="lbl" style="right:8px">Before</span></div>
+    <input type="range" id="fxR" min="0" max="100" value="50">
+    <button class="btn" id="fxPost">📸 Share it with the family</button><button class="btn ghost" id="fxBook">💡 Make it a "Who's in the picture?" question</button><button class="btn ghost" id="fxSave">💾 Save to my phone</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
+  const fit=()=>{const bw=$("#fxBox").clientWidth;$("#fxAft img").style.width=bw+"px";$("#fxAft img").style.height="auto"};setTimeout(fit,30);
+  $("#fxR").oninput=e=>$("#fxAft").style.width=e.target.value+"%";
+  $("#fxPost").onclick=()=>busy($("#fxPost"),async()=>{await act("post",{text:"🪄 An old one, fixed up",photo:after});closeSheet();sfx.fan();toast("📸 Shared!");refresh()});
+  $("#fxBook").onclick=()=>{closeSheet();triviaForm({cat:"Who's in the Picture?",photoData:after})};
+  $("#fxSave").onclick=()=>{const a=document.createElement("a");a.href=after;a.download="fixed-photo.jpg";document.body.appendChild(a);a.click();a.remove();toast("Saved. On iPhone, press and hold the picture and tap Save to Photos.")};
+};
+
+/* ================= 🔍 bigger text ================= */
+function applyBig(){const on=!!ls.get("big",false);document.body.classList.toggle("big",on);const t=$("#fBigTxt");if(t)t.innerHTML=`Bigger text<small>${on?"On":"Off"}</small>`}
+$("#fBig").onclick=()=>{ls.set("big",!ls.get("big",false));applyBig();toast(ls.get("big",false)?"🔍 Bigger text is on":"Normal text size")};
+applyBig();
 
 /* ================= 🍽️ Sunday dinner ================= */
 function renderDinner(){

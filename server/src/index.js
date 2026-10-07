@@ -137,11 +137,11 @@ export class Family extends DurableObject {
 
   async load() {
     if (this.d) return this.d;
-    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily", "stories", "recipes", "dinner", "prayers", "polls", "hands", "events"];
+    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily", "stories", "recipes", "dinner", "prayers", "polls", "hands", "events", "notes"];
     const got = await this.ctx.storage.get(keys);
     this.d = {
       meta: got.get("meta") || null, members: got.get("members") || {}, chat: got.get("chat") || [], feed: got.get("feed") || [],
-      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [], hands: got.get("hands") || [], events: got.get("events") || [],
+      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [], hands: got.get("hands") || [], events: got.get("events") || [], notes: got.get("notes") || [],
     };
     return this.d;
   }
@@ -205,6 +205,7 @@ export class Family extends DurableObject {
       grandma: this.grandmaNow(), stories: d.stories.list.slice(-60), recipes: d.recipes, dinner: this.dinnerNow(),
       prayers: d.prayers.slice(-40), polls: d.polls.slice(-12).map(pl => this.pollView(pl, me)), pushOn: (me.push || []).length > 0,
       hands: d.hands.filter(h => h.status !== "done" || Date.now() - h.doneTs < 7 * 864e5).slice(-40), tourney: this.tourneyView(), dayKey: centralDay(),
+      notes: me.mom ? d.notes.slice(-60) : d.notes.filter(n => n.from === me.id).slice(-20),
       events: d.events.filter(e => e.date >= centralDay(-1)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).slice(0, 30),
       photos: d.feed.filter(p => p.photo || (p.photos && p.photos.length)).flatMap(p => (p.photos || [p.photo]).map(id => ({ id, from: p.from, ts: p.ts, text: (p.text || "").slice(0, 120) }))).slice(-600),
       games: Object.values(d.games).map(g => ({ id: g.id, title: g.title, status: g.status, updated: g.updated, players: g.players, turnMember: g.turnMember, created: g.created })),
@@ -488,6 +489,22 @@ export class Family extends DurableObject {
         for (const f of ["born", "died"]) if (b[f] !== undefined) e[f] = clip(b[f], 40);
         if (b.story !== undefined) e.story = clip(b.story, 300);
         await this.save("tree"); this.broadcast("tree", null); return json({ ok: true });
+      }
+      case "noteAdd": { // 💌 a note for Sarnaw: words, a picture, or a voice message
+        const sn = Object.values(d.members).find(m => m.mom && m.status === "member"); if (!sn) return fail("Ask Topher to mark who Sarnaw is first");
+        if (sn.id === me.id) return fail("This one's for the family to send you");
+        const text = clip(b.text, 600).trim(), photo = await this.putPhoto(b.photo), audio = await this.putPhoto(b.audio, "audio");
+        if (!text && !photo && !audio) return fail("Write something, or add a picture or voice message");
+        d.notes.push({ id: rid(8), from: me.id, text, photo, audio, ts: Date.now(), seen: false }); if (d.notes.length > 300) d.notes.shift();
+        await this.save("notes"); this.broadcast("notes", null, [sn.id, me.id]);
+        this.notify([sn.id], null, { title: `💌 A note from ${me.name}`, body: text ? text.slice(0, 120) : audio ? "A voice message for you" : "A picture for you", tag: "note", url: "./#home" });
+        return json({ ok: true });
+      }
+      case "noteSeen": {
+        if (!me.mom) return json({ ok: true }); let ch = false;
+        for (const n of d.notes) if (!n.seen && (!b.id || n.id === b.id)) { n.seen = true; n.seenTs = Date.now(); ch = true; const f = d.members[n.from];
+          if (f && f.id !== me.id) this.notify([f.id], null, { title: `💛 ${d.meta.momName || SN_DEFAULT} read your note`, body: (n.text || "Your note").slice(0, 100), tag: "noteseen", url: "./#home" }); }
+        if (ch) { await this.save("notes"); this.broadcast("notes", null); } return json({ ok: true });
       }
       case "checkinSet": { // opt in to the daily "I'm OK" check-in
         me.checkin = !!b.on; if (me.checkin) me.checkDay = centralDay();

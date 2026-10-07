@@ -242,6 +242,11 @@ body.big #nav{zoom:1.12}
 #viewer{position:fixed;inset:0;z-index:70;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center}#viewer.on{display:flex}#viewer img{max-width:100%;max-height:78vh;object-fit:contain}
 #viewer .cap{color:#fff;padding:10px 16px;text-align:center;font-weight:700}#viewer .vb{position:absolute;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;display:flex;justify-content:space-between}
 #viewer .nx{position:absolute;top:50%;transform:translateY(-50%);font-size:34px;background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:50%;width:52px;height:52px}
+#easy .wrap{gap:14px}.ehead{font-size:30px;font-weight:900;text-align:center;margin-top:6px}.ehead small{display:block;font-size:17px;color:var(--dim);font-weight:700}
+.etiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}.etile{background:var(--card);border:0;border-radius:22px;padding:20px 10px;color:var(--ink);font-size:20px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.etile .ei{font-size:46px;line-height:1}.etile .eb{position:absolute;top:8px;right:10px;background:var(--hot,#ff5d8f);color:#fff;border-radius:14px;padding:2px 9px;font-size:16px}
+.note{background:#fff8e7;color:#3b2a12;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:none}.note .fr{font-weight:900;font-size:18px}.note .tx{font-size:20px;line-height:1.4;white-space:pre-wrap}.note img{width:100%;border-radius:12px}.note.new{outline:3px solid #ffb703}
+.etext{font-size:19px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -290,12 +295,28 @@ body.big #nav{zoom:1.12}
   <div id="bdayBox" class="list"></div>
   <div id="dailyBox"></div>
   <div id="grandmaBox"></div>
+  <div id="noteBox"></div>
   <div id="soonBox"></div>
   <div id="dinnerBox"></div>
   <div id="memBox"></div>
   <div id="handBox"></div>
   <div id="prayerBox"></div>
   <div id="feed" class="list"></div>
+</div></section>
+
+<!-- SARNAW'S EASY SCREEN -->
+<section class="screen nonav" id="easy"><div class="wrap">
+  <div class="ehead" id="eHead">Hi! 💛</div>
+  <div id="eCheck"></div>
+  <div class="etiles">
+    <button class="etile" id="ePics"><span class="ei">📸</span>Pictures<span class="eb" id="ePicsN" hidden></span></button>
+    <button class="etile" id="eNotesB"><span class="ei">💌</span>Notes<span class="eb" id="eNotesN" hidden></span></button>
+    <button class="etile" id="eStory"><span class="ei">🎙️</span>This week's question</button>
+    <button class="etile" id="eChat"><span class="ei">💬</span>Messages<span class="eb" id="eChatN" hidden></span></button>
+  </div>
+  <div id="eNotes"></div>
+  <div id="eSoon"></div>
+  <button class="btn ghost" id="eRegular">Show the regular screen</button>
 </div></section>
 
 <!-- CHAT -->
@@ -351,6 +372,7 @@ body.big #nav{zoom:1.12}
     <button class="li" id="fHomeScreen"><span class="p">📲</span><span class="n">Put Family Pop on my Home Screen<small>Opens like an app, already signed in</small></span>›</button>
     <button class="li" id="fAlerts"><span class="p">🔔</span><span class="n" id="fAlertsTxt">Phone alerts<small>Off</small></span>›</button>
     <button class="li" id="fCheck"><span class="p">💛</span><span class="n" id="fCheckTxt">Daily "I'm OK" check-in<small>Off</small></span>›</button>
+    <button class="li" id="fEasy" hidden><span class="p">🌼</span><span class="n" id="fEasyTxt">Easy screen<small>Big buttons, just the important things</small></span>›</button>
     <button class="li" id="fBig"><span class="p">🔍</span><span class="n" id="fBigTxt">Bigger text<small>Off</small></span>›</button>
     <button class="li" id="fLetIn"><span class="p">📲</span><span class="n">Let a phone in<small>Someone sees a sign-in code? Type it here</small></span>›</button>
     <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
@@ -527,12 +549,12 @@ const GAMES=[
 /* ================= navigation ================= */
 let TAB="home";
 function showScreen(id){$$(".screen").forEach(s=>s.classList.toggle("on",s.id===id));$("#nav").classList.toggle("on",["home","chat","play","games","bank","family"].includes(id))}
-function tab(t){TAB=t;$$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));showScreen(t);
+function tab(t){if(t==="home"&&easyOn()){TAB="home";showScreen("easy");renderEasy();return}TAB=t;$$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));showScreen(t);
   if(t==="chat"){renderChat();setTimeout(()=>{const m=$("#msgs");m.scrollTop=m.scrollHeight},30)} if(t==="home")renderFeed(); if(t==="bank")renderBank(); if(t==="family")renderFamily(); if(t==="play")renderPlay(); if(t==="games")renderShelf()}
 $$("#nav button").forEach(b=>b.onclick=()=>tab(b.dataset.t));
 function renderAll(){if(!S||S.pending)return;$("#famName").textContent=S.meta.name;$$(".snName").forEach(x=>x.textContent=SN());
-  if(!["home","chat","play","games","bank","family","game"].some(id=>$("#"+id).classList.contains("on")))tab(TAB);
-  renderFeed();renderChat();renderPlay();renderBank();renderFamily();badges()}
+  if(!["home","chat","play","games","bank","family","game","easy"].some(id=>$("#"+id).classList.contains("on")))tab(TAB);
+  renderFeed();renderChat();renderPlay();renderBank();renderFamily();badges();if($("#easy").classList.contains("on"))renderEasy()}
 function badges(){
   const seen=ls.get("seen",{});const unread=r=>S.chat.filter(c=>c.room===r&&c.from!==meId()&&c.ts>(seen[r]||0)).length;
   const rooms=["all"].concat(S.members.filter(m=>m.id!==meId()&&m.status==="member").map(m=>[meId(),m.id].sort().join("~")));
@@ -640,7 +662,7 @@ function renderMemory(){ // "memory of the day": an older family photo comes bac
   if($("#memQ"))$("#memQ").onclick=()=>triviaForm({photoId:pk.id,cat:"Who's in the Picture?"});
 }
 function renderFeed(){
-  if(!S)return;renderHomeScreenBox();renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();renderHands();renderRemember();renderCheck();renderSoon();const f=S.feed.slice().reverse();
+  if(!S)return;renderHomeScreenBox();renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();renderHands();renderRemember();renderCheck();renderSoon();renderNoteBox();const f=S.feed.slice().reverse();
   $("#feed").innerHTML=f.length?f.map(p=>{if(p.kind==="remember")return rememberPost(p);if(p.from==="system")return `<div class="post sys${p.kind==="recap"?" recap":""}">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span>${p.audio?`<audio controls preload="none" src="${photoURL(p.audio)}"></audio>`:""}${p.story?`<div class="text" style="color:var(--ink);font-weight:700">${esc(p.story)}</div>`:""}</div>`;
     const a=mem(p.from)||{name:"Someone",piece:"🫧"};const liked=p.likes.includes(meId());
     return `<div class="post"><div class="who"><span class="pc">${a.piece}</span><span>${esc(a.name)}<br><small>${ago(p.ts)}</small></span></div>
@@ -732,7 +754,7 @@ $("#fHomeScreen").onclick=()=>setupHome($("#fHomeScreen"));
 $("#fAlerts").onclick=()=>{if(!S.pushOn)return enableAlerts($("#fAlerts"));
   sheet(`<div class="bigmoji">🔔</div><h2>Phone alerts are on</h2><button class="btn" id="alTest">Send me a test alert</button><button class="btn ghost" id="alRedo">Set them up again</button><button class="btn ghost" id="alOff">Turn alerts off</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
   $("#alTest").onclick=()=>testAlert($("#alTest"));$("#alRedo").onclick=()=>{closeSheet();enableAlerts(null)};$("#alOff").onclick=()=>{closeSheet();disableAlerts(null)}};
-function renderFamily(){renderEvents();if($("#setSN")&&document.activeElement!==$("#setSN"))$("#setSN").value=SN();const ct=$("#fCheckTxt");if(ct)ct.innerHTML=`Daily "I'm OK" check-in<small>${S.me.checkin?"On: the family hears if you haven't checked in by early afternoon":"Off"}</small>`;
+function renderFamily(){renderEvents();$("#fEasy").hidden=!S.me.mom;$("#fEasyTxt").innerHTML=`Easy screen<small>${easyOn()?"On":"Off"}: big buttons, just the important things</small>`;if($("#setSN")&&document.activeElement!==$("#setSN"))$("#setSN").value=SN();const ct=$("#fCheckTxt");if(ct)ct.innerHTML=`Daily "I'm OK" check-in<small>${S.me.checkin?"On: the family hears if you haven't checked in by early afternoon":"Off"}</small>`;
   if(!S)return;const me=S.me;
   $("#mePiece").textContent=me.piece;$("#meName").innerHTML=`${esc(me.name)}<small>Edit my piece and trivia answers</small>`;
   const pend=S.members.filter(m=>m.status==="pending");
@@ -1354,6 +1376,50 @@ $("#fFix").onclick=async()=>{const before=await pickPhoto(1400);if(!before)retur
   $("#fxBook").onclick=()=>{closeSheet();triviaForm({cat:"Who's in the Picture?",photoData:after})};
   $("#fxSave").onclick=()=>{const a=document.createElement("a");a.href=after;a.download="fixed-photo.jpg";document.body.appendChild(a);a.click();a.remove();toast("Saved. On iPhone, press and hold the picture and tap Save to Photos.")};
 };
+
+/* ================= 🌼 Sarnaw's easy screen + 💌 notes ================= */
+function easyOn(){return !!(S&&S.me&&S.me.mom&&ls.get("easy",true))}
+$("#fEasy").onclick=()=>{ls.set("easy",!easyOn());if(!easyOn())ls.set("big",false);else ls.set("big",true);applyBig();tab("home")};
+$("#eRegular").onclick=()=>{ls.set("easy",false);TAB="home";tab("home");toast("You can turn the easy screen back on in Family → Me")};
+function noteCard(n){const m=mem(n.from)||{name:"Someone",piece:"💌"};
+  return `<div class="note ${n.seen?"":"new"}"><div class="fr">${m.piece} ${esc(m.name)} <span style="font-weight:600;font-size:14px;opacity:.7">· ${ago(n.ts)}</span></div>
+    ${n.text?`<div class="tx">${esc(n.text)}</div>`:""}${n.photo?`<img loading="lazy" src="${photoURL(n.photo)}" alt="">`:""}${n.audio?`<audio controls preload="none" src="${photoURL(n.audio)}"></audio>`:""}
+    ${n.text?`<button class="btn small ghost" style="color:#3b2a12" data-nsay="${n.id}">🔊 Read it to me</button>`:""}</div>`}
+function renderEasy(){if(!S)return;$("#eHead").innerHTML=`Hi, ${esc(SN())}! 💛<small>${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</small>`;
+  const td=S.dayKey;$("#eCheck").innerHTML=S.me.checkin?(S.me.checkDay===td?`<div class="soon" style="font-size:19px">💛 You told the family you're OK today</div>`:`<button class="checkbig" id="eCk">💛 I'm OK today</button>`):"";
+  if($("#eCk"))$("#eCk").onclick=()=>busy($("#eCk"),doCheckin);
+  const notes=(S.notes||[]).slice().reverse(),unseen=notes.filter(n=>!n.seen).length,lastPic=ls.get("ePicSeen",0),newPics=(S.photos||[]).filter(p=>p.ts>lastPic&&p.from!==meId()).length;
+  const nb=(el,n)=>{$(el).hidden=!n;$(el).textContent=n};nb("#eNotesN",unseen);nb("#ePicsN",newPics);nb("#eChatN",+($("#nbChat").textContent||0)*(!$("#nbChat").hidden));
+  $("#eNotes").innerHTML=notes.length?`<h3 style="margin:6px 0 0;font-size:22px">💌 Notes for you</h3>${notes.slice(0,3).map(noteCard).join("")}`:"";
+  const soon=(S.events||[]).filter(e=>e.date>=td).slice(0,3);
+  $("#eSoon").innerHTML=soon.length?`<div class="mem"><div class="cat" style="font-size:16px">📅 Coming up</div>${soon.map(e=>`<div class="etext"><b>${esc(e.title)}</b><br>${evDay(e.date).toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}${e.time?" at "+esc(e.time):""}</div>`).join("")}</div>`:"";
+  $$("[data-nsay]").forEach(b=>b.onclick=()=>{const n=S.notes.find(x=>x.id===b.dataset.nsay);const m=mem(n.from);say2((m?m.name+" says: ":"")+n.text)});
+  if(unseen)setTimeout(()=>{if($("#easy").classList.contains("on"))act("noteSeen",{}).catch(()=>{})},2500);
+}
+$("#ePics").onclick=()=>{ls.set("ePicSeen",Date.now());GAL=(S.photos||[]).slice().reverse();if(!GAL.length)return toast("No pictures yet");openViewer(0)};
+$("#eNotesB").onclick=()=>{const notes=(S.notes||[]).slice().reverse();sheet(`<h2>💌 Notes for you</h2>${notes.map(noteCard).join("")||'<div class="dim">No notes yet. The family can send you one anytime!</div>'}<button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
+  $$("#modal [data-nsay]").forEach(b=>b.onclick=()=>{const n=S.notes.find(x=>x.id===b.dataset.nsay);const m=mem(n.from);say2((m?m.name+" says: ":"")+n.text)})};
+$("#eChat").onclick=()=>tab("chat");
+$("#eStory").onclick=async()=>{const g=S.grandma;if(!g)return toast("No question this week");if(g.answered)return toast("You already answered this week's question. Thank you! 💛");
+  sheet(`<div class="bigmoji">🎙️</div><h2 style="font-size:24px">"${esc(g.prompt)}"</h2><button class="btn" id="esTalk" style="font-size:20px;padding:16px">🎤 Answer by talking</button><button class="btn ghost" id="esSay">🔊 Read the question to me</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Not now</button>`);
+  $("#esSay").onclick=()=>say2(g.prompt);
+  $("#esTalk").onclick=async()=>{const a=await recordSheet(g.prompt);if(a)busy(null,async()=>{await act("storyAnswer",{audio:a});sfx.fan();toast("🎙️ Saved! The family will love this.");refresh()})}};
+function renderNoteBox(){const box=$("#noteBox");if(!box)return;const sn=S.members.find(m=>m.mom&&m.status==="member");
+  if(!sn||sn.id===meId()){box.innerHTML="";return}const mine=(S.notes||[]).slice(-2).reverse();
+  box.innerHTML=`<div class="mem"><div class="cat">💌 Notes for ${esc(SN())}</div><div class="dim small">Send ${esc(SN())} a note, a picture, or a voice message. It lands right on her screen.</div>
+    ${mine.map(n=>`<div class="small">You: ${esc((n.text||(n.audio?"🎤 voice message":"📷 picture")).slice(0,60))} <b style="color:${n.seen?"var(--good)":"var(--dim)"}">${n.seen?"✓ She read it":"· sent"}</b></div>`).join("")}
+    <button class="btn small" id="ntGo">💌 Send ${esc(SN())} a note</button></div>`;
+  $("#ntGo").onclick=()=>{NT={text:"",photo:null,audio:null};noteSheet()}}
+let NT={text:"",photo:null,audio:null};
+function noteSheet(){sheet(`<h2>💌 A note for ${esc(SN())}</h2><textarea id="ntTxt" maxlength="600" placeholder="Love you! Here's what we did today…">${esc(NT.text)}</textarea>
+   <div class="split"><button class="btn ghost" id="ntPic">📷 ${NT.photo?"Change picture":"Picture"}</button><button class="btn ghost" id="ntMic">🎤 ${NT.audio?"Record again":"Voice"}</button></div>
+   <img id="ntPrev" class="qphoto" ${NT.photo?`src="${NT.photo}"`:"hidden"} alt=""><div class="small" style="font-weight:800">${NT.audio?"🎤 Voice message ready":""}</div>
+   <button class="btn" id="ntSend">Send it to ${esc(SN())}</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  const keep=()=>NT.text=$("#ntTxt").value;
+  $("#ntPic").onclick=async()=>{keep();const p=await pickPhoto(1000);if(p){NT.photo=p;noteSheet()}};
+  $("#ntMic").onclick=async()=>{keep();const a=await recordSheet("A voice message for "+SN());if(a)NT.audio=a;noteSheet()};
+  $("#ntSend").onclick=()=>busy($("#ntSend"),async()=>{keep();const t=NT.text.trim();if(!t&&!NT.photo&&!NT.audio)return toast("Write something, or add a picture or voice message");
+    await act("noteAdd",{text:t,photo:NT.photo,audio:NT.audio});NT={text:"",photo:null,audio:null};closeSheet();sfx.fan();toast(`💌 Sent! ${SN()} will get it right away.`);refresh()})}
 
 /* ================= 🔊 read it to me ================= */
 function say2(text){try{const ss=window.speechSynthesis;if(!ss)return toast("This phone can't read out loud here");

@@ -232,14 +232,20 @@ audio{width:220px;max-width:100%}
 <section class="screen nonav" id="welcome"><div class="wrap">
   <div class="logo"><span class="f">Family</span> <span class="p">Pop</span></div>
   <div class="tag">Our family's own private place: talk, share pictures, and play the board game all about us.</div>
+  <div class="card" id="wSignIn" style="display:none;text-align:center;flex-direction:column;gap:10px">
+    <b style="font-size:21px">📲 Sign in to Family Pop</b>
+    <div>Text this code to anyone in the family:</div>
+    <div class="code" id="wDevCode">· · ·</div>
+    <button class="btn ghost" id="wDevCopy">📋 Copy code</button>
+    <div class="dim small">They open Family Pop → <b>Family</b> → <b>📲 Let a phone in</b>, and type it. This screen will sign you in by itself.</div>
+    <details><summary class="small dim">Got a code from Family Pop instead?</summary>
+      <input id="wHomeCode" maxlength="10" placeholder="Code" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-size:24px;margin-top:8px" autocapitalize="characters">
+      <button class="btn ghost" id="wHomePaste">📋 Paste code</button><button class="btn" id="wHomeGo">Sign me in</button></details>
+  </div>
+  <div class="dim small" id="wNewHdr" style="display:none;text-align:center;margin-top:6px">New to Family Pop?</div>
   <button class="big main" id="wStart"><span class="ico">🏡</span><div>Start our family<small>You'll get a link to invite everyone</small></div></button>
   <button class="big" id="wJoin"><span class="ico">✉️</span><div>I got an invite<small>Paste the link or code someone sent you</small></div></button>
   <button class="big" id="wRelink"><span class="ico">📱</span><div>I'm already in, on another phone<small>Use the code from Family → Me</small></div></button>
-  <div class="card" id="wHomeTip" hidden style="text-align:center;display:flex;flex-direction:column;gap:10px">
-    <b style="font-size:18px">📲 Already in Family Pop in Safari?</b>
-    <div class="dim small">Open Family Pop in <b>Safari</b> and tap <b>"📲 Put Family Pop on my Home Screen"</b>. Then come back here. It should sign you in by itself. If it doesn't, type the code Safari shows:</div>
-    <input id="wHomeCode" maxlength="8" placeholder="Code" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-size:24px" autocapitalize="characters">
-    <button class="btn ghost" id="wHomePaste">📋 Paste code</button><button class="btn" id="wHomeGo">Sign me in</button></div>
 </div></section>
 
 <!-- WAITING FOR APPROVAL -->
@@ -319,6 +325,7 @@ audio{width:220px;max-width:100%}
   <div class="card"><h3>Me</h3><div class="list"><button class="li" id="fEditMe"><span class="p" id="mePiece">🫧</span><span class="n" id="meName">Me<small>Edit my piece and trivia answers</small></span>›</button>
     <button class="li" id="fHomeScreen"><span class="p">📲</span><span class="n">Put Family Pop on my Home Screen<small>Opens like an app, already signed in</small></span>›</button>
     <button class="li" id="fAlerts"><span class="p">🔔</span><span class="n" id="fAlertsTxt">Phone alerts<small>Off</small></span>›</button>
+    <button class="li" id="fLetIn"><span class="p">📲</span><span class="n">Let a phone in<small>Someone sees a sign-in code? Type it here</small></span>›</button>
     <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
   <div class="card" id="adminCard"><h3>Family settings</h3><label class="chk"><input type="checkbox" id="setApproval"> <span>New people need a yes first<br><small class="dim">From someone marked as an approver below</small></span></label>
     <button class="btn small ghost" id="fNewCode" style="margin-top:10px">Make a new invite link (old ones stop working)</button></div>
@@ -532,9 +539,29 @@ async function joinFlow(inv){
     await refresh();connect();if(r.status==="member")tab("home")})}
 $("#wJoin").onclick=()=>{sheet(`<h2>Paste your invite</h2><label class="f">The link or code someone sent you<input id="invIn" placeholder="https://…family-pop/?join=…"></label><button class="btn" id="invGo">Next</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
   $("#invGo").onclick=()=>{const inv=parseInvite($("#invIn").value);if(!inv)return toast("That doesn't look like an invite link");closeSheet();joinFlow(inv)}};
-$("#wRelink").onclick=()=>{sheet(`<h2>Already in the family?</h2><div class="dim">On your other phone, open Family Pop → Family → "Use Family Pop on another phone" to get a code.</div><label class="f">Code<input id="rlIn" maxlength="10" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-size:24px"></label><button class="btn ghost" id="rlPaste">📋 Paste code</button><button class="btn" id="rlGo">Use this phone</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
-  $("#rlPaste").onclick=async()=>{try{const t=(await navigator.clipboard.readText()).trim();if(t)$("#rlIn").value=t.replace(/[^a-z0-9]/gi,"").slice(0,10);else toast("Nothing copied yet")}catch(e){$("#rlIn").focus();toast("Tap the box, then hold and choose Paste")}};
-  $("#rlGo").onclick=()=>busy($("#rlGo"),async()=>{const r=await api("/relink",{code:$("#rlIn").value.trim()});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);closeSheet();await refresh();connect();tab("home")})};
+$("#wRelink").onclick=()=>{devSignIn();$("#wSignIn").scrollIntoView({behavior:"smooth"})};
+let DEV=null;
+async function devSignIn(){ // works anywhere: Home Screen app, new phone, other browser
+  $("#wSignIn").style.display="flex";$("#wNewHdr").style.display="";$("#wStart").classList.remove("main");
+  const signedIn=async r=>{SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);clearInterval(DEV&&DEV.t);DEV=null;sfx.fan();await refresh();connect();tab("home");toast("👋 You're in!");keepHomeLink()};
+  const fresh=async()=>{try{const r=await api("/devreq",{});DEV={code:r.code,t:DEV&&DEV.t};$("#wDevCode").textContent=r.code}catch(e){$("#wDevCode").textContent="No internet?"}};
+  if(DEV)return;DEV={};await fresh();
+  DEV.t=setInterval(async()=>{if(SES||!DEV||!DEV.code||document.hidden)return;try{const r=await api("/devwait",{code:DEV.code});if(r.token)signedIn(r);else if(r.gone)fresh()}catch(e){}},3000);
+  $("#wDevCopy").onclick=()=>DEV&&DEV.code&&copyCode(DEV.code,$("#wDevCopy"));
+  const go=()=>busy($("#wHomeGo"),async()=>{const c=$("#wHomeCode").value.trim();if(!c)return toast("Type the code");signedIn(await api("/relink",{code:c}))});
+  $("#wHomeGo").onclick=go;$("#wHomeCode").onkeydown=e=>{if(e.key==="Enter")go()};
+  $("#wHomePaste").onclick=async()=>{try{const t=(await navigator.clipboard.readText()).trim();if(t){$("#wHomeCode").value=t.replace(/[^a-z0-9]/gi,"").slice(0,10);go()}else toast("Nothing copied yet")}catch(e){$("#wHomeCode").focus();toast("Tap the box, then hold and choose Paste")}};
+}
+function letInSheet(who){ // type the code a not-signed-in phone is showing
+  const canPick=S.me.approver,list=S.members.filter(m=>m.status==="member");
+  sheet(`<div class="bigmoji">📲</div><h2>Let a phone in</h2><div class="dim">Type the code showing on the phone that needs signing in.</div>
+    <input id="liCode" maxlength="6" placeholder="CODE" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:6px;text-align:center;font-size:28px">
+    ${canPick?`<label class="f">Whose phone is it?<select id="liWho">${list.map(m=>`<option value="${m.id}" ${m.id===(who||meId())?"selected":""}>${m.piece} ${esc(m.name)}${m.id===meId()?" (me)":""}</option>`).join("")}</select></label>`:`<div class="dim small">This signs the phone in as you. To sign in someone else, ask an approver.</div>`}
+    <button class="btn" id="liGo">Let it in</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  $("#liCode").focus();
+  $("#liGo").onclick=()=>busy($("#liGo"),async()=>{const code=$("#liCode").value.trim();if(code.length<4)return toast("Type the code from their screen");
+    const r=await act("signInDevice",{code,memberId:canPick?$("#liWho").value:meId()});closeSheet();sfx.fan();toast(`📲 Done! ${esc(r.name)}'s phone is signing in now.`)});
+}
 $("#pendCheck").onclick=refresh;
 setInterval(()=>{if(SES&&$("#pending").classList.contains("on"))refresh()},15000);
 
@@ -744,15 +771,18 @@ function memberSheet(m){
    <div class="card" style="text-align:left">${[["🎂 Birthday",m.birthday],["😄 Nickname",m.nick],["🍽️ Favorite food",m.food]].map(([k,v])=>`<div>${k}: <b>${esc(v||"—")}</b></div>`).join("")}</div>
    ${m.fb?`<a class="btn ghost" style="text-decoration:none;display:block" href="${esc(m.fb)}" target="_blank" rel="noopener">📘 See ${esc(m.name)} on Facebook</a>`:""}
    ${isMe?"":`<button class="btn" id="msGive">🎁 Give ${esc(m.name)} something</button><button class="btn ghost" id="msChat">💬 Message ${esc(m.name)}</button>`}
+   ${me.approver&&!isMe?`<button class="btn ghost" id="msLetIn">📲 Sign in ${esc(m.name)}'s phone</button>`:""}
    ${me.approver&&!isMe?`<label class="chk"><input type="checkbox" id="msAppr" ${m.approver?"checked":""}> ${esc(m.name)} approves new people</label><label class="chk"><input type="checkbox" id="msMom" ${m.mom?"checked":""}> This is Mom (she gets paid when someone forgets to call her)</label>`:""}
    <button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
   if($("#msGive"))$("#msGive").onclick=()=>giveSheet(m.id);
+  if($("#msLetIn"))$("#msLetIn").onclick=()=>letInSheet(m.id);
   if($("#msChat"))$("#msChat").onclick=()=>{closeSheet();ROOM=m.id;tab("chat")};
   if($("#msAppr"))$("#msAppr").onchange=e=>busy(null,async()=>{await act("setApprover",{memberId:m.id,on:e.target.checked});refresh()});
   if($("#msMom"))$("#msMom").onchange=e=>busy(null,async()=>{if(e.target.checked)await act("setMom",{memberId:m.id});refresh()});
 }
 $("#fEditMe").onclick=()=>{sheet(`<h2>Me</h2>${profileFields(S.me)}<button class="btn" id="meSave">Save</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);wirePieces();
   $("#meSave").onclick=()=>busy($("#meSave"),async()=>{const p=readProfile();if(!p.name)return toast("Please type your name");await act("profile",p);closeSheet();refresh()})};
+$("#fLetIn").onclick=()=>letInSheet();
 $("#fRelink").onclick=()=>busy(null,async()=>{const r=await act("relinkCode");sheet(`<div class="bigmoji">📱</div><h2>Your code</h2><div class="code">${r.code}</div><button class="btn ghost" id="rlCopy">📋 Copy code</button><div class="dim">On your other phone (or your Home Screen app), open Family Pop and paste or type this. It works once, for 15 minutes.</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Done</button>`);$("#rlCopy").onclick=()=>copyCode(r.code,$("#rlCopy"))});
 $("#setApproval").onchange=e=>busy(null,async()=>{await act("settings",{approval:e.target.checked});refresh()});
 $("#fNewCode").onclick=()=>busy($("#fNewCode"),async()=>{await act("settings",{newCode:true});await refresh();inviteSheet()});
@@ -1340,14 +1370,10 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)keepHomeLi
   const inv=parseInvite(location.search);
   const link=new URLSearchParams(location.search).get("link");
   if(!SES&&link){try{const r=await api("/relink",{code:link});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES)}
-    catch(e){toast("That sign-in pass was already used. Open Family Pop in Safari and add it to your Home Screen again.")}
+    catch(e){}
     history.replaceState(null,"",location.pathname+location.hash)}
-  if(!SES&&standalone()){if(!(await tryPair())){$("#wHomeTip").hidden=false;
-    const go=()=>busy($("#wHomeGo"),async()=>{const c=$("#wHomeCode").value.trim();if(!c)return toast("Type the code from Safari");
-      const r=await api("/relink",{code:c});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);await refresh();connect();tab("home")});
-    $("#wHomeGo").onclick=go;
-    $("#wHomePaste").onclick=async()=>{try{const t=(await navigator.clipboard.readText()).trim();if(t){$("#wHomeCode").value=t.replace(/[^a-z0-9]/gi,"").slice(0,10);go()}else toast("Nothing copied yet")}catch(e){$("#wHomeCode").focus();toast("Tap the box, then hold and choose Paste")}};$("#wHomeCode").onkeydown=e=>{if(e.key==="Enter")go()};
-    document.addEventListener("visibilitychange",async()=>{if(!document.hidden&&!SES&&await tryPair()){await refresh();connect();tab("home")}})}}
+  if(!SES&&standalone()&&!(await tryPair()))devSignIn();
+  document.addEventListener("visibilitychange",async()=>{if(!document.hidden&&!SES&&standalone()&&await tryPair()){await refresh();connect();tab("home")}});
   applyTheme();
   if(SES){const c=ls.get("cache",null);if(c&&!c.pending){S=c;renderAll();tab("home")}await refresh();connect();
     const h=location.hash.slice(1);if(["home","chat","play","games","bank","family"].includes(h))tab(h);

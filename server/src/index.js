@@ -32,6 +32,9 @@ function centralToday(offsetDays = 0) {
   return [+p.month, +p.day, +p.year];
 }
 const BDAY_BUCKS = 250;
+const HAND_BUCKS = 75;
+const TOURNEYS = [{ game: "word-popper", name: "Word Popper", icon: "🫧", mode: "best", rule: "Best single game score" }, { game: "pic-pop", name: "PIC POP", icon: "🖼️", mode: "sum", rule: "Most puzzle points all month" }];
+const TOURNEY_PRIZES = [500, 250, 100], TOURNEY_TROPHIES = ["🏆", "🥈", "🥉"];
 const GRANDMA_PROMPTS = [
   "What was your house like when you were little?", "How did you and Dad meet?", "What's your favorite memory of your mama?",
   "What did you do for fun when you were a kid?", "What was school like for you?", "What was your very first job?",
@@ -72,6 +75,15 @@ export default {
         const stub = env.FAMILY.get(env.FAMILY.idFromName(r.fid));
         return stub.fetch(new Request(`https://do/relink?fid=${r.fid}`, { method: "POST", body: JSON.stringify(r) }));
       }
+      if (p[1] === "devreq" && req.method === "POST") { // a phone that isn't signed in asks for a short code to text to family
+        const dir = env.DIR.get(env.DIR.idFromName("dir")); const code = rid(5).toUpperCase();
+        await dir.fetch(new Request("https://dir/devreq", { method: "POST", body: JSON.stringify({ code }) }));
+        return json({ code });
+      }
+      if (p[1] === "devwait" && req.method === "POST") { // ...and checks whether someone let it in yet
+        const { code } = await req.json(); const dir = env.DIR.get(env.DIR.idFromName("dir"));
+        return json(await (await dir.fetch(new Request("https://dir/devget", { method: "POST", body: JSON.stringify({ code: clip(code, 8).toUpperCase() }) }))).json());
+      }
       if (p[1] === "relink" && req.method === "POST") {
         const { code } = await req.json();
         const dir = env.DIR.get(env.DIR.idFromName("dir"));
@@ -98,7 +110,12 @@ export class Directory extends DurableObject {
   async fetch(req) {
     const url = new URL(req.url), b = await req.json();
     if (url.pathname === "/put") { const ttl = Math.min(Math.max(+b.ttl || 15 * 60e3, 60e3), 7 * 864e5);
-      await this.ctx.storage.put("c:" + b.code, { fid: b.fid, memberId: b.memberId, exp: Date.now() + ttl }); return json({ ok: true }); }
+      await this.ctx.storage.put("c:" + b.code, { fid: b.fid, memberId: b.memberId, exp: Date.now() + ttl, multi: !!b.multi }); return json({ ok: true }); }
+    if (url.pathname === "/devreq") { await this.ctx.storage.put("d:" + b.code, { exp: Date.now() + 30 * 60e3 }); return json({ ok: true }); }
+    if (url.pathname === "/devset") { const v = await this.ctx.storage.get("d:" + b.code); if (!v || v.exp < Date.now() || v.token) return json({ ok: false });
+      await this.ctx.storage.put("d:" + b.code, { ...v, fid: b.fid, memberId: b.memberId, token: b.token }); return json({ ok: true }); }
+    if (url.pathname === "/devget") { const v = await this.ctx.storage.get("d:" + b.code); if (!v || v.exp < Date.now()) return json({ gone: true });
+      if (!v.token) return json({ waiting: true }); await this.ctx.storage.delete("d:" + b.code); return json({ fid: v.fid, memberId: v.memberId, token: v.token }); }
     if (url.pathname === "/putip") { await this.ctx.storage.put("ip:" + b.ip, { fid: b.fid, memberId: b.memberId, exp: Date.now() + 15 * 60e3 }); return json({ ok: true }); }
     if (url.pathname === "/getip") { const v = await this.ctx.storage.get("ip:" + b.ip); if (!v || v.exp < Date.now()) return json({}); await this.ctx.storage.delete("ip:" + b.ip); return json(v); }
     if (url.pathname === "/reg") { await this.ctx.storage.put("f:" + b.fid, 1); return json({ ok: true }); }
@@ -106,7 +123,7 @@ export class Directory extends DurableObject {
     if (url.pathname === "/get") {
       const v = await this.ctx.storage.get("c:" + b.code);
       if (!v || v.exp < Date.now()) return json({});
-      await this.ctx.storage.delete("c:" + b.code);
+      if (!v.multi) await this.ctx.storage.delete("c:" + b.code);
       return json(v);
     }
     return json({});
@@ -118,11 +135,11 @@ export class Family extends DurableObject {
 
   async load() {
     if (this.d) return this.d;
-    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily", "stories", "recipes", "dinner", "prayers", "polls"];
+    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily", "stories", "recipes", "dinner", "prayers", "polls", "hands"];
     const got = await this.ctx.storage.get(keys);
     this.d = {
       meta: got.get("meta") || null, members: got.get("members") || {}, chat: got.get("chat") || [], feed: got.get("feed") || [],
-      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [],
+      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [], hands: got.get("hands") || [],
     };
     return this.d;
   }
@@ -185,6 +202,7 @@ export class Family extends DurableObject {
       champion: d.meta.champion || null, month: d.meta.monthKey,
       grandma: this.grandmaNow(), stories: d.stories.list.slice(-60), recipes: d.recipes, dinner: this.dinnerNow(),
       prayers: d.prayers.slice(-40), polls: d.polls.slice(-12).map(pl => this.pollView(pl, me)), pushOn: (me.push || []).length > 0,
+      hands: d.hands.filter(h => h.status !== "done" || Date.now() - h.doneTs < 7 * 864e5).slice(-40), tourney: this.tourneyView(),
       games: Object.values(d.games).map(g => ({ id: g.id, title: g.title, status: g.status, updated: g.updated, players: g.players, turnMember: g.turnMember, created: g.created })),
     };
   }
@@ -303,8 +321,17 @@ export class Family extends DurableObject {
       case "homeLink": { // a one-time pass that rides along when you add Family Pop to your Home Screen
         const code = rid(10).toUpperCase();
         const dir = this.env.DIR.get(this.env.DIR.idFromName("dir"));
-        await dir.fetch(new Request("https://dir/put", { method: "POST", body: JSON.stringify({ code, fid: d.meta.fid, memberId: me.id, ttl: 7 * 864e5 }) }));
+        await dir.fetch(new Request("https://dir/put", { method: "POST", body: JSON.stringify({ code, fid: d.meta.fid, memberId: me.id, ttl: 7 * 864e5, multi: true }) }));
         return json({ code });
+      }
+      case "signInDevice": { // type the code a not-signed-in phone shows; approvers can do it for anyone in the family
+        const target = b.memberId ? d.members[b.memberId] : me; if (!target || target.status !== "member") return fail("Pick who it is");
+        if (target.id !== me.id && !isApprover) return fail("Only an approver can sign in someone else's phone", 403);
+        const token = await this.issueToken(target); await this.save("members");
+        const dir = this.env.DIR.get(this.env.DIR.idFromName("dir"));
+        const r = await (await dir.fetch(new Request("https://dir/devset", { method: "POST", body: JSON.stringify({ code: clip(b.code, 8).toUpperCase().replace(/[^A-Z0-9]/g, ""), fid: d.meta.fid, memberId: target.id, token }) }))).json();
+        if (!r.ok) return fail("That code didn't work. Have them close and reopen Family Pop for a fresh one.");
+        return json({ ok: true, name: target.name });
       }
       case "relinkCode": {
         const code = rid(6).toUpperCase();
@@ -377,8 +404,13 @@ export class Family extends DurableObject {
         const amt = Math.max(0, Math.min(Math.floor(+b.amount || 0), cap - so));
         d.earn[k] = so + amt; me.bucks += amt;
         for (const key of Object.keys(d.earn)) if (!key.endsWith(today())) delete d.earn[key];
+        let tPlace = null;
+        if (b.tscore != null) { const t = await this.tourneyRoll(); if (t.game === game) {
+          const v = Math.max(0, Math.floor(+b.tscore || 0));
+          if (t.mode === "best") t.scores[me.id] = Math.max(t.scores[me.id] || 0, Math.min(v, 5000)); else t.scores[me.id] = (t.scores[me.id] || 0) + Math.min(v, 500);
+          tPlace = Object.values(t.scores).filter(x => x > t.scores[me.id]).length + 1; await this.save("meta"); this.broadcast("tourney", null); } }
         await this.save("members", "earn"); if (amt) this.broadcast("members", null);
-        return json({ ok: true, earned: amt, capLeft: cap - d.earn[k], bucks: me.bucks });
+        return json({ ok: true, tPlace, earned: amt, capLeft: cap - d.earn[k], bucks: me.bucks });
       }
       case "pass": { // use (-1) or win (+1) a Free Pass during a board game
         const delta = Math.sign(+b.delta || 0);
@@ -444,6 +476,41 @@ export class Family extends DurableObject {
       }
       case "gameDelete": {
         const g = d.games[b.id]; if (g && (g.host === me.id || isApprover)) { delete d.games[b.id]; await this.save("games"); this.broadcast("games", null); }
+        return json({ ok: true });
+      }
+      case "treeEdit": { // fill in full dates later so Remembering Days can happen
+        const e = d.tree.find(x => x.id === b.id); if (!e) return fail("Not found", 404);
+        for (const f of ["born", "died"]) if (b[f] !== undefined) e[f] = clip(b[f], 40);
+        if (b.story !== undefined) e.story = clip(b.story, 300);
+        await this.save("tree"); this.broadcast("tree", null); return json({ ok: true });
+      }
+      case "handAdd": { // Need a hand board
+        const text = clip(b.text, 300).trim(); if (text.length < 4) return fail("Say what you need a hand with");
+        const h = { id: rid(8), from: me.id, text, when: clip(b.when, 60).trim(), ts: Date.now(), status: "open", helper: null };
+        d.hands.push(h); if (d.hands.length > 120) d.hands.shift();
+        await this.save("hands"); this.broadcast("hands", null);
+        this.notify(null, me.id, { title: `🤝 ${me.name} could use a hand`, body: text.slice(0, 120) + (h.when ? " · " + h.when : ""), tag: "hand-" + h.id, url: "./#home" });
+        return json({ ok: true });
+      }
+      case "handTake": {
+        const h = d.hands.find(x => x.id === b.id); if (!h || h.status === "done") return fail("That one's already taken care of");
+        if (h.from === me.id) return fail("That's your own request");
+        if (h.helper && h.helper !== me.id) return fail("Someone already said they'd help");
+        if (h.helper === me.id) { h.helper = null; h.status = "open"; } else { h.helper = me.id; h.status = "taken";
+          this.notify([h.from], null, { title: `🤝 ${me.name} will help!`, body: h.text.slice(0, 120), tag: "hand-" + h.id, url: "./#home" }); }
+        await this.save("hands"); this.broadcast("hands", null); return json({ ok: true });
+      }
+      case "handDone": {
+        const h = d.hands.find(x => x.id === b.id); if (!h || h.status === "done") return json({ ok: true });
+        if (h.from !== me.id && !isApprover) return fail("The person who asked marks it done", 403);
+        h.status = "done"; h.doneTs = Date.now(); const hp = h.helper && d.members[h.helper];
+        if (hp) { hp.bucks += HAND_BUCKS; hp.mpts = (hp.mpts || 0) + 15; hp.stats.helped = (hp.stats.helped || 0) + 1;
+          this.post(`🤝 ${hp.piece} ${hp.name} gave ${me.piece} ${me.name} a hand: "${h.text.slice(0, 100)}". +${HAND_BUCKS} Pop Bucks from the family bank!`);
+          this.notify([hp.id], null, { title: `🤝 ${me.name} says thank you!`, body: `+${HAND_BUCKS} Pop Bucks for helping`, tag: "hand-" + h.id, url: "./#bank" }); }
+        await this.save("hands", "members", "feed"); this.broadcast("hands", null); this.broadcast("members", null); this.broadcast("feed", null); return json({ ok: true });
+      }
+      case "handDel": {
+        const h = d.hands.find(x => x.id === b.id); if (h && (h.from === me.id || isApprover)) { d.hands = d.hands.filter(x => x.id !== b.id); await this.save("hands"); this.broadcast("hands", null); }
         return json({ ok: true });
       }
       case "treeAdd": {
@@ -658,8 +725,71 @@ export class Family extends DurableObject {
     if (this.d.daily && this.d.daily.q && this.d.daily.date !== before) this.notify(null, null, { title: "⭐ Today's family question is up!", body: this.d.daily.q, tag: "daily", url: "./#home" });
     const g = this.grandmaNow(); if (g && dow === 1 && !g.answered) this.notify([g.momId], null, { title: "🎙️ This week's Ask Grandma", body: g.prompt, tag: "grandma", url: "./#home" });
     if (dow === 6) { const dn = this.dinnerNow(); this.notify(null, null, { title: "🍽️ Sunday dinner is tomorrow!", body: dn.host ? `At ${dn.host}'s. What are you bringing?` : "What are you bringing?", tag: "dinner", url: "./#home" }); }
+    await this.tourneyRoll(); await this.remembering(); if (dow === 0) await this.recap();
     for (const pl of this.d.polls) if (pl.status === "collecting" && Date.now() - pl.ts > 3 * 864e5 && Object.keys(pl.answers).length >= 2) this.closePoll(pl);
     await this.save("polls", "feed");
+  }
+  monthKeyNow() { const [mo, , yr] = centralToday(); return `${yr}-${String(mo).padStart(2, "0")}`; }
+  async tourneyRoll() { // one game per month; top 3 win when the month turns over
+    const key = this.monthKeyNow(), t = this.d.meta.tourney;
+    if (t && t.key === key) return t;
+    if (t && Object.keys(t.scores).length) {
+      const label = new Date(t.key + "-15").toLocaleString("en-US", { month: "long" });
+      const top = Object.entries(t.scores).filter(([id]) => this.d.members[id]).sort((a, b) => b[1] - a[1]).slice(0, 3);
+      const lines = top.map(([id, sc], i) => { const m = this.d.members[id]; m.bucks += TOURNEY_PRIZES[i]; m.stats.trophies.push(TOURNEY_TROPHIES[i]);
+        this.notify([id], null, { title: `${TOURNEY_TROPHIES[i]} You placed #${i + 1} in the ${label} ${t.name} tournament!`, body: `+${TOURNEY_PRIZES[i]} Pop Bucks`, tag: "tourney", url: "./#games" });
+        return `${TOURNEY_TROPHIES[i]} ${m.piece} ${m.name} (${sc}) +${TOURNEY_PRIZES[i]}`; });
+      this.post(`🏆 The ${label} ${t.icon} ${t.name} tournament is over! ${lines.join(" · ")}`);
+      this.d.meta.lastTourney = { name: t.name, icon: t.icon, month: label, top: top.map(([id, sc]) => ({ id, sc })) };
+    }
+    const [mo] = centralToday(), g = TOURNEYS[mo % TOURNEYS.length];
+    this.d.meta.tourney = { key, ...g, scores: {} };
+    if (t) { this.post(`🏁 A new tournament starts today: ${g.icon} ${g.name}! ${g.rule} wins 500 Pop Bucks and a 🏆. Play it in Games.`);
+      this.notify(null, null, { title: `🏁 This month's tournament: ${g.name}`, body: "Top 3 win Pop Bucks and trophies", tag: "tourney", url: "./#games" }); }
+    await this.save("meta", "members", "feed"); this.broadcast("feed", null); this.broadcast("tourney", null);
+    return this.d.meta.tourney;
+  }
+  tourneyView() { const t = this.d.meta.tourney; if (!t) return null;
+    const [mo, , yr] = centralToday(), daysLeft = new Date(Date.UTC(yr, mo, 0)).getUTCDate() - centralToday()[1];
+    return { name: t.name, icon: t.icon, game: t.game, rule: t.rule, daysLeft, prizes: TOURNEY_PRIZES,
+      board: Object.entries(t.scores).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([id, sc]) => ({ id, sc })), last: this.d.meta.lastTourney || null }; }
+  async remembering() { // passing anniversaries, birthdays of those gone, and Memorial Day for everyone
+    const [mo, da, yr] = centralToday(), done = this.d.meta.remembered || (this.d.meta.remembered = {}); let any = false;
+    const say = (k, text, e) => { if (done[k]) return; done[k] = 1; any = true;
+      this.d.feed.push({ id: rid(10), from: "system", kind: "remember", about: e ? e.id : null, photo: e && e.photo || null, text, ts: Date.now(), likes: [], comments: [] });
+      this.notify(null, null, { title: "🕯️ Today we remember", body: text.replace(/^🕯️ /, "").slice(0, 120), tag: "remember", url: "./#home" }); };
+    for (const e of this.d.tree) { if (!e.died) continue;
+      const dd = parseBday(e.died), bd = parseBday(e.born), yrOf = s => (String(s).match(/(1[89]\d\d|20\d\d)/) || [])[1];
+      if (dd && dd[0] === mo && dd[1] === da) { const y = yrOf(e.died); say(`d:${e.id}:${yr}`, `🕯️ Today we remember ${e.name}${e.relation ? ", " + e.relation : ""}, who went home ${y ? yr - y + " years ago today" : "on this day"}.${e.story ? ' "' + e.story + '"' : ""} Share a memory of them below.`, e); }
+      if (bd && bd[0] === mo && bd[1] === da) { const y = yrOf(e.born); say(`b:${e.id}:${yr}`, `🕯️ ${e.name} was born on this day${y ? " in " + y + " (" + (yr - y) + " years ago)" : ""}. ${e.relation ? e.relation + ". " : ""}${e.story ? '"' + e.story + '" ' : ""}Share a memory of them below.`, e); }
+    }
+    const lastMon = (() => { const d = new Date(Date.UTC(yr, 5, 0)); while (d.getUTCDay() !== 1) d.setUTCDate(d.getUTCDate() - 1); return d.getUTCDate(); })();
+    if (mo === 5 && da === lastMon) { const gone = this.d.tree.filter(e => e.died);
+      if (gone.length) say(`memorial:${yr}`, `🕯️ Family Remembering Day. Today we remember ${gone.map(e => e.name).join(", ")}. Share a story, a photo, or something they used to say.`, null); }
+    if (any) { await this.save("meta", "feed"); this.broadcast("feed", null); }
+  }
+  async recap() { // Sunday morning: this week in our family
+    const wk = this.weekKey(); if (this.d.meta.recapWeek === wk) return; this.d.meta.recapWeek = wk;
+    const since = Date.now() - 7 * 864e5, d = this.d, mine = x => x.ts > since, n = (k, a) => a.length ? `${a.length} ${k}${a.length === 1 ? "" : "s"}` : "";
+    const posts = d.feed.filter(p => mine(p) && p.from !== "system"), photos = posts.reduce((a, p) => a + (p.photos ? p.photos.length : p.photo ? 1 : 0), 0);
+    const msgs = d.chat.filter(mine), wins = d.feed.filter(p => mine(p) && p.from === "system" && /^🏆 .* won Family Pop/.test(p.text));
+    const act = {}; for (const x of posts.concat(msgs)) act[x.from] = (act[x.from] || 0) + 1;
+    const top = Object.entries(act).sort((a, b) => b[1] - a[1])[0], tm = top && d.members[top[0]];
+    const lines = [
+      posts.length && `📸 ${n("post", posts)}${photos ? ` and ${photos} picture${photos === 1 ? "" : "s"}` : ""}`,
+      msgs.length && `💬 ${n("message", msgs)}`,
+      wins.length && `🎲 ${n("board game", wins)} played. ${wins.map(w => w.text.match(/^🏆 (.*?) won/)[1]).join(", ")} won`,
+      d.hands.filter(h => h.status === "done" && h.doneTs > since).length && `🤝 ${d.hands.filter(h => h.status === "done" && h.doneTs > since).length} helping hand(s) given`,
+      d.prayers.filter(p => p.answered && p.answeredTs > since).length && `🙌 ${d.prayers.filter(p => p.answered && p.answeredTs > since).length} prayer(s) answered`,
+      d.stories.list.filter(mine).length && `🎙️ A new Ask Grandma story`,
+      d.recipes.filter(mine).length && `🍲 ${n("new recipe", d.recipes.filter(mine))}`,
+      tm && `⭐ Most active: ${tm.piece} ${tm.name}`,
+      d.meta.tourney && Object.keys(d.meta.tourney.scores).length && (() => { const [id] = Object.entries(d.meta.tourney.scores).sort((a, b) => b[1] - a[1])[0]; const m = d.members[id]; return m ? `🏆 Leading the ${d.meta.tourney.name} tournament: ${m.piece} ${m.name}` : ""; })(),
+    ].filter(Boolean);
+    if (!lines.length) return this.save("meta");
+    d.feed.push({ id: rid(10), from: "system", kind: "recap", text: "🗞️ This week in our family\n" + lines.join("\n"), ts: Date.now(), likes: [], comments: [] });
+    await this.save("meta", "feed"); this.broadcast("feed", null);
+    this.notify(null, null, { title: "🗞️ This week in our family", body: lines.slice(0, 3).join(" · "), tag: "recap", url: "./#home" });
   }
   prune() { const gs = Object.values(this.d.games).sort((a, b) => b.updated - a.updated); for (const g of gs.slice(30)) delete this.d.games[g.id]; }
   post(text) { this.d.feed.push({ id: rid(10), from: "system", text, ts: Date.now(), likes: [], comments: [] }); }

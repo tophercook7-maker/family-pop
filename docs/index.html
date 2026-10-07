@@ -1284,29 +1284,42 @@ function renderTourney(){const box=$("#tourneyBox");if(!box||!S)return;const t=S
 }
 
 /* ================= 🪄 fix up an old photo (all on the phone, free) ================= */
-function restorePhoto(src){return new Promise(res=>{const im=new Image();im.onload=()=>{
+function restorePhoto(src,mode){ // mode: undefined = guess, "bw", "color"
+  return new Promise(res=>{const im=new Image();im.onload=()=>{
   const k=Math.min(1,1400/Math.max(im.width,im.height)),w=Math.round(im.width*k),h=Math.round(im.height*k);
   const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.drawImage(im,0,0,w,h);
   const id=x.getImageData(0,0,w,h),d=id.data,n=w*h,hist=[new Uint32Array(256),new Uint32Array(256),new Uint32Array(256)];let sat=0;
   for(let i=0;i<d.length;i+=4){hist[0][d[i]]++;hist[1][d[i+1]]++;hist[2][d[i+2]]++;sat+=Math.max(d[i],d[i+1],d[i+2])-Math.min(d[i],d[i+1],d[i+2])}
-  const gray=sat/n<14; // black & white photo: keep it black & white, just clean the yellowing
   const cut=(H,p)=>{let a=0,t=n*p;for(let v=0;v<256;v++){a+=H[v];if(a>=t)return v}return 255};
   const lo=[0,1,2].map(ch=>cut(hist[ch],.006)),hi=[0,1,2].map(ch=>cut(hist[ch],.994));
-  if(gray){const L=Math.min(...lo),Hh=Math.max(...hi);lo.fill(L);hi.fill(Hh)}
-  const lut=[0,1,2].map(ch=>{const t=new Uint8ClampedArray(256),r=Math.max(1,hi[ch]-lo[ch]);for(let v=0;v<256;v++){let y=(v-lo[ch])/r;y=Math.max(0,Math.min(1,y));y=Math.pow(y,.92);t[v]=y*255}return t});
-  for(let i=0;i<d.length;i+=4){let r=lut[0][d[i]],g=lut[1][d[i+1]],b=lut[2][d[i+2]];
-    if(gray){const l=.3*r+.59*g+.11*b;r=g=b=l}else{const l=.3*r+.59*g+.11*b;r=l+(r-l)*1.15;g=l+(g-l)*1.15;b=l+(b-l)*1.15}
+  // a yellowed black & white print turns almost colorless once each color is stretched on its own; a real color photo doesn't
+  let s2=0,cnt2=0;for(let i=0;i<d.length;i+=4*7){const v=[0,1,2].map(ch=>(d[i+ch]-lo[ch])/Math.max(1,hi[ch]-lo[ch]));s2+=Math.max(...v)-Math.min(...v);cnt2++}
+  const gray=mode==="bw"||(mode!=="color"&&(sat/n<14||s2/cnt2<.09)); // black & white: keep it that way, just clean the yellowing
+  // half "same stretch for all colors" (restores contrast) + half "per color" (removes the yellow/red cast), so true colors aren't pushed too far
+  const L=Math.min(...lo),H=Math.max(...hi),A=gray?0:.45;
+  const lut=[0,1,2].map(ch=>{const t=new Uint8ClampedArray(256),r=Math.max(24,hi[ch]-lo[ch]),R=Math.max(1,H-L);for(let v=0;v<256;v++){
+    const per=Math.max(0,Math.min(1,(v-lo[ch])/r)),all=Math.max(0,Math.min(1,(v-L)/R));t[v]=Math.pow(per*A+all*(1-A),.92)*255}return t});
+  for(let i=0;i<d.length;i+=4){d[i]=lut[0][d[i]];d[i+1]=lut[1][d[i+1]];d[i+2]=lut[2][d[i+2]]}
+  // white balance from the brightest bits of the picture (old prints yellow most in the whites)
+  const lh=new Uint32Array(256);for(let i=0;i<d.length;i+=4)lh[(d[i]*.3+d[i+1]*.59+d[i+2]*.11)|0]++;
+  let thr=255;for(let a=0;thr>0;thr--){a+=lh[thr];if(a>=n*.03)break}
+  let sr=0,sg=0,sb=0,cnt=0;for(let i=0;i<d.length;i+=4)if(d[i]*.3+d[i+1]*.59+d[i+2]*.11>=thr){sr+=d[i];sg+=d[i+1];sb+=d[i+2];cnt++}
+  const mean=(sr+sg+sb)/3/cnt||1,cl=v=>Math.max(.82,Math.min(1.22,v)),gain=gray?[1,1,1]:[sr,sg,sb].map(v=>1+(cl(mean/(v/cnt||1))-1)*.75);
+  for(let i=0;i<d.length;i+=4){let r=d[i]*gain[0],g=d[i+1]*gain[1],b=d[i+2]*gain[2];
+    if(gray){const l=.3*r+.59*g+.11*b;r=g=b=l}else{const l=.3*r+.59*g+.11*b;r=l+(r-l)*1.1;g=l+(g-l)*1.1;b=l+(b-l)*1.1}
     d[i]=r;d[i+1]=g;d[i+2]=b}
   const src2=new Uint8ClampedArray(d),amt=.55; // gentle sharpen
   for(let yy=1;yy<h-1;yy++)for(let xx=1;xx<w-1;xx++){const i=(yy*w+xx)*4;for(let ch=0;ch<3;ch++){const v=src2[i+ch],avg=(src2[i+ch-4]+src2[i+ch+4]+src2[i+ch-w*4]+src2[i+ch+w*4])/4;d[i+ch]=v+(v-avg)*amt}}
   x.putImageData(id,0,0);res({url:c.toDataURL("image/jpeg",.86),gray})};im.src=src})}
-$("#fFix").onclick=async()=>{const before=await pickPhoto(1400);if(!before)return;toast("🪄 Fixing it up…");const {url:after,gray}=await restorePhoto(before);
-  sheet(`<h2>🪄 Fixed up${gray?" (kept black & white)":""}</h2><div class="dim small">Slide to compare.</div>
+$("#fFix").onclick=async()=>{const before=await pickPhoto(1400);if(!before)return;toast("🪄 Fixing it up…");let {url:after,gray}=await restorePhoto(before);
+  sheet(`<h2>🪄 Fixed up</h2><div class="dim small">Slide to compare.</div>
     <div class="fix" id="fxBox"><img src="${before}" alt="Before"><div class="aft" id="fxAft" style="width:50%"><img src="${after}" alt="After"></div><span class="lbl" style="left:8px">After</span><span class="lbl" style="right:8px">Before</span></div>
     <input type="range" id="fxR" min="0" max="100" value="50">
+    <label class="chk"><input type="checkbox" id="fxBW" ${gray?"checked":""}> Black & white photo</label>
     <button class="btn" id="fxPost">📸 Share it with the family</button><button class="btn ghost" id="fxBook">💡 Make it a "Who's in the picture?" question</button><button class="btn ghost" id="fxSave">💾 Save to my phone</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
   const fit=()=>{const bw=$("#fxBox").clientWidth;$("#fxAft img").style.width=bw+"px";$("#fxAft img").style.height="auto"};setTimeout(fit,30);
   $("#fxR").oninput=e=>$("#fxAft").style.width=e.target.value+"%";
+  $("#fxBW").onchange=async e=>{({url:after}=await restorePhoto(before,e.target.checked?"bw":"color"));$("#fxAft img").src=after};
   $("#fxPost").onclick=()=>busy($("#fxPost"),async()=>{await act("post",{text:"🪄 An old one, fixed up",photo:after});closeSheet();sfx.fan();toast("📸 Shared!");refresh()});
   $("#fxBook").onclick=()=>{closeSheet();triviaForm({cat:"Who's in the Picture?",photoData:after})};
   $("#fxSave").onclick=()=>{const a=document.createElement("a");a.href=after;a.download="fixed-photo.jpg";document.body.appendChild(a);a.click();a.remove();toast("Saved. On iPhone, press and hold the picture and tap Save to Photos.")};

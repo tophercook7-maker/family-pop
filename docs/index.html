@@ -247,6 +247,8 @@ body.big #nav{zoom:1.12}
 .etile .ei{font-size:46px;line-height:1}.etile .eb{position:absolute;top:8px;right:10px;background:var(--hot,#ff5d8f);color:#fff;border-radius:14px;padding:2px 9px;font-size:16px}
 .note{background:#fff8e7;color:#3b2a12;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:none}.note .fr{font-weight:900;font-size:18px}.note .tx{font-size:20px;line-height:1.4;white-space:pre-wrap}.note img{width:100%;border-radius:12px}.note.new{outline:3px solid #ffb703}
 .etext{font-size:19px;line-height:1.45}
+#easy .wrap{zoom:1.18}body.big #easy .wrap{zoom:1.3}
+.note .nsay{background:#ffe2a8;color:#3b2a12;border:0;border-radius:12px;padding:10px;font-weight:900;font-size:16px}
 </style>
 </head>
 <body>
@@ -1384,7 +1386,7 @@ $("#eRegular").onclick=()=>{ls.set("easy",false);TAB="home";tab("home");toast("Y
 function noteCard(n){const m=mem(n.from)||{name:"Someone",piece:"💌"};
   return `<div class="note ${n.seen?"":"new"}"><div class="fr">${m.piece} ${esc(m.name)} <span style="font-weight:600;font-size:14px;opacity:.7">· ${ago(n.ts)}</span></div>
     ${n.text?`<div class="tx">${esc(n.text)}</div>`:""}${n.photo?`<img loading="lazy" src="${photoURL(n.photo)}" alt="">`:""}${n.audio?`<audio controls preload="none" src="${photoURL(n.audio)}"></audio>`:""}
-    ${n.text?`<button class="btn small ghost" style="color:#3b2a12" data-nsay="${n.id}">🔊 Read it to me</button>`:""}</div>`}
+    ${n.text?`<button class="nsay" data-nsay="${n.id}">🔊 Read it to me</button>`:""}</div>`}
 function renderEasy(){if(!S)return;$("#eHead").innerHTML=`Hi, ${esc(SN())}! 💛<small>${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</small>`;
   const td=S.dayKey;$("#eCheck").innerHTML=S.me.checkin?(S.me.checkDay===td?`<div class="soon" style="font-size:19px">💛 You told the family you're OK today</div>`:`<button class="checkbig" id="eCk">💛 I'm OK today</button>`):"";
   if($("#eCk"))$("#eCk").onclick=()=>busy($("#eCk"),doCheckin);

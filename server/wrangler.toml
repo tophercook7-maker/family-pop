@@ -15,7 +15,7 @@ tag = "v1"
 new_sqlite_classes = ["Family", "Directory"]
 
 [triggers]
-crons = ["0 14 * * *"]
+crons = ["0 14,18 * * *"]
 
 [vars]
 VAPID_PUBLIC = "BCc84ZqpAZSLf-m-K-nPiToUtwyEx3Z8Eyg-jU4YHDPUcYkS8Iyhec9ZxtIc-swb_ZvAEjuq_YsWJZEteLDEq6Q"

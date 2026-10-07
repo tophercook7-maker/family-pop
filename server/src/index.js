@@ -32,6 +32,7 @@ function centralToday(offsetDays = 0) {
   return [+p.month, +p.day, +p.year];
 }
 const BDAY_BUCKS = 250;
+const centralDay = (off = 0) => { const [mo, da, yr] = centralToday(off); return `${yr}-${String(mo).padStart(2, "0")}-${String(da).padStart(2, "0")}`; };
 const HAND_BUCKS = 75;
 const TOURNEYS = [{ game: "word-popper", name: "Word Popper", icon: "🫧", mode: "best", rule: "Best single game score" }, { game: "pic-pop", name: "PIC POP", icon: "🖼️", mode: "sum", rule: "Most puzzle points all month" }];
 const TOURNEY_PRIZES = [500, 250, 100], TOURNEY_TROPHIES = ["🏆", "🥈", "🥉"];
@@ -52,7 +53,7 @@ export default {
   async scheduled(event, env, ctx) { // every morning: daily question, birthdays, Ask Grandma, Sunday dinner reminders
     const dir = env.DIR.get(env.DIR.idFromName("dir"));
     const { fids } = await (await dir.fetch(new Request("https://dir/list", { method: "POST", body: "{}" }))).json();
-    for (const fid of fids || []) ctx.waitUntil(env.FAMILY.get(env.FAMILY.idFromName(fid)).fetch(new Request(`https://do/tick?fid=${fid}`, { method: "POST", body: "{}" })).catch(() => {}));
+    for (const fid of fids || []) ctx.waitUntil(env.FAMILY.get(env.FAMILY.idFromName(fid)).fetch(new Request(`https://do/tick?fid=${fid}&slot=${new Date(event.scheduledTime).getUTCHours() >= 17 ? "noon" : "morning"}`, { method: "POST", body: "{}" })).catch(() => {}));
   },
   async fetch(req, env) {
     if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
@@ -135,11 +136,11 @@ export class Family extends DurableObject {
 
   async load() {
     if (this.d) return this.d;
-    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily", "stories", "recipes", "dinner", "prayers", "polls", "hands"];
+    const keys = ["meta", "members", "chat", "feed", "book", "sqpics", "games", "earn", "trivia", "tree", "daily", "stories", "recipes", "dinner", "prayers", "polls", "hands", "events"];
     const got = await this.ctx.storage.get(keys);
     this.d = {
       meta: got.get("meta") || null, members: got.get("members") || {}, chat: got.get("chat") || [], feed: got.get("feed") || [],
-      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [], hands: got.get("hands") || [],
+      book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [], hands: got.get("hands") || [], events: got.get("events") || [],
     };
     return this.d;
   }
@@ -168,7 +169,7 @@ export class Family extends DurableObject {
   publicMember(m, full) {
     const o = { id: m.id, name: m.name, piece: m.piece, status: m.status, approver: !!m.approver, mom: !!m.mom, creator: !!m.creator,
       bucks: m.bucks, passes: m.passes, stats: m.stats, pieces: m.pieces || [] };
-    o.fb = m.fb || ""; o.mpts = m.mpts || 0;
+    o.fb = m.fb || ""; o.mpts = m.mpts || 0; o.checkin = !!m.checkin; o.checkDay = m.checkDay || "";
     if (full) Object.assign(o, { birthday: m.birthday || "", nick: m.nick || "", food: m.food || "", secret: m.secret || "", chatTrivia: m.chatTrivia !== false, sqCredits: m.sqCredits || 0 });
     return o;
   }
@@ -202,7 +203,9 @@ export class Family extends DurableObject {
       champion: d.meta.champion || null, month: d.meta.monthKey,
       grandma: this.grandmaNow(), stories: d.stories.list.slice(-60), recipes: d.recipes, dinner: this.dinnerNow(),
       prayers: d.prayers.slice(-40), polls: d.polls.slice(-12).map(pl => this.pollView(pl, me)), pushOn: (me.push || []).length > 0,
-      hands: d.hands.filter(h => h.status !== "done" || Date.now() - h.doneTs < 7 * 864e5).slice(-40), tourney: this.tourneyView(),
+      hands: d.hands.filter(h => h.status !== "done" || Date.now() - h.doneTs < 7 * 864e5).slice(-40), tourney: this.tourneyView(), dayKey: centralDay(),
+      events: d.events.filter(e => e.date >= centralDay(-1)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).slice(0, 30),
+      photos: d.feed.filter(p => p.photo || (p.photos && p.photos.length)).flatMap(p => (p.photos || [p.photo]).map(id => ({ id, from: p.from, ts: p.ts, text: (p.text || "").slice(0, 120) }))).slice(-600),
       games: Object.values(d.games).map(g => ({ id: g.id, title: g.title, status: g.status, updated: g.updated, players: g.players, turnMember: g.turnMember, created: g.created })),
     };
   }
@@ -224,7 +227,7 @@ export class Family extends DurableObject {
     }
     if (!d.meta) return fail("We couldn't find that family. Check the link.", 404);
     if (!this.registered) { this.registered = true; const dir = this.env.DIR.get(this.env.DIR.idFromName("dir")); this.ctx.waitUntil(dir.fetch(new Request("https://dir/reg", { method: "POST", body: JSON.stringify({ fid: d.meta.fid }) })).catch(() => { this.registered = false; })); }
-    if (path === "/tick") { await this.tick(); return json({ ok: true }); }
+    if (path === "/tick") { await req.text().catch(() => ""); if (url.searchParams.get("slot") === "noon") await this.checkinAlerts(); else await this.tick(); return json({ ok: true }); }
 
     if (path === "/relink" && req.method === "POST") {
       const b = await req.json(); const m = d.members[b.memberId];
@@ -484,6 +487,34 @@ export class Family extends DurableObject {
         if (b.story !== undefined) e.story = clip(b.story, 300);
         await this.save("tree"); this.broadcast("tree", null); return json({ ok: true });
       }
+      case "checkinSet": { // opt in to the daily "I'm OK" check-in
+        me.checkin = !!b.on; if (me.checkin) me.checkDay = centralDay();
+        await this.save("members"); this.broadcast("members", null); return json({ ok: true });
+      }
+      case "checkin": {
+        const first = me.checkDay !== centralDay(); me.checkDay = centralDay(); me.checkTs = Date.now();
+        if (first && me.checkAlerted === centralDay()) this.notify(null, me.id, { title: `💛 ${me.name} checked in`, body: "All good today", tag: "checkin-" + me.id, url: "./#home" });
+        await this.save("members"); this.broadcast("members", null); return json({ ok: true });
+      }
+      case "eventAdd": {
+        const title = clip(b.title, 80).trim(), date = String(b.date || ""); if (!title) return fail("Name the event");
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < centralDay()) return fail("Pick a day that hasn't passed");
+        const e = { id: rid(8), title, date, time: clip(b.time, 20), place: clip(b.place, 80), note: clip(b.note, 300), by: me.id, rsvp: { [me.id]: "yes" }, ts: Date.now() };
+        d.events.push(e); d.events = d.events.filter(x => x.date >= centralDay(-60)).slice(-150);
+        this.post(`📅 ${me.piece} ${me.name} added "${title}" to the family calendar: ${new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}${e.time ? " at " + e.time : ""}`);
+        await this.save("events", "feed"); this.broadcast("events", null); this.broadcast("feed", null);
+        this.notify(null, me.id, { title: `📅 ${title}`, body: `${me.name} added it to the family calendar. Are you coming?`, tag: "event-" + e.id, url: "./#family" });
+        return json({ ok: true });
+      }
+      case "eventRsvp": {
+        const e = d.events.find(x => x.id === b.id); if (!e) return fail("Not found", 404);
+        if (["yes", "no", "maybe"].includes(b.ans)) e.rsvp[me.id] = b.ans; else delete e.rsvp[me.id];
+        await this.save("events"); this.broadcast("events", null); return json({ ok: true });
+      }
+      case "eventDel": {
+        const e = d.events.find(x => x.id === b.id); if (e && (e.by === me.id || isApprover)) { d.events = d.events.filter(x => x.id !== b.id); await this.save("events"); this.broadcast("events", null); }
+        return json({ ok: true });
+      }
       case "handAdd": { // Need a hand board
         const text = clip(b.text, 300).trim(); if (text.length < 4) return fail("Say what you need a hand with");
         const h = { id: rid(8), from: me.id, text, when: clip(b.when, 60).trim(), ts: Date.now(), status: "open", helper: null };
@@ -726,8 +757,26 @@ export class Family extends DurableObject {
     const g = this.grandmaNow(); if (g && dow === 1 && !g.answered) this.notify([g.momId], null, { title: "🎙️ This week's Ask Grandma", body: g.prompt, tag: "grandma", url: "./#home" });
     if (dow === 6) { const dn = this.dinnerNow(); this.notify(null, null, { title: "🍽️ Sunday dinner is tomorrow!", body: dn.host ? `At ${dn.host}'s. What are you bringing?` : "What are you bringing?", tag: "dinner", url: "./#home" }); }
     await this.tourneyRoll(); await this.remembering(); if (dow === 0) await this.recap();
+    const td = centralDay(), tm = centralDay(1);
+    for (const e of this.d.events) {
+      const who = Object.entries(e.rsvp).filter(([, a]) => a !== "no").map(([id]) => id), at = (e.time ? " at " + e.time : "") + (e.place ? " · " + e.place : "");
+      if (e.date === tm) this.notify(null, null, { title: `📅 Tomorrow: ${e.title}`, body: (at.replace(/^ at /, "") || "Are you coming?") + (who.length ? ` · ${who.length} coming` : ""), tag: "event-" + e.id, url: "./#family" });
+      if (e.date === td) this.notify(who.length ? who : null, null, { title: `📅 Today: ${e.title}`, body: at.replace(/^ at /, "") || "See you there!", tag: "event-" + e.id, url: "./#family" });
+    }
+    for (const m of Object.values(this.d.members)) if (m.status === "member" && m.checkin && m.checkDay !== td)
+      this.notify([m.id], null, { title: "☀️ Good morning!", body: "Tap to let the family know you're OK today", tag: "checkin", url: "./?checkin=1#home" });
     for (const pl of this.d.polls) if (pl.status === "collecting" && Date.now() - pl.ts > 3 * 864e5 && Object.keys(pl.answers).length >= 2) this.closePoll(pl);
     await this.save("polls", "feed");
+  }
+  async checkinAlerts() { // early afternoon: anyone who turned on check-ins and hasn't tapped "I'm OK" today
+    const td = centralDay(); let changed = false;
+    for (const m of Object.values(this.d.members)) {
+      if (m.status !== "member" || !m.checkin || m.checkDay === td || m.checkAlerted === td) continue;
+      m.checkAlerted = td; changed = true;
+      this.notify(null, m.id, { title: `💛 ${m.name} hasn't checked in today`, body: "Might be nothing. Maybe give them a text?", tag: "checkin-" + m.id, url: "./#home" });
+      this.notify([m.id], null, { title: "💛 The family's checking on you", body: "Tap to say you're OK", tag: "checkin", url: "./?checkin=1#home" });
+    }
+    if (changed) await this.save("members");
   }
   monthKeyNow() { const [mo, , yr] = centralToday(); return `${yr}-${String(mo).padStart(2, "0")}`; }
   async tourneyRoll() { // one game per month; top 3 win when the month turns over

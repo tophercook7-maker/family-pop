@@ -259,18 +259,18 @@ body.big #nav{zoom:1.12}
   <div class="tag">Our family's own private place: talk, share pictures, and play the board game all about us.</div>
   <div class="card" id="wSignIn" style="display:none;text-align:center;flex-direction:column;gap:10px">
     <b style="font-size:21px">📲 Sign in to Family Pop</b>
-    <div>Text this code to anyone in the family:</div>
+    <div>Already in Family Pop on your phone? Grab it and go to <b>Family → Me → 📲 Let a phone in</b>, then type this code:</div>
     <div class="code" id="wDevCode">· · ·</div>
     <button class="btn ghost" id="wDevCopy">📋 Copy code</button>
-    <div class="dim small">They open Family Pop → <b>Family</b> → <b>📲 Let a phone in</b>, and type it. This screen will sign you in by itself.</div>
+    <div class="dim small">No phone handy? Text the code to anyone in the family and they can type it in for you. This screen signs you in by itself.</div>
     <details><summary class="small dim">Got a code from Family Pop instead?</summary>
       <input id="wHomeCode" maxlength="10" placeholder="Code" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-size:24px;margin-top:8px" autocapitalize="characters">
       <button class="btn ghost" id="wHomePaste">📋 Paste code</button><button class="btn" id="wHomeGo">Sign me in</button></details>
   </div>
-  <div class="dim small" id="wNewHdr" style="display:none;text-align:center;margin-top:6px">New to Family Pop?</div>
-  <button class="big main" id="wStart"><span class="ico">🏡</span><div>Start our family<small>You'll get a link to invite everyone</small></div></button>
+  <button class="big" id="wRelink"><span class="ico">📱</span><div>I'm already in the family<small>Sign in on this phone, iPad, or Home Screen app</small></div></button>
+  <div class="dim small" id="wNewHdr" style="display:none;text-align:center;margin-top:6px">Never joined before?</div>
   <button class="big" id="wJoin"><span class="ico">✉️</span><div>I got an invite<small>Paste the link or code someone sent you</small></div></button>
-  <button class="big" id="wRelink"><span class="ico">📱</span><div>I'm already in<small>Sign in on this phone or Home Screen app</small></div></button>
+  <button class="btn ghost small" id="wStart" style="margin-top:14px;opacity:.75">Start a brand-new family</button>
 </div></section>
 
 <!-- WAITING FOR APPROVAL -->
@@ -443,7 +443,7 @@ const rel=r=>String(r||"").replace(/^Mom's/,SN()+"'s");
 const mem=id=>S&&S.members.find(m=>m.id===id);
 let refreshT=null;
 async function refresh(){
-  try{const d=await api(`/f/${SES.fid}/me`);S=d;ls.set("cache",d);
+  try{const d=await api(`/f/${SES.fid}/me`);S=d;ls.set("cache",d);try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
     if(d.pending){showScreen("pending");$("#pendTitle").textContent=`Almost in, ${d.me.name}!`;return}
     renderAll();
   }catch(e){if(e.status===401){toast("This phone isn't in the family anymore");ls.set("session",null);SES=null;showScreen("welcome")}else if(!S)toast(e.message)}
@@ -582,7 +582,7 @@ function profileFields(p,opts={}){
 function readProfile(){let piece=($(".pieces button.on")||{}).dataset;piece=piece?piece.p:"🧁";
   return {name:$("#pfName").value.trim(),piece,birthday:$("#pfBday").value.trim(),nick:$("#pfNick").value.trim(),food:$("#pfFood").value.trim(),secret:$("#pfSecret").value.trim(),fb:($("#pfFb")||{value:""}).value.trim(),chatTrivia:$("#pfChat").checked}}
 function wirePieces(){$$("#pfPieces button").forEach(b=>b.onclick=()=>{if(b.classList.contains("lock")){toast("Buy that piece in the Bank 🏦");return}$$("#pfPieces button").forEach(x=>x.classList.toggle("on",x===b))})}
-$("#wStart").onclick=()=>{sheet(`<h2>Start our family</h2><label class="f">Family name<input id="fmName" placeholder="The Cook Family" maxlength="40"></label>${profileFields()}<button class="btn" id="fmGo">Start it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);wirePieces();
+$("#wStart").onclick=()=>{sheet(`<h2>Start a brand-new family</h2><div class="soon" style="text-align:left">⚠️ If anyone in your family already uses Family Pop, <b>don't</b> start a new one. Tap Cancel and use the sign-in code instead.</div><label class="f">Family name<input id="fmName" placeholder="The Cook Family" maxlength="40"></label>${profileFields()}<button class="btn" id="fmGo">Start it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);wirePieces();
   $("#fmGo").onclick=()=>busy($("#fmGo"),async()=>{const me=readProfile();if(!me.name)return toast("Please type your name");
     const r=await api("/create",{familyName:$("#fmName").value.trim()||"Our Family",me});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);closeSheet();
     await refresh();connect();tab("family");setTimeout(inviteSheet,400)})};
@@ -598,7 +598,7 @@ $("#wJoin").onclick=()=>{sheet(`<h2>Paste your invite</h2><label class="f">The l
 $("#wRelink").onclick=()=>{devSignIn();$("#wSignIn").scrollIntoView({behavior:"smooth"})};
 let DEV=null;
 async function devSignIn(){ // works anywhere: Home Screen app, new phone, other browser
-  $("#wSignIn").style.display="flex";$("#wNewHdr").style.display="";$("#wStart").classList.remove("main");
+  $("#wSignIn").style.display="flex";$("#wNewHdr").style.display="";$("#wRelink").style.display="none";
   const signedIn=async r=>{SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);clearInterval(DEV&&DEV.t);DEV=null;sfx.fan();await refresh();connect();tab("home");toast("👋 You're in!");keepHomeLink()};
   const fresh=async()=>{try{const r=await api("/devreq",{});DEV={code:r.code,t:DEV&&DEV.t};$("#wDevCode").textContent=r.code}catch(e){$("#wDevCode").textContent="No internet?"}};
   if(DEV)return;DEV={};await fresh();
@@ -1644,7 +1644,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)keepHomeLi
     if(new URLSearchParams(location.search).get("checkin")&&S&&S.me&&S.me.checkin&&S.me.checkDay!==S.dayKey)busy(null,doCheckin);
     keepHomeLink();
     if(inv&&inv.fid!==SES.fid)toast("You're already in a family on this phone")}
-  else{showScreen("welcome");if(inv)joinFlow(inv)}
+  else{showScreen("welcome");if(inv)joinFlow(inv);else devSignIn()}
 })();
 })();
 </script>

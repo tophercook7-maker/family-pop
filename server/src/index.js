@@ -143,6 +143,8 @@ export class Family extends DurableObject {
       meta: got.get("meta") || null, members: got.get("members") || {}, chat: got.get("chat") || [], feed: got.get("feed") || [],
       book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [], hands: got.get("hands") || [], events: got.get("events") || [], notes: got.get("notes") || [],
     };
+    const sm = Object.values(this.d.members).find(m => m.mom); const sn = (this.d.meta && this.d.meta.momName) || SN_DEFAULT;
+    if (sm && sm.name !== sn) { sm.realName = sm.realName || sm.name; sm.name = sn; this.ctx.waitUntil(this.save("members")); }
     return this.d;
   }
   async save(...keys) { const o = {}; for (const k of keys) o[k] = this.d[k]; await this.ctx.storage.put(o); }
@@ -285,7 +287,7 @@ export class Family extends DurableObject {
 
     switch (a) {
       case "profile": {
-        for (const f of PROFILE_FIELDS) if (b[f] !== undefined && f !== "mom") me[f] = typeof b[f] === "boolean" ? b[f] : clip(b[f], f === "secret" ? 140 : f === "fb" ? 200 : 40);
+        for (const f of PROFILE_FIELDS) if (b[f] !== undefined && f !== "mom" && !(f === "name" && me.mom)) me[f] = typeof b[f] === "boolean" ? b[f] : clip(b[f], f === "secret" ? 140 : f === "fb" ? 200 : 40);
         me.fb = fbLink(me.fb);
         await this.save("members"); this.broadcast("members", null); return json({ ok: true });
       }
@@ -305,11 +307,12 @@ export class Family extends DurableObject {
       }
       case "setMom": {
         if (!isApprover) return fail("Only approvers can do that", 403);
-        for (const x of Object.values(d.members)) x.mom = false; member(b.memberId).mom = true;
+        for (const x of Object.values(d.members)) x.mom = false; const sm = member(b.memberId); sm.mom = true;
+        if (sm.name !== (d.meta.momName || SN_DEFAULT)) { sm.realName = sm.realName || sm.name; sm.name = d.meta.momName || SN_DEFAULT; }
         await this.save("members"); this.broadcast("members", null); return json({ ok: true });
       }
       case "settings": {
-        if (b.momName !== undefined && (isApprover || me.mom)) { d.meta.momName = clip(b.momName, 24).trim() || SN_DEFAULT; await this.save("meta"); this.broadcast("members", null); this.broadcast("feed", null); if (Object.keys(b).length <= 2) return json({ ok: true }); }
+        if (b.momName !== undefined && (isApprover || me.mom)) { d.meta.momName = clip(b.momName, 24).trim() || SN_DEFAULT; for (const x of Object.values(d.members)) if (x.mom) x.name = d.meta.momName; await this.save("meta", "members"); this.broadcast("members", null); this.broadcast("feed", null); if (Object.keys(b).length <= 2) return json({ ok: true }); }
         if (!isApprover) return fail("Only approvers can change settings", 403);
         if (b.approval !== undefined) d.meta.approval = !!b.approval;
         if (b.name) d.meta.name = clip(b.name, 40);

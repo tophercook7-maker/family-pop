@@ -501,7 +501,7 @@ async function shareOut(text,photoId){ // send a family moment out to Facebook, 
 /* ================= the world ================= */
 const BASIC_PIECES=["🧁","🐢","🏎️","🚜","🫧","🐉","🌹","🦋","🐈","🐕","☕","🎸"];
 const SHOP_PIECES=["🦄","👑","🎣","🏈","🌻","⭐","🦅","🐴","🚀","🍀","🎂","🦖"];
-const BOTS=[{id:"bot1",name:"Granny Bot",piece:"👵",acc:.55,brave:.15,buy:.7},{id:"bot2",name:"Uncle Ace",piece:"🤠",acc:.72,brave:.45,buy:.85},{id:"bot3",name:"Shark",piece:"🦈",acc:.86,brave:.8,buy:.95}];
+const BOTS=[{id:"bot1",name:"Slowpoke Bot",piece:"🐢",acc:.55,brave:.15,buy:.7},{id:"bot2",name:"Uncle Ace",piece:"🤠",acc:.72,brave:.45,buy:.85},{id:"bot3",name:"Shark",piece:"🦈",acc:.86,brave:.8,buy:.95}];
 const CATS=["Way Back When","Favorites","Who's in the Picture?","Then & Now"];
 const GROUPS={townA:{name:"Around Town",color:"var(--gTownA)"},famA:{name:"Family Places",color:"var(--gFamA)"},townB:{name:"Downtown",color:"var(--gTownB)"},famB:{name:"Family Places",color:"var(--gFamB)"},home:{name:"Homes",color:"var(--gHome)"}};
 const BASE=[{t:"go",name:"GO",ic:"🫧"},{t:"home",slot:0,name:"House",ic:"🏡",g:"home",price:150},{t:"prop",name:"The Diner",ic:"🍔",g:"townA",price:100},{t:"fine",name:"Oops!",ic:"😬"},
@@ -568,7 +568,7 @@ function badges(){
 /* ================= welcome / join ================= */
 function profileFields(p,opts={}){
   p=p||{};const owned=BASIC_PIECES.concat(p.pieces||[]);
-  return `<label class="f">Your name<input id="pfName" value="${esc(p.name||"")}" placeholder="Like Sarnaw, Kelsey, or Andrew" maxlength="18"></label>
+  return `<label class="f">Your name<input id="pfName" value="${esc(p.name||"")}" placeholder="Like Sarnaw, Kelsey, or Andrew" maxlength="18" ${p.mom?"disabled title=\"The whole family knows you as Sarnaw\"":""}></label>
    <div style="text-align:left;font-weight:800">Pick your game piece</div>
    <div class="pieces" id="pfPieces">${owned.concat(SHOP_PIECES.filter(x=>!owned.includes(x))).map(x=>`<button type="button" class="${x===(p.piece||"🧁")?"on":""} ${owned.includes(x)?"":"lock"}" data-p="${x}" ${owned.includes(x)?"":'title="Buy it in the Bank"'}>${x}</button>`).join("")}</div>
    <div class="dim" style="text-align:left;font-weight:800">Quick trivia for the game. One short answer each. Skip any.</div>
@@ -781,15 +781,15 @@ const MOM_RESEARCH=[
  {name:"Ira William Young Sr.",relation:"Mom's grandfather",born:"1899",died:"1974",place:"Grannis, Arkansas",story:"Lost his mother when he was 3, and was raised by his grandmother Ardena."},
  {name:"Vera Mae Bagley",relation:"Mom's grandmother",born:"1909",died:"1990",place:"Grannis, Arkansas",story:"Married Ira Young Sr. The family remembered her birth year as 1910, but her stone says 1909."},
  {name:"Joseph Elmer Vaughn",relation:"Mom's grandfather",born:"1881",died:"1959",place:"Garland County, Arkansas",story:"Grandpa Vaughn. Father of 13 children with Cora, plus 3 with his first wife, Rosie Lee Clemons."},
- {name:"Cora Ellen Neighbors",relation:"Mom's grandmother",born:"1898",died:"1976",place:"Hot Springs, Arkansas",story:"Grandma Vaughn. Raised 13 children in Hot Springs."},
+ {name:"Cora Ellen Neighbors",relation:"Mom's grandmother",born:"1898",died:"1976",place:"Hot Springs, Arkansas",story:"Sarnaw's Grandma Vaughn. Raised 13 children in Hot Springs."},
  {name:"Harry Young",relation:"Mom's great-grandparent",story:"A stranger in town. He married Rowena Duggan, then up and left the family one day."},
  {name:"Rowena Duggan",relation:"Mom's great-grandparent",born:"1879",died:"1902",place:"Polk County, Arkansas",story:"Died at about 22, leaving two little ones, Ira Sr. and Lillian, for her mother Ardena to raise."},
  {name:"David Alexander Bagley",relation:"Mom's great-grandparent",born:"1868",died:"1951",place:"Grannis, Arkansas",story:"Vera Mae Bagley's father. Buried at Overturf Cemetery."},
  {name:"Ella Jane Sims",relation:"Mom's great-grandparent",born:"1886",died:"1922",place:"Greenville, Texas",story:"Called Jennie. Born in Greenville, Texas, and died in Grannis at 36."},
  {name:"James Melton Vaughn",relation:"Mom's great-grandparent",born:"1844",died:"1900",story:"Grandpa Vaughn's father."},
  {name:"Ruth Caroline Dodd",relation:"Mom's great-grandparent",story:"Grandpa Vaughn's mother."},
- {name:"Archie Miller Neighbors",relation:"Mom's great-grandparent",born:"1867",died:"1923",place:"Garland County, Arkansas",story:"Grandma Vaughn's father."},
- {name:"Rose Etta Harris",relation:"Mom's great-grandparent",born:"1869",died:"1949",story:"Called Rosetta. Grandma Vaughn's mother."},
+ {name:"Archie Miller Neighbors",relation:"Mom's great-grandparent",born:"1867",died:"1923",place:"Garland County, Arkansas",story:"Father of Sarnaw's Grandma Vaughn."},
+ {name:"Rose Etta Harris",relation:"Mom's great-grandparent",born:"1869",died:"1949",story:"Called Rosetta. Mother of Sarnaw's Grandma Vaughn."},
  {name:"Michael Charles Duggan",relation:"Mom's ancestor",born:"1822",died:"1902",place:"Maynooth, County Kildare, Ireland",story:"An Irish immigrant and Union Civil War soldier in the 3rd Illinois Cavalry, who settled in the Arkansas pines. The deepest root of the family."},
  {name:"Ardena Frances Hays",relation:"Mom's ancestor",born:"1852",died:"1927",place:"Arkansas",story:"Outlived her daughter Rowena and raised her grandchildren, Ira Sr. and Lillian. The family name Ardena comes from her."},
  {name:"Leven Savage Neighbors",relation:"Mom's ancestor",born:"1829",died:"1898",place:"Kentucky",story:"Born in Kentucky and died in Hot Springs."},
@@ -1111,7 +1111,7 @@ async function doFine(p){
   const st=ST(),f=rnd(FINES),idx=st.players.indexOf(p),bot=BOTS.find(b=>b.id===p.bot);let useP=false;
   if(p.pass){if(bot)useP=f.amt>=25;else useP=await ask(`<div class="bigmoji">😬</div><h2>${f.text}</h2><div>${f.sub}</div><div class="dim">You have a Free Pass. Use it to skip this fine?</div>`,[["🎟️ Use my Free Pass",true,"btn"],["Just pay it",false]])}
   if(useP){p.pass--;log(`${p.name} used a Free Pass on "${f.text}"`);toast("🎟️ Free Pass! No fine");renderPlayers();return}
-  if(f.k==="call"){const mom=st.players.find(x=>x.mom&&x!==p);p.cash-=50;if(mom)mom.cash+=50;else st.pot+=50;log(`${p.name} forgot to call ${SN()}: 50 ${mom?"to "+mom.name:"into the Pie Pot"}`)}
+  if(f.k==="call"){const mom=st.players.find(x=>x.mom&&x!==p);p.cash-=50;if(mom)mom.cash+=50;else st.pot+=50;log(`${p.name} forgot to call ${SN()}: 50 ${mom?"to "+SN():"into the Pie Pot"}`)}
   else if(f.k==="dish"){p.cash-=25;st.pot+=25;log(`${p.name} left the dishes: 25 into the Pie Pot`)}
   else if(f.k==="thank"){const prev=st.players[(idx-1+st.players.length)%st.players.length];p.cash-=20;if(prev!==p)prev.cash+=20;else st.pot+=20;log(`${p.name} forgot to say thank you: 20 to ${prev.name}`)}
   else{st.players.forEach(x=>{if(x!==p){p.cash-=10;x.cash+=10}});log(`${p.name} ate the last piece of pie: 10 to everyone`)}
@@ -1267,7 +1267,7 @@ function renderHomeScreenBox(){const box=$("#homeScreenBox");if(!box)return;
   if($("#hsGo"))$("#hsGo").onclick=()=>setupHome($("#hsGo"));if($("#hsNo"))$("#hsNo").onclick=()=>{ls.set("hsDismiss",Date.now());renderHomeScreenBox()}}
 async function tryPair(){ // Home Screen app with no sign-in: was this phone just set up from Safari?
   try{const r=await api("/pair",{});if(r&&r.token){SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);return true}}catch(e){}return false}
-/* ================= 🎙️ recording helper (Ask Grandma) ================= */
+/* ================= 🎙️ recording helper (Ask Sarnaw) ================= */
 function recordSheet(title){return new Promise(async res=>{
   if(!navigator.mediaDevices||!window.MediaRecorder){toast("This phone can't record here. You can type it instead.");return res(null)}
   let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast("Please allow the microphone");return res(null)}
@@ -1281,22 +1281,22 @@ function recordSheet(title){return new Promise(async res=>{
   $("#recStop").onclick=()=>rec.stop();$("#recCancel").onclick=()=>{cancelled=true;rec.stop()};rec.start(1000);
 })}
 
-/* ================= 🎙️ Ask Grandma ================= */
+/* ================= 🎙️ Ask Sarnaw ================= */
 function renderGrandma(){
   const box=$("#grandmaBox");if(!box)return;const g=S.grandma;
   if(!g){box.innerHTML=S.me.approver?`<div class="soon">🎙️ <b>Ask ${SN()}</b> starts once ${SN()} is marked. Family → tap her name → "This is ${SN()}".</div>`:"";return}
   const mom=mem(g.momId),story=S.stories.slice().reverse().find(x=>x.week===g.week),isMom=S.me.id===g.momId;
   box.innerHTML=`<div class="mem"><div class="cat">🎙️ Ask ${SN()} · this week</div><div class="qtext" style="font-size:19px">"${esc(g.prompt)}" <button class="say" id="gmSay" aria-label="Read it to me">🔊</button></div>
-    ${story?`${story.audio?`<audio controls preload="none" src="${photoURL(story.audio)}"></audio>`:""}${story.text?`<div class="text" style="white-space:pre-wrap">${esc(story.text)}</div>`:""}<div class="small dim">${isMom?"Thank you! Your story is saved for the whole family.":esc(mom.name)+" answered "+ago(story.ts)}</div>`
-      :isMom?`<div class="split"><button class="btn" id="gmTalk">🎤 Answer by talking</button><button class="btn ghost" id="gmType">⌨️ Type it</button></div>`:`<div class="dim small">Waiting for ${esc(mom.name)}'s answer…</div>`}
-    <div class="row">${S.stories.length?`<button class="btn small ghost" id="gmAll">📚 ${isMom?"My":esc(mom.name)+"'s"} stories (${S.stories.length})</button>`:""}${isMom?"":`<button class="btn small ghost" id="gmAsk">💡 Suggest a question for ${esc(mom.name)}</button>`}</div></div>`;
-  $("#gmSay").onclick=()=>say2(g.prompt+(story&&story.text?". "+mom.name+" said: "+story.text:""));
+    ${story?`${story.audio?`<audio controls preload="none" src="${photoURL(story.audio)}"></audio>`:""}${story.text?`<div class="text" style="white-space:pre-wrap">${esc(story.text)}</div>`:""}<div class="small dim">${isMom?"Thank you! Your story is saved for the whole family.":esc(SN())+" answered "+ago(story.ts)}</div>`
+      :isMom?`<div class="split"><button class="btn" id="gmTalk">🎤 Answer by talking</button><button class="btn ghost" id="gmType">⌨️ Type it</button></div>`:`<div class="dim small">Waiting for ${esc(SN())}'s answer…</div>`}
+    <div class="row">${S.stories.length?`<button class="btn small ghost" id="gmAll">📚 ${isMom?"My":esc(SN())+"'s"} stories (${S.stories.length})</button>`:""}${isMom?"":`<button class="btn small ghost" id="gmAsk">💡 Suggest a question for ${esc(SN())}</button>`}</div></div>`;
+  $("#gmSay").onclick=()=>say2(g.prompt+(story&&story.text?". "+SN()+" said: "+story.text:""));
   if($("#gmTalk"))$("#gmTalk").onclick=async()=>{const a=await recordSheet(g.prompt);if(a)busy(null,async()=>{await act("storyAnswer",{audio:a});sfx.fan();toast("🎙️ Saved! The family will love this.");refresh()})};
   if($("#gmType"))$("#gmType").onclick=()=>{sheet(`<h2>${esc(g.prompt)}</h2><textarea id="gmTxt" style="min-height:160px" maxlength="3000" placeholder="Tell us…"></textarea><button class="btn" id="gmSave">Save my story</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
     $("#gmSave").onclick=()=>busy($("#gmSave"),async()=>{const t=$("#gmTxt").value.trim();if(!t)return toast("Type your answer");await act("storyAnswer",{text:t});closeSheet();sfx.fan();refresh()})};
-  if($("#gmAsk"))$("#gmAsk").onclick=()=>{sheet(`<h2>💡 A question for ${esc(mom.name)}</h2><div class="dim">She'll get it as a future Ask ${SN()} question.</div><input id="gmQ" maxlength="200" placeholder="What was Grandpa Vaughn like?"><button class="btn" id="gmQGo">Send it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
+  if($("#gmAsk"))$("#gmAsk").onclick=()=>{sheet(`<h2>💡 A question for ${esc(SN())}</h2><div class="dim">She'll get it as a future Ask ${SN()} question.</div><input id="gmQ" maxlength="200" placeholder="What was Grandpa Vaughn like?"><button class="btn" id="gmQGo">Send it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);
     $("#gmQGo").onclick=()=>busy($("#gmQGo"),async()=>{await act("storySuggest",{q:$("#gmQ").value});closeSheet();toast(`💡 Added to ${SN()}'s questions`);refresh()})};
-  if($("#gmAll"))$("#gmAll").onclick=()=>sheet(`<h2>📚 ${esc(mom.name)}'s stories</h2><div class="list">${S.stories.slice().reverse().map(x=>`<div class="post" style="text-align:left"><b>"${esc(x.prompt)}"</b>${x.audio?`<audio controls preload="none" src="${photoURL(x.audio)}"></audio>`:""}${x.text?`<div class="text">${esc(x.text)}</div>`:""}<div class="small dim">${new Date(x.ts).toLocaleDateString()}</div></div>`).join("")}</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
+  if($("#gmAll"))$("#gmAll").onclick=()=>sheet(`<h2>📚 ${esc(SN())}'s stories</h2><div class="list">${S.stories.slice().reverse().map(x=>`<div class="post" style="text-align:left"><b>"${esc(x.prompt)}"</b>${x.audio?`<audio controls preload="none" src="${photoURL(x.audio)}"></audio>`:""}${x.text?`<div class="text">${esc(x.text)}</div>`:""}<div class="small dim">${new Date(x.ts).toLocaleDateString()}</div></div>`).join("")}</div><button class="btn" onclick="document.getElementById('modal').classList.remove('on')">Close</button>`);
 }
 
 /* ================= 🕯️ remembering ================= */
@@ -1529,7 +1529,7 @@ function renderRecipes(){
 }
 function recipeForm(){let photo=null;const names=[...new Set(S.members.filter(m=>m.status==="member").map(m=>m.name).concat((S.tree||[]).map(t=>t.name)))];
   sheet(`<h2>🍲 Add a family recipe</h2><label class="f">The dish<input id="rcT" maxlength="80" placeholder="Chicken and dumplings"></label>
-    <label class="f">Whose is it?<input id="rcW" maxlength="60" list="rcNames" placeholder="Grandma Vaughn"><datalist id="rcNames">${names.map(n=>`<option value="${esc(n)}">`).join("")}</datalist></label>
+    <label class="f">Whose is it?<input id="rcW" maxlength="60" list="rcNames" placeholder="Sarnaw"><datalist id="rcNames">${names.map(n=>`<option value="${esc(n)}">`).join("")}</datalist></label>
     <button class="btn ghost" id="rcP">📷 Add a picture</button><img id="rcPrev" class="qphoto" hidden alt="">
     <label class="f">What you need<textarea id="rcI" maxlength="2000" placeholder="One per line"></textarea></label><label class="f">How to make it<textarea id="rcS" maxlength="4000"></textarea></label>
     <button class="btn" id="rcGo">Add to the recipe box</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);

@@ -249,6 +249,24 @@ body.big #nav{zoom:1.12}
 .etext{font-size:19px;line-height:1.45}
 #easy .wrap{zoom:1.18}body.big #easy .wrap{zoom:1.3}
 .note .nsay{background:#ffe2a8;color:#3b2a12;border:0;border-radius:12px;padding:10px;font-weight:900;font-size:16px}
+/* Family Pop Plus: little lock on Plus buttons for free families, locked cards, plan + upgrade sheet */
+body.free [data-plus]::after{content:"🔒";font-size:.72em;margin-left:5px;opacity:.9}
+body.free .chatbar [data-plus]{opacity:.55}body.free .chatbar [data-plus]::after{content:none}
+body.free .li[data-plus]{opacity:.8}
+#home .wrap>div:empty{display:none}
+body.free #fAddEv,body.free #fAddTree,body.free #fAddRecipe,body.free #fAddMem,body.free #feudNew{display:none}
+.lockb{display:flex;align-items:center;gap:10px;background:rgba(255,194,61,.1);border:2px dashed rgba(255,194,61,.55);border-radius:14px;padding:10px 12px;text-align:left}
+.lockb .p{font-size:24px}.lockb .n{flex:1;font-weight:800}.lockb small{display:block;color:var(--dim);font-weight:700;margin-top:2px}
+.plushome{border:2px solid rgba(255,194,61,.45)}
+.plushome b{color:var(--sun);font-size:18px}
+.plist{display:flex;flex-direction:column;gap:6px;text-align:left;margin:4px 0}
+.plist div{display:flex;gap:10px;align-items:flex-start;background:var(--card);border-radius:12px;padding:8px 10px}
+.plist span{font-size:20px;line-height:1.2}.plist small{display:block;color:var(--dim);font-weight:700}
+.price{font-size:34px;font-weight:900;color:var(--sun);text-align:center;line-height:1}
+.price small{display:block;font-size:15px;color:var(--dim);margin-top:4px}
+a.btn{display:block;text-align:center;text-decoration:none;box-sizing:border-box}
+.paypal{background:#ffc439;color:#253b80}
+.planline{display:flex;align-items:center;gap:10px}.planline .n{flex:1;font-weight:800}.planline small{display:block;color:var(--dim);font-weight:700}
 </style>
 </head>
 <body>
@@ -286,8 +304,9 @@ body.big #nav{zoom:1.12}
   <div class="card compose">
     <textarea id="postText" placeholder="Share something with the family…" maxlength="2000"></textarea>
     <img id="postPrev" class="sqphoto" hidden alt="">
-    <div class="row"><button class="btn small ghost" id="postPhoto">📷 Photos</button><span style="flex:1"></span><button class="btn small" id="postGo">Post</button></div>
+    <div class="row"><button class="btn small ghost" id="postPhoto" data-plus="photos">📷 Photos</button><span style="flex:1"></span><button class="btn small" id="postGo">Post</button></div>
   </div>
+  <div id="plusHome"></div>
   <div id="checkBox"></div>
   <div id="homeScreenBox"></div>
   <div id="alertBox"></div>
@@ -326,7 +345,7 @@ body.big #nav{zoom:1.12}
   <div class="rooms" id="rooms"></div>
   <div class="tip" id="chatTip"></div>
   <div class="msgs" id="msgs"></div>
-  <div class="chatbar"><button id="chatPhoto" aria-label="Send a photo">📷</button><button id="chatMic" aria-label="Record a voice message">🎤</button><textarea id="chatText" rows="1" placeholder="Message" maxlength="1000"></textarea><button class="send" id="chatSend" aria-label="Send">➤</button></div>
+  <div class="chatbar"><button id="chatPhoto" data-plus="photos" aria-label="Send a photo">📷</button><button id="chatMic" data-plus="photos" aria-label="Record a voice message">🎤</button><textarea id="chatText" rows="1" placeholder="Message" maxlength="1000"></textarea><button class="send" id="chatSend" aria-label="Send">➤</button></div>
 </section>
 
 <!-- PLAY -->
@@ -334,8 +353,8 @@ body.big #nav{zoom:1.12}
   <div class="title">🎲 Family Pop</div>
   <button class="big main" id="pNew"><span class="ico">🫧</span><div>New game<small>On everyone's phones, or pass this phone around</small></div></button>
   <div class="card"><h3>Your games</h3><div class="list" id="gameList"></div></div>
-  <div class="card"><h3>📊 Family Feud</h3><div class="dim small" style="margin-bottom:8px">Everybody answers a question, then everyone tries to guess the family's top answers.</div><button class="btn small" id="feudNew">+ New question</button><div class="list" id="feudList" style="margin-top:10px"></div></div>
-  <button class="big" id="pKids"><span class="ico">👶</span><div>Grandkids mode<small>Easy picture game for little ones, read out loud</small></div></button>
+  <div class="card"><h3>📊 Family Feud</h3><div class="dim small" style="margin-bottom:8px">Everybody answers a question, then everyone tries to guess the family's top answers.</div><button class="btn small" id="feudNew" data-plus="feud">+ New question</button><div class="list" id="feudList" style="margin-top:10px"></div></div>
+  <button class="big" id="pKids" data-plus="kids"><span class="ico">👶</span><div>Grandkids mode<small>Easy picture game for little ones, read out loud</small></div></button>
   <button class="big" id="pHow"><span class="ico">❓</span><div>How to play</div></button>
 </div></section>
 
@@ -351,7 +370,7 @@ body.big #nav{zoom:1.12}
 <section class="screen" id="bank"><div class="wrap">
   <div class="title">🏦 Family Bank</div>
   <div class="card bankbig"><div class="dim">Your Pop Bucks</div><div class="money" id="myBucks">0</div><div id="myPasses" class="dim"></div></div>
-  <div class="split"><button class="btn" id="bGive">🎁 Give</button><button class="btn ghost" id="bPic">📸 My picture square</button></div>
+  <div class="split"><button class="btn" id="bGive">🎁 Give</button><button class="btn ghost" id="bPic" data-plus="square">📸 My picture square</button></div>
   <div class="card"><h3>Spend Pop Bucks</h3><div class="list" id="shop"></div></div>
   <div class="card"><h3>Everybody's accounts</h3><div class="list" id="accounts"></div></div>
   <div class="card"><h3>🥇 Champion of the month</h3><div class="dim small" style="margin-bottom:8px">Points for playing, winning, and right answers. The month's champion gets 300 Pop Bucks, their picture welcomes everyone, and a <b>real 3D-printed game piece</b>.</div><div class="list" id="monthList"></div></div>
@@ -363,21 +382,22 @@ body.big #nav{zoom:1.12}
   <div class="title">👨‍👩‍👧 Family</div>
   <div id="pendingBox"></div>
   <button class="btn" id="fInvite">✉️ Invite someone</button>
-  <div class="split"><button class="btn ghost" id="fMap">🗺️ Family map</button><button class="btn ghost" id="fBook">📖 Our yearbook</button></div>
-  <div class="split"><button class="btn ghost" id="fGal">🖼️ All our photos</button><button class="btn ghost" id="fFix">🪄 Fix an old photo</button></div>
-  <div class="card"><h3>📅 Family calendar</h3><button class="btn small" id="fAddEv">+ Add something</button><div class="list" id="evList" style="margin-top:10px"></div></div>
+  <div class="split"><button class="btn ghost" id="fMap" data-plus="map">🗺️ Family map</button><button class="btn ghost" id="fBook" data-plus="yearbook">📖 Our yearbook</button></div>
+  <div class="split"><button class="btn ghost" id="fGal" data-plus="gallery">🖼️ All our photos</button><button class="btn ghost" id="fFix" data-plus="fix">🪄 Fix an old photo</button></div>
+  <div class="card"><h3>📅 Family calendar</h3><button class="btn small" id="fAddEv" data-plus="calendar">+ Add something</button><div class="list" id="evList" style="margin-top:10px"></div></div>
   <div class="card"><h3>Everyone</h3><div class="list" id="memberList"></div></div>
-  <div class="card"><h3>🌳 <span class="snName">Sarnaw</span>'s family tree</h3><div class="dim small" style="margin-bottom:8px"><span class="snName">Sarnaw</span>'s side of the family. Everyone can add who they know, and it all turns into "Way Back When" questions.</div><button class="btn small" id="fAddTree">+ Add someone</button><div id="treeImport" style="margin-top:6px"></div><div class="list" id="treeList" style="margin-top:10px"></div></div>
-  <div class="card"><h3>🍲 Recipe box</h3><button class="btn small" id="fAddRecipe">+ Add a recipe</button><div class="list" id="recipeList" style="margin-top:10px"></div></div>
-  <div class="card"><h3>📖 Family Book</h3><div class="dim small" style="margin-bottom:8px">Memories and photos that turn into game questions.</div><button class="btn small" id="fAddMem">+ Add a memory</button><div class="list" id="bookList" style="margin-top:10px"></div></div>
+  <div class="card"><h3>🌳 <span class="snName">Sarnaw</span>'s family tree</h3><div class="dim small" style="margin-bottom:8px"><span class="snName">Sarnaw</span>'s side of the family. Everyone can add who they know, and it all turns into "Way Back When" questions.</div><button class="btn small" id="fAddTree" data-plus="tree">+ Add someone</button><div id="treeImport" style="margin-top:6px"></div><div class="list" id="treeList" style="margin-top:10px"></div></div>
+  <div class="card"><h3>🍲 Recipe box</h3><button class="btn small" id="fAddRecipe" data-plus="recipes">+ Add a recipe</button><div class="list" id="recipeList" style="margin-top:10px"></div></div>
+  <div class="card"><h3>📖 Family Book</h3><div class="dim small" style="margin-bottom:8px">Memories and photos that turn into game questions.</div><button class="btn small" id="fAddMem" data-plus="book">+ Add a memory</button><div class="list" id="bookList" style="margin-top:10px"></div></div>
   <div class="card"><h3>Me</h3><div class="list"><button class="li" id="fEditMe"><span class="p" id="mePiece">🫧</span><span class="n" id="meName">Me<small>Edit my piece and trivia answers</small></span>›</button>
     <button class="li" id="fHomeScreen"><span class="p">📲</span><span class="n">Put Family Pop on my Home Screen<small>Opens like an app, already signed in</small></span>›</button>
-    <button class="li" id="fAlerts"><span class="p">🔔</span><span class="n" id="fAlertsTxt">Phone alerts<small>Off</small></span>›</button>
-    <button class="li" id="fCheck"><span class="p">💛</span><span class="n" id="fCheckTxt">Daily "I'm OK" check-in<small>Off</small></span>›</button>
-    <button class="li" id="fEasy" hidden><span class="p">🌼</span><span class="n" id="fEasyTxt">Easy screen<small>Big buttons, just the important things</small></span>›</button>
+    <button class="li" id="fAlerts" data-plus="alerts"><span class="p">🔔</span><span class="n" id="fAlertsTxt">Phone alerts<small>Off</small></span>›</button>
+    <button class="li" id="fCheck" data-plus="checkin"><span class="p">💛</span><span class="n" id="fCheckTxt">Daily "I'm OK" check-in<small>Off</small></span>›</button>
+    <button class="li" id="fEasy" data-plus="easy" hidden><span class="p">🌼</span><span class="n" id="fEasyTxt">Easy screen<small>Big buttons, just the important things</small></span>›</button>
     <button class="li" id="fBig"><span class="p">🔍</span><span class="n" id="fBigTxt">Bigger text<small>Off</small></span>›</button>
     <button class="li" id="fLetIn"><span class="p">📲</span><span class="n">Let a phone in<small>Someone sees a sign-in code? Type it here</small></span>›</button>
     <button class="li" id="fRelink"><span class="p">📱</span><span class="n">Use Family Pop on another phone<small>Get a one-time code</small></span>›</button></div></div>
+  <div class="card" id="planCard" hidden><div id="planBox"></div></div>
   <div class="card" id="adminCard"><h3>Family settings</h3><label class="chk"><input type="checkbox" id="setApproval"> <span>New people need a yes first<br><small class="dim">From someone marked as an approver below</small></span></label>
     <label class="f" style="margin-top:10px">What does the whole family call Mom?<small>Shows everywhere: "Ask Sarnaw", "Sarnaw's family tree"…</small><div class="row"><input id="setSN" maxlength="24" style="flex:1;min-width:0"><button class="btn small" id="setSNGo">Save</button></div></label>
     <button class="btn small ghost" id="fNewCode" style="margin-top:10px">Make a new invite link (old ones stop working)</button></div>
@@ -441,6 +461,96 @@ const meId=()=>SES&&SES.memberId;
 const SN=()=>(S&&S.meta&&S.meta.momName)||"Sarnaw"; // the whole family calls Mom "Sarnaw" (GMA, the way her youngest grandson said it)
 const rel=r=>String(r||"").replace(/^Mom's/,SN()+"'s");
 const mem=id=>S&&S.members.find(m=>m.id===id);
+/* ================= Family Pop Plus: prices + pay links (the ONE place to change them) ================= */
+const PLUS_CFG={
+  price:"$29", per:"a year for the whole family", setupPrice:"$99",
+  stripePlus:"https://buy.stripe.com/28E5kw9LIdev4BD9pk3cc14",   // Stripe Payment Link "Family Pop Plus — 1 year" $29 (family id rides along as client_reference_id)
+  stripeSetup:"https://buy.stripe.com/00waEQ5vs6Q7b01eJE3cc15",  // Stripe Payment Link "Family Pop setup (done for you)" $99
+  paypalPlus:"",    // PAYPAL_PLUS_LINK: paste a PayPal payment link here. Empty = "Pay with PayPal" texts Topher for one
+  paypalSetup:"",   // PAYPAL_SETUP_LINK: same for the $99 setup
+  topherSms:"+15015758017"  // Text Topher (a text, never a call)
+};
+const PLAN=()=>(S&&S.plan)||{tier:"plus"};
+const PLUS=()=>PLAN().tier==="plus";
+const canPay=()=>!!(S&&S.me&&(S.me.approver||S.me.mom));
+const payLink=(base,fid)=>base?base+(base.includes("?")?"&":"?")+"client_reference_id="+encodeURIComponent(fid||""):"";
+const smsTopher=body=>`sms:${PLUS_CFG.topherSms}${/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)?"&":"?"}body=${encodeURIComponent(body)}`;
+function plusFeatures(){const sn=SN();return [
+  ["members","👨‍👩‍👧‍👦","Room for everybody","Free Family Pop holds 4 people. Plus has no limit, so nobody waits outside."],
+  ["photos","📸","Photos and voice messages","Share pictures, and talk instead of type, in chat and on Home."],
+  ["tree","🌳",sn+"'s family tree","Everyone adds who they know, and it turns into Way Back When questions in the game."],
+  ["book","📖","Family Book","Your own memories and photos become game questions."],
+  ["daily","⭐","Daily family question","A new question about your family every morning. First right answer wins Pop Bucks."],
+  ["grandma","🎙️","Ask "+sn,"One question a week for "+sn+". Her answers are saved for the family, in her own voice."],
+  ["dinner","🍽️","Sunday dinner","Who's hosting, who's coming, and who's bringing what."],
+  ["prayers","🙏","Prayer requests","Ask for prayer, see who's praying, and mark it answered."],
+  ["recipes","🍲","Recipe box","The family's famous dishes, kept in one place, and turned into game questions."],
+  ["feud","📊","Family Feud","Everybody answers a question, then everyone guesses the family's top answers."],
+  ["map","🗺️","Family map","Where your family comes from, on a map."],
+  ["yearbook","📖","Yearbook","Your year together in one book you can print or save."],
+  ["calendar","📅","Family calendar","Birthdays, reunions and get-togethers, with who's coming and a reminder the day before."],
+  ["checkin","💛","Daily \"I'm OK\" check-in","One tap a day lets the family know you're all right."],
+  ["notes","💌","Notes for "+sn,"Words, pictures and voice notes just for her, with a read receipt."],
+  ["hands","🤝","Need a hand","Ask the family for help, and whoever helps earns Pop Bucks."],
+  ["gallery","🖼️","All our photos","Every picture the family has shared, by month."],
+  ["fix","🪄","Old-photo fixer","Brightens faded and yellowed old pictures right on your phone."],
+  ["kids","👶","Grandkids mode","An easy picture game for little ones, read out loud."],
+  ["easy","🌼","Easy screen","Big buttons for "+sn+": I'm OK, pictures, notes and messages."],
+  ["square","🖼️","Picture squares","Put your own photo on a square of the game board."],
+  ["holiday","🎄","Holiday themes","The app and the board dress up for fall, Thanksgiving and Christmas."],
+  ["champ","🥇","Champion of the month","Points for playing all month. The champion wins big Pop Bucks and a trophy."],
+  ["bday","🎂","Birthday bonus","The birthday person gets Pop Bucks and a Free Pass, and their questions pay double."],
+  ["alerts","🔔","Phone alerts","A buzz when it's your turn, someone messages, or there's news."]]}
+const feat=k=>plusFeatures().find(f=>f[0]===k)||["plus","✨","Family Pop Plus","Everything in Family Pop, for the whole family."];
+function plusCTA(){return PLAN().trialUsed===false?"✨ Try Plus free for 30 days":"✨ See Family Pop Plus"}
+function askApprover(){const ap=S.members.filter(m=>m.status==="member"&&(m.approver||m.mom)&&m.id!==meId()).map(m=>esc(m.name));
+  return `<div class="dim small">${ap.length?ap.slice(0,3).join(" or "):"The person who started your family"} can turn on Plus in Family → Family settings.</div>`}
+function lockSheet(k){const [,ic,name,what]=feat(k);
+  sheet(`<div class="bigmoji">${ic}</div><h2>${esc(name)}</h2><div class="dim">${esc(what)}</div>
+    <div class="soon" style="text-align:left;font-weight:700">✨ This is part of <b>Family Pop Plus</b>. Anything your family already added is kept safe and comes right back with Plus.</div>
+    ${canPay()?`<button class="btn" id="lkUp">${plusCTA()}</button>`:askApprover()}
+    <button class="btn ghost" id="lkNo">Not now</button>`);
+  if($("#lkUp"))$("#lkUp").onclick=upgradeSheet;$("#lkNo").onclick=closeSheet}
+function lockBlurb(k,saved){const [,ic,,what]=feat(k);
+  return `<div class="lockb"><span class="p">${ic}</span><span class="n">Part of Family Pop Plus<small>${esc(what)}${saved?` Your ${esc(saved)} ${/s$/.test(saved)?"are":"is"} saved.`:""}</small></span><button class="btn small ghost" data-lk="${k}">See Plus</button></div>`}
+function plusSheet(){const P=PLAN();
+  sheet(`<div class="bigmoji">✨</div><h2>Family Pop Plus</h2><div class="dim">Everything in Family Pop, for your whole family.</div>
+    <div class="plist">${plusFeatures().filter(f=>!["easy","square","kids","fix","gallery","hands","notes"].includes(f[0])).map(([,ic,n,w])=>`<div><span>${ic}</span><span><b>${esc(n)}</b><small>${esc(w)}</small></span></div>`).join("")}
+      <div><span>➕</span><span><b>And more</b><small>Grandkids mode, the easy screen, notes, picture squares, the old-photo fixer, and every new thing I add.</small></span></div></div>
+    <div class="dim small" style="text-align:center">Free Family Pop keeps chat and the board game for up to 4 people, forever. Your family's things are never deleted.</div>
+    ${canPay()?`<button class="btn" id="psUp">Get Plus · ${PLUS_CFG.price} ${PLUS_CFG.per}</button>`:askApprover()}
+    <button class="btn ghost" id="psNo">Close</button>`);
+  if($("#psUp"))$("#psUp").onclick=upgradeSheet;$("#psNo").onclick=closeSheet}
+function upgradeSheet(){if(!canPay())return plusSheet();const fid=S.meta.fid,fam=S.meta.name,P=PLAN();
+  const ppPlus=PLUS_CFG.paypalPlus?payLink(PLUS_CFG.paypalPlus,fid):smsTopher(`Hi Topher! I'd like to pay for Family Pop Plus with PayPal. Our family is "${fam}" (code ${fid}).`);
+  const ppSetup=PLUS_CFG.paypalSetup?payLink(PLUS_CFG.paypalSetup,fid):smsTopher(`Hi Topher! I'd like the $99 Family Pop setup and want to pay with PayPal. Our family is "${fam}" (code ${fid}).`);
+  sheet(`<div class="bigmoji">✨</div><h2>Family Pop Plus</h2>
+    <div class="price">${PLUS_CFG.price}<small>${PLUS_CFG.per} · one payment, no auto-renew</small></div>
+    <a class="btn" href="${esc(payLink(PLUS_CFG.stripePlus,fid))}" target="_blank" rel="noopener">💳 Pay by card</a>
+    <a class="btn paypal" href="${esc(ppPlus)}" ${PLUS_CFG.paypalPlus?'target="_blank" rel="noopener"':""}>Pay with PayPal</a>
+    <div class="dim small" style="text-align:center">${PLUS_CFG.paypalPlus?"":"PayPal opens a text to me and I'll send you a PayPal link. "}Once you've paid, I turn Plus on for ${esc(fam)} within a day and text you when it's on.${P.trial?` Your trial keeps going until then (${P.daysLeft} day${P.daysLeft===1?"":"s"} left).`:""}</div>
+    <div class="card" style="text-align:left;gap:8px;display:flex;flex-direction:column"><b style="font-size:18px">🧺 Want me to set it all up for you?</b>
+      <div>${PLUS_CFG.setupPrice} one time. I load your family tree, photos and stories, so it's ready to play.</div>
+      <a class="btn ghost" href="${esc(smsTopher(`Hi Topher! I'm interested in the ${PLUS_CFG.setupPrice} Family Pop setup for "${fam}" (code ${fid}).`))}">💬 Text Topher</a>
+      <a class="btn ghost" href="${esc(payLink(PLUS_CFG.stripeSetup,fid))}" target="_blank" rel="noopener">💳 Pay ${PLUS_CFG.setupPrice} by card</a>
+      <a class="small dim" style="text-align:center;color:var(--dim)" href="${esc(ppSetup)}">or pay with PayPal</a></div>
+    <button class="btn ghost" id="upNo">Close</button>`);
+  $("#upNo").onclick=closeSheet}
+function renderPlan(){const P=PLAN(),box=$("#planBox"),card=$("#planCard");if(!box||!card)return;
+  card.hidden=!!P.forever||!canPay();if(card.hidden)return;
+  const dt=t=>new Date(t).toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"});
+  box.innerHTML=P.trial?`<div class="planline"><span class="p" style="font-size:26px">✨</span><span class="n">Plus trial: ${P.daysLeft} day${P.daysLeft===1?"":"s"} left<small>Everything is on. After ${dt(P.until)}, chat and the board game stay free for up to 4 people.</small></span></div><button class="btn small ghost" id="plGo" style="margin-top:8px">Keep Plus · ${PLUS_CFG.price} a year</button>`
+    :P.paid?`<div class="planline"><span class="p" style="font-size:26px">✨</span><span class="n">Family Pop Plus is on<small>Paid through ${dt(P.until)}. Thank you!</small></span></div><button class="btn small ghost" id="plGo" style="margin-top:8px">Pay for another year</button>`
+    :`<div class="planline"><span class="p" style="font-size:26px">🫧</span><span class="n">Free Family Pop<small>${P.members} of ${P.cap} people · chat and the board game. Everything your family added is saved.</small></span></div><button class="btn small" id="plGo" style="margin-top:8px">${plusCTA()}</button>`;
+  $("#plGo").onclick=upgradeSheet}
+function renderPlusHome(){const box=$("#plusHome");if(!box)return;if(PLUS()){box.innerHTML="";return}
+  box.innerHTML=`<div class="card plushome"><b>✨ Family Pop Plus</b><div class="small dim">Photos, ${esc(SN())}'s family tree, a daily family question, Ask ${esc(SN())}, Sunday dinner and more. Everything your family added is saved.</div><button class="btn small ghost" id="phMore">See what's in Plus</button></div>`;
+  $("#phMore").onclick=plusSheet}
+// any button marked data-plus opens a friendly "this is Plus" card instead, on free families
+window.addEventListener("click",e=>{const t=e.target&&e.target.closest?e.target:null;if(!t)return;
+  const lk=t.closest("[data-lk]");if(lk){e.preventDefault();e.stopPropagation();lockSheet(lk.dataset.lk);return}
+  const el=t.closest("[data-plus]");if(!el||PLUS())return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();lockSheet(el.dataset.plus)},true);
+
 let refreshT=null;
 async function refresh(){
   try{const d=await api(`/f/${SES.fid}/me`);S=d;ls.set("cache",d);try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
@@ -554,7 +664,7 @@ function showScreen(id){$$(".screen").forEach(s=>s.classList.toggle("on",s.id===
 function tab(t){if(t==="home"&&easyOn()){TAB="home";showScreen("easy");renderEasy();return}TAB=t;$$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));showScreen(t);
   if(t==="chat"){renderChat();setTimeout(()=>{const m=$("#msgs");m.scrollTop=m.scrollHeight},30)} if(t==="home")renderFeed(); if(t==="bank")renderBank(); if(t==="family")renderFamily(); if(t==="play")renderPlay(); if(t==="games")renderShelf()}
 $$("#nav button").forEach(b=>b.onclick=()=>tab(b.dataset.t));
-function renderAll(){if(!S||S.pending)return;$("#famName").textContent=S.meta.name;$$(".snName").forEach(x=>x.textContent=SN());
+function renderAll(){if(!S||S.pending)return;$("#famName").textContent=S.meta.name;document.body.classList.toggle("free",!PLUS());applyTheme();$$(".snName").forEach(x=>x.textContent=SN());
   if(!["home","chat","play","games","bank","family","game","easy"].some(id=>$("#"+id).classList.contains("on")))tab(TAB);
   renderFeed();renderChat();renderPlay();renderBank();renderFamily();badges();if($("#easy").classList.contains("on"))renderEasy()}
 function badges(){
@@ -582,13 +692,14 @@ function profileFields(p,opts={}){
 function readProfile(){let piece=($(".pieces button.on")||{}).dataset;piece=piece?piece.p:"🧁";
   return {name:$("#pfName").value.trim(),piece,birthday:$("#pfBday").value.trim(),nick:$("#pfNick").value.trim(),food:$("#pfFood").value.trim(),secret:$("#pfSecret").value.trim(),fb:($("#pfFb")||{value:""}).value.trim(),chatTrivia:$("#pfChat").checked}}
 function wirePieces(){$$("#pfPieces button").forEach(b=>b.onclick=()=>{if(b.classList.contains("lock")){toast("Buy that piece in the Bank 🏦");return}$$("#pfPieces button").forEach(x=>x.classList.toggle("on",x===b))})}
-$("#wStart").onclick=()=>{sheet(`<h2>Start a brand-new family</h2><div class="soon" style="text-align:left">⚠️ If anyone in your family already uses Family Pop, <b>don't</b> start a new one. Tap Cancel and use the sign-in code instead.</div><label class="f">Family name<input id="fmName" placeholder="The Cook Family" maxlength="40"></label>${profileFields()}<button class="btn" id="fmGo">Start it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);wirePieces();
+$("#wStart").onclick=()=>{sheet(`<h2>Start a brand-new family</h2><div class="soon" style="text-align:left">⚠️ If anyone in your family already uses Family Pop, <b>don't</b> start a new one. Tap Cancel and use the sign-in code instead.</div><div class="dim small" style="text-align:left">✨ Your family gets everything free for 30 days. After that, chat and the board game stay free for up to 4 people, or Family Pop Plus is $29 a year for everything.</div><label class="f">Family name<input id="fmName" placeholder="The Cook Family" maxlength="40"></label>${profileFields()}<button class="btn" id="fmGo">Start it</button><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancel</button>`);wirePieces();
   $("#fmGo").onclick=()=>busy($("#fmGo"),async()=>{const me=readProfile();if(!me.name)return toast("Please type your name");
     const r=await api("/create",{familyName:$("#fmName").value.trim()||"Our Family",me});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);closeSheet();
     await refresh();connect();tab("family");setTimeout(inviteSheet,400)})};
 function parseInvite(s){s=String(s||"").trim();const m=s.match(/join=([a-z0-9]+)\.([A-Za-z0-9]+)/)||s.match(/^([a-z0-9]{8,})\.([A-Za-z0-9]{4,})$/);return m?{fid:m[1],code:m[2]}:null}
 async function joinFlow(inv){
   let info={name:"the family"};try{info=await api(`/f/${inv.fid}/info`)}catch(e){toast("That invite link doesn't work. Ask for a new one.");return}
+  if(info.full){sheet(`<div class="bigmoji">👨‍👩‍👧‍👦</div><h2>${esc(info.name)} is full for now</h2><div class="dim">This family is on free Family Pop, which holds 4 people. Ask whoever sent you the link to turn on Family Pop Plus, then tap the same link again.</div><button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">OK</button>`);return}
   sheet(`<div class="bigmoji">✉️</div><h2>Join ${esc(info.name)}</h2>${info.approval?'<div class="dim">Someone in the family will say yes, then you\'re in.</div>':""}${profileFields()}<button class="btn" id="jGo">Join</button>`);wirePieces();
   $("#jGo").onclick=()=>busy($("#jGo"),async()=>{const me=readProfile();if(!me.name)return toast("Please type your name");
     const r=await api(`/f/${inv.fid}/join`,{code:inv.code,me});SES={fid:r.fid,memberId:r.memberId,token:r.token};ls.set("session",SES);closeSheet();history.replaceState(null,"",location.pathname);
@@ -664,13 +775,16 @@ function renderMemory(){ // "memory of the day": an older family photo comes bac
   if($("#memQ"))$("#memQ").onclick=()=>triviaForm({photoId:pk.id,cat:"Who's in the Picture?"});
 }
 function renderFeed(){
-  if(!S)return;renderHomeScreenBox();renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();renderHands();renderRemember();renderCheck();renderSoon();renderNoteBox();const f=S.feed.slice().reverse();
+  if(!S)return;renderHomeScreenBox();renderPlusHome();
+  if(PLUS()){renderAlertBox();renderHolidayBanner();renderChamp();renderBirthdays();renderDaily();renderGrandma();renderDinner();renderMemory();renderPrayers();renderHands();renderRemember();renderCheck();renderSoon();renderNoteBox()}
+  else ["alertBox","holidayBox","champBox","bdayBox","dailyBox","grandmaBox","dinnerBox","memBox","prayerBox","handBox","rememberBox","checkBox","soonBox","noteBox"].forEach(id=>{const b=$("#"+id);if(b)b.innerHTML=""});
+  const f=S.feed.slice().reverse();
   $("#feed").innerHTML=f.length?f.map(p=>{if(p.kind==="remember")return rememberPost(p);if(p.from==="system")return `<div class="post sys${p.kind==="recap"?" recap":""}">${esc(p.text)} <span class="small">· ${ago(p.ts)}</span>${p.audio?`<audio controls preload="none" src="${photoURL(p.audio)}"></audio>`:""}${p.story?`<div class="text" style="color:var(--ink);font-weight:700">${esc(p.story)}</div>`:""}</div>`;
     const a=mem(p.from)||{name:"Someone",piece:"🫧"};const liked=p.likes.includes(meId());
     return `<div class="post"><div class="who"><span class="pc">${a.piece}</span><span>${esc(a.name)}<br><small>${ago(p.ts)}</small></span></div>
       ${p.text?`<div class="text">${esc(p.text)}</div>`:""}${p.photos&&p.photos.length>1?`<div class="grid">${p.photos.map(id=>`<img loading="lazy" src="${photoURL(id)}" alt="">`).join("")}</div>`:p.photo?`<img class="ph" loading="lazy" src="${photoURL(p.photo)}" alt="Photo from ${esc(a.name)}">`:""}
       <div class="acts"><button class="${liked?"on":""}" data-like="${p.id}">❤️ ${p.likes.length||""}</button><button data-cm="${p.id}">💬 ${p.comments.length||""}</button>
-      ${p.text?`<button data-say="${p.id}" aria-label="Read it to me">🔊</button>`:""}<button data-share="${p.id}">📤 Share out</button><button data-q="${p.id}">💡 Make a question</button></div>
+      ${p.text?`<button data-say="${p.id}" aria-label="Read it to me">🔊</button>`:""}<button data-share="${p.id}">📤 Share out</button><button data-q="${p.id}" data-plus="book">💡 Make a question</button></div>
       ${p.comments.length?`<div class="cmts">${p.comments.map(c=>{const w=mem(c.from)||{name:"Someone"};return `<div><b>${esc(w.name)}</b> ${esc(c.text)}</div>`}).join("")}</div>`:""}</div>`}).join("")
     :'<div class="card dim" style="text-align:center">Nothing here yet. Share the first picture!</div>';
   $$("[data-like]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("like",{postId:b.dataset.like});buzz(10);refresh()}));
@@ -722,7 +836,7 @@ $("#chatMic").onclick=async()=>{ // tap to start talking, tap again to send
 $("#chatText").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat()}});
 
 /* ================= trivia + Family Book ================= */
-function triviaForm(pre={}){
+function triviaForm(pre={}){if(!PLUS())return lockSheet("book");
   let photo=pre.photoData||null;
   sheet(`<h2>💡 Make a game question</h2>
    <label class="f">Kind<select id="tCat">${CATS.map(c=>`<option ${c===pre.cat?"selected":""}>${c}</option>`).join("")}</select></label>
@@ -740,7 +854,10 @@ function triviaForm(pre={}){
 $("#fAddMem").onclick=()=>triviaForm({});
 
 /* ================= family tab ================= */
-function inviteSheet(){
+function inviteSheet(){if(S.plan&&S.plan.full){const [,ic]=feat("members");
+    sheet(`<div class="bigmoji">${ic}</div><h2>Your family is full on free Family Pop</h2><div class="dim">Free Family Pop holds ${S.plan.cap} people, and ${esc(S.meta.name)} has ${S.plan.members}. Nobody gets removed. New invites wait until Plus is on, then there's room for everybody.</div>
+      ${canPay()?`<button class="btn" id="ivUp">${plusCTA()}</button>`:askApprover()}<button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">Not now</button>`);
+    if($("#ivUp"))$("#ivUp").onclick=upgradeSheet;return}
   const link=`${location.origin}${location.pathname}?join=${S.meta.fid}.${S.meta.code}`;
   sheet(`<div class="bigmoji">✉️</div><h2>Invite someone</h2><div class="dim">Send this link to family, or people who are like family.${S.meta.approval?" They'll wait for a yes from an approver.":""}</div>
    <div class="card" style="word-break:break-all;font-size:14px;-webkit-user-select:text;user-select:text">${esc(link)}</div>
@@ -761,13 +878,16 @@ function renderFamily(){renderEvents();$("#fEasy").hidden=!S.me.mom;$("#fEasyTxt
   $("#mePiece").textContent=me.piece;$("#meName").innerHTML=`${esc(me.name)}<small>Edit my piece and trivia answers</small>`;
   const pend=S.members.filter(m=>m.status==="pending");
   $("#pendingBox").innerHTML=pend.length&&me.approver?`<div class="card" style="border:2px solid var(--sun)"><h3>Waiting for a yes</h3><div class="list">${pend.map(m=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${esc(m.name)}<small>wants to join</small></span><button class="btn small" data-ok="${m.id}">Yes</button><button class="btn small ghost" data-no="${m.id}">No</button></div>`).join("")}</div></div>`:"";
-  $$("[data-ok]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("approve",{memberId:b.dataset.ok});sfx.fan();refresh()}));
+  $$("[data-ok]").forEach(b=>b.onclick=()=>{if(S.plan&&S.plan.full)return lockSheet("members");busy(b,async()=>{await act("approve",{memberId:b.dataset.ok});sfx.fan();refresh()})});
   $$("[data-no]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("deny",{memberId:b.dataset.no});refresh()}));
   $("#memberList").innerHTML=S.members.filter(m=>m.status==="member").map(m=>`<button class="li" data-mem="${m.id}"><span class="p">${m.piece}</span><span class="n">${esc(m.name)}${m.mom?" 💐":""}${m.id===meId()?" (you)":""}<small>${m.approver?"✅ approves new people · ":""}${[m.birthday&&"🎂 "+esc(m.birthday),m.food&&"🍽️ "+esc(m.food)].filter(Boolean).join(" · ")||"no trivia yet"}</small></span>›</button>`).join("");
   $$("[data-mem]").forEach(b=>b.onclick=()=>memberSheet(mem(b.dataset.mem)));
   $("#bookList").innerHTML=S.book.length?S.book.slice().reverse().map(e=>{const by=mem(e.by);return `<div class="li">${e.photo?`<img src="${photoURL(e.photo)}" alt="">`:'<span class="p">💬</span>'}<span class="n">${esc(e.q)}<small>${esc(e.cat)} · ${esc(e.a)}${by?" · by "+esc(by.name):""}</small></span>${(e.by===meId()||me.approver)?`<button class="btn small ghost" data-bd="${e.id}">✕</button>`:""}</div>`}).join(""):'<div class="dim small">Nothing yet.</div>';
   $$("[data-bd]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("bookDel",{id:b.dataset.bd});refresh()}));
-  renderTree();renderRecipes();
+  renderTree();renderRecipes();renderPlan();
+  if(!PLUS()){const n=(a,w)=>a&&a.length?`${a.length} ${w}${a.length===1?"":"s"}`:"";
+    $("#bookList").innerHTML=lockBlurb("book",n(S.book,"memory").replace("memorys","memories"));$("#treeList").innerHTML=lockBlurb("tree",n(S.tree,"person").replace("persons","people"));$("#treeImport").innerHTML="";
+    $("#recipeList").innerHTML=lockBlurb("recipes",n(S.recipes,"recipe"));$("#evList").innerHTML=lockBlurb("calendar",n(S.events,"event"))}
   $("#fAlertsTxt").innerHTML=`Phone alerts<small>${S.pushOn?"On · tap to turn off":"Off · tap to turn on"}</small>`;
   $("#adminCard").style.display=me.approver?"":"none";$("#setApproval").checked=!!S.meta.approval;
 }
@@ -871,15 +991,16 @@ function renderBank(){
   $("#myBucks").textContent=me.bucks.toLocaleString();$("#myPasses").innerHTML=`🎟️ ${me.passes} Free Pass${me.passes===1?"":"es"}${me.sqCredits?` · 📸 ${me.sqCredits} picture square ready to use`:""}`;
   const items=[["pass","🎟️","A Free Pass","Skip a fine or get out of Time Out",300],["square","📸","Put your picture on a board square","It stays on the board for every family game",600]]
     .concat(SHOP_PIECES.filter(p=>!(me.pieces||[]).includes(p)).slice(0,6).map(p=>["piece:"+p,p,"New game piece","Yours to use forever",150]));
-  $("#shop").innerHTML=items.map(([id,ic,n,d,price])=>`<div class="li"><span class="p">${ic}</span><span class="n">${n}<small>${d}</small></span><button class="btn small" data-buy="${id}" ${me.bucks<price?"disabled":""}>${price}</button></div>`).join("");
+  $("#shop").innerHTML=items.map(([id,ic,n,d,price])=>`<div class="li"><span class="p">${ic}</span><span class="n">${n}<small>${d}</small></span><button class="btn small" data-buy="${id}" ${id==="square"?'data-plus="square"':""} ${me.bucks<price&&(PLUS()||id!=="square")?"disabled":""}>${price}</button></div>`).join("");
   $$("[data-buy]").forEach(b=>b.onclick=()=>busy(b,async()=>{await act("shop",{item:b.dataset.buy});sfx.cash();toast("Bought! 🎉");await refresh();if(b.dataset.buy==="square")squareFlow()}));
   const ms=S.members.filter(m=>m.status==="member");
   $("#accounts").innerHTML=ms.slice().sort((a,b)=>b.bucks-a.bucks).map(m=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${esc(m.name)}<small>🎟️ ${m.passes} Free Pass${m.passes===1?"":"es"}</small></span><b style="color:var(--sun)">${m.bucks.toLocaleString()}</b></div>`).join("");
   $("#monthList").innerHTML=(S.champion?`<div class="li"><span class="p">🥇</span><span class="n">Last champion: ${esc(S.champion.name)}<small>${esc(S.champion.month)}</small></span></div>`:"")+
     ms.slice().sort((a,b)=>(b.mpts||0)-(a.mpts||0)).map((m,i)=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${i===0&&m.mpts?"👑 ":""}${esc(m.name)}<small>this month</small></span><b>${m.mpts||0} pts</b></div>`).join("");
+  if(!PLUS())$("#monthList").innerHTML=lockBlurb("champ");
   $("#brag").innerHTML=ms.slice().sort((a,b)=>b.stats.wins-a.stats.wins||(b.stats.right/(b.stats.asked||1))-(a.stats.right/(a.stats.asked||1))).map((m,i)=>`<div class="li"><span class="p">${m.piece}</span><span class="n">${i===0&&m.stats.wins?"👑 ":""}${esc(m.name)}<small>🧠 knows the family ${m.stats.asked?Math.round(100*m.stats.right/m.stats.asked):0}% · ${m.stats.trophies.slice(-6).join(" ")||"no trophies yet"}</small></span><b>${m.stats.wins} 🏆</b></div>`).join("");
 }
-async function squareFlow(){
+async function squareFlow(){if(!PLUS())return lockSheet("square");
   if(!S.me.sqCredits){toast("Win a game, or buy a picture square in the Bank (600)");return}
   const props=BASE.map((s,i)=>Object.assign({i},s)).filter(s=>s.t==="prop");
   const pick=await ask(`<h2>📸 Which square gets your picture?</h2><div class="dim">It stays on the board for every family game, with your name on it.</div>`,
@@ -918,6 +1039,7 @@ function famQuestions(){
     if(p.nick)qs.push({cat:"Way Back When",about:p.id,q:`Who goes by the nickname "${p.nick}"?`,a:p.name,pool:names});
     if(p.secret)qs.push({cat:"Way Back When",about:p.id,q:`Something nobody knew… whose secret is this? "${p.secret}"`,a:p.name,pool:names});
   });
+  if(!PLUS())return qs; // free: starter questions + everyone's profile answers
   (S.trivia||[]).forEach(t=>{const m=mem(t.about);if(m&&m.status==="member")qs.push({cat:t.cat,about:t.about,q:t.q,a:m.name,pool:names})});
   const tree=S.tree||[],tnames=tree.map(t=>t.name),momM=ppl.find(m=>m.mom),momName=SN();
   tree.forEach(t=>{
@@ -941,7 +1063,7 @@ function makeQuestion(p,size){
   let pool=fam.filter(q=>!QUSED.has(q.q));
   if(!pool.length||Math.random()<.25)pool=pool.concat(starters.filter(q=>!QUSED.has(q.q)));
   if(!pool.length){QUSED.clear();pool=fam.concat(starters)}
-  const bdays=(S.today&&S.today.birthdays||[]).filter(id=>id!==p.memberId);
+  const bdays=PLUS()?(S.today&&S.today.birthdays||[]).filter(id=>id!==p.memberId):[];
   const bpool=pool.filter(q=>bdays.includes(q.about));
   const q=bpool.length&&Math.random()<.45?rnd(bpool):rnd(pool);QUSED.add(q.q);const n=size===2?2:size===4?3:4;
   const key=x=>String(x).toLowerCase().split(",")[0].trim(),seen=new Set([key(q.a)]);   // "Hot Springs" and "Hot Springs, Arkansas" count as the same
@@ -954,7 +1076,7 @@ function makeQuestion(p,size){
 /* ================= board game: setup ================= */
 let GAME=null;   // {mode:'local'|'online', id, rev, st:{...serializable...}}
 function renderPlay(){
-  if(!S)return;renderFeud();const gs=S.games.slice().sort((a,b)=>b.updated-a.updated);
+  if(!S)return;if(PLUS())renderFeud();else $("#feudList").innerHTML=lockBlurb("feud",(S.polls||[]).length?`${S.polls.length} Feud question${S.polls.length===1?"":"s"}`:"");const gs=S.games.slice().sort((a,b)=>b.updated-a.updated);
   $("#gameList").innerHTML=gs.length?gs.map(g=>{const t=mem(g.turnMember);const mine=g.turnMember===meId();const inIt=g.players.some(p=>p.memberId===meId());
     return `<button class="li" data-gid="${g.id}"><span class="p">${g.status==="done"?"🏁":mine?"🔔":"🎲"}</span><span class="n">${g.players.map(p=>p.piece).join("")} ${esc(g.title)}<small>${g.status==="done"?"Finished":mine?"Your turn!":t?"Waiting for "+esc(t.name):"Computer's turn"} · ${ago(g.updated)}</small></span>${inIt?"›":"👀"}</button>`}).join("")
     :'<div class="dim small">No games yet. Start one!</div>';
@@ -1007,7 +1129,7 @@ function onGameEvent(e){if(!GAME||GAME.mode!=="online"||GAME.id!==e.id||!$("#gam
 const ST=()=>GAME.st;
 function boardSquares(){const st=ST();return BASE.map((s,i)=>{const sq=Object.assign({i},s);
   if(s.t==="home"){const pl=st.players.find(p=>p.home===s.slot);sq.name=pl?pl.name+"'s House":"Neighbor's House"}
-  if(THEME&&THEME.names[s.t])sq.name=THEME.names[s.t];
+  const TH=theme();if(TH&&TH.names[s.t])sq.name=TH.names[s.t];
   const pic=S.sqpics&&S.sqpics[i];if(pic&&s.t==="prop"){sq.name=pic.name||sq.name;sq.photo=photoURL(pic.photo);sq.pic=pic}return sq})}
 function openBoard(){showScreen("game");$("#gChatBadge").style.display="none";paintAll()}
 function paintAll(){
@@ -1380,7 +1502,7 @@ $("#fFix").onclick=async()=>{const before=await pickPhoto(1400);if(!before)retur
 };
 
 /* ================= 🌼 Sarnaw's easy screen + 💌 notes ================= */
-function easyOn(){return !!(S&&S.me&&S.me.mom&&ls.get("easy",true))}
+function easyOn(){return !!(S&&S.me&&S.me.mom&&PLUS()&&ls.get("easy",true))}
 $("#fEasy").onclick=()=>{ls.set("easy",!easyOn());if(!easyOn())ls.set("big",false);else ls.set("big",true);applyBig();tab("home")};
 $("#eRegular").onclick=()=>{ls.set("easy",false);TAB="home";tab("home");toast("You can turn the easy screen back on in Family → Me")};
 function noteCard(n){const m=mem(n.from)||{name:"Someone",piece:"💌"};
@@ -1610,14 +1732,15 @@ function openBook(){
 
 /* ================= 🎄 holiday themes ================= */
 function thanksgivingDay(y){const d=new Date(y,10,1);const first=(4-d.getDay()+7)%7+1;return first+21}
-const THEME=(()=>{const n=new Date(),m=n.getMonth()+1,d=n.getDate();
+const THEME0=(()=>{const n=new Date(),m=n.getMonth()+1,d=n.getDate();
   if(m===12)return{id:"xmas",emoji:["❄️","🎄","⭐","🎁"],names:{lucky:"Stocking Stuffer",pot:"Christmas Pie Pot",go:"GO 🎄"},banner:d===25?"🎄 Merry Christmas from all of us!":null};
   if(m===11)return{id:"thanks",emoji:["🍂","🦃","🥧","🍁"],names:{pot:"Pumpkin Pie Pot",lucky:"Lucky Wishbone"},banner:d===thanksgivingDay(n.getFullYear())?"🦃 Happy Thanksgiving! What are you thankful for?":null,thanks:true};
   if(m===10&&d>=15)return{id:"fall",emoji:["🎃","🍂","🍁"],names:{pot:"Pumpkin Pie Pot",lucky:"Treat Bubble"},banner:d===31?"🎃 Happy Halloween!":null};
   return null})();
-function applyTheme(){if(!THEME)return;document.body.dataset.holiday=THEME.id;
+const theme=()=>THEME0&&S&&PLUS()?THEME0:null;
+function applyTheme(){const THEME=theme();if(!THEME){delete document.body.dataset.holiday;const fx=$("#holidayFx");if(fx)fx.innerHTML="";return}document.body.dataset.holiday=THEME.id;
   const fx=$("#holidayFx");if(fx&&!fx.childElementCount&&!matchMedia("(prefers-reduced-motion: reduce)").matches)for(let i=0;i<14;i++){const e=document.createElement("span");e.textContent=rnd(THEME.emoji);e.style.left=Math.random()*100+"vw";e.style.animationDelay=(-Math.random()*14)+"s";e.style.fontSize=(14+Math.random()*16)+"px";fx.appendChild(e)}}
-function renderHolidayBanner(){const box=$("#holidayBox");if(!box)return;
+function renderHolidayBanner(){const box=$("#holidayBox");if(!box)return;const THEME=theme();
   box.innerHTML=THEME&&THEME.banner?`<div class="bday"><b>${esc(THEME.banner)}</b>${THEME.thanks?`<button class="btn small" id="thxGo">Share what you're thankful for</button>`:""}</div>`:"";
   if($("#thxGo"))$("#thxGo").onclick=()=>{$("#postText").value="I'm thankful for ";$("#postText").focus()}}
 
@@ -1644,7 +1767,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)keepHomeLi
     if(new URLSearchParams(location.search).get("checkin")&&S&&S.me&&S.me.checkin&&S.me.checkDay!==S.dayKey)busy(null,doCheckin);
     keepHomeLink();
     if(inv&&inv.fid!==SES.fid)toast("You're already in a family on this phone")}
-  else{showScreen("welcome");if(inv)joinFlow(inv);else devSignIn()}
+  else{showScreen("welcome");if(inv)joinFlow(inv);else if(new URLSearchParams(location.search).get("start")){history.replaceState(null,"",location.pathname);$("#wStart").click()}else devSignIn()}
 })();
 })();
 </script>

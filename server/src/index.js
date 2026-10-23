@@ -48,6 +48,29 @@ const GRANDMA_PROMPTS = [
   "What did a Saturday look like when you were 10?", "What was your first car?", "What's a prayer that was answered in your life?",
   "What do you want the family to always remember?"];
 const PROFILE_FIELDS = ["name", "piece", "birthday", "nick", "food", "secret", "chatTrivia", "mom", "fb"];
+// ---- Family Pop Plus ----
+// Free: up to 4 people, family chat (words), the board game with starter + profile trivia.
+// Plus ($29/year): everything else. New families get a 30-day Plus trial. Topher's own family is "forever".
+const TRIAL_DAYS = 30, FREE_CAP = 4, PLUS_YEAR = 365 * 864e5;
+const FOREVER_FIDS = ["wvjtreqeabwc"]; // Topher's real family: all of Plus, never billed, never asked
+const PLUS_ACTIONS = new Set(["makeTrivia", "treeAdd", "treeEdit", "treeImport", "daily", "pushSub", "pushTest", "storyAnswer", "storySuggest",
+  "recipeAdd", "dinner", "prayerAdd", "pray", "prayerAnswered", "pollAdd", "pollAnswer", "pollClose", "pollPlayed", "noteAdd", "checkinSet", "checkin",
+  "eventAdd", "eventRsvp", "handAdd", "handTake", "handDone", "square"]);
+function planOf(meta) {
+  const now = Date.now(); meta = meta || {};
+  if (meta.plan === "forever") return { tier: "plus", forever: true };
+  if ((meta.plusUntil || 0) > now) return { tier: "plus", paid: true, until: meta.plusUntil };
+  if ((meta.trialEnds || 0) > now) return { tier: "plus", trial: true, until: meta.trialEnds, daysLeft: Math.ceil((meta.trialEnds - now) / 864e5) };
+  return { tier: "free", trialUsed: !!meta.trialEnds, cap: FREE_CAP };
+}
+const needPlus = (msg) => json({ error: msg || "That's part of Family Pop Plus.", plus: true }, 402);
+async function sameSecret(a, b) { // constant-time compare of two secrets (hash first so lengths match)
+  const [x, y] = await Promise.all([sha(String(a || "")), sha(String(b || ""))]); let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x.charCodeAt(i) ^ y.charCodeAt(i); return diff === 0;
+}
+function parseUntil(u) { if (u == null || u === "") return 0; const n = typeof u === "number" ? u : /^\d+$/.test(String(u)) ? +u : Date.parse(String(u) + (/^\d{4}-\d{2}-\d{2}$/.test(String(u)) ? "T23:59:59-06:00" : ""));
+  return Number.isFinite(n) && n > 0 ? n : NaN; }
+
 const RELATIONS = ["Mom's mother","Mom's father","Mom's grandmother","Mom's grandfather","Mom's great-grandparent","Mom's ancestor","Mom's brother","Mom's sister","Mom's aunt","Mom's uncle","Mom's cousin","Other family"];
 
 export default {
@@ -67,6 +90,17 @@ export default {
         const stub = env.FAMILY.get(env.FAMILY.idFromName(fid));
         const body = await req.json();
         return stub.fetch(new Request(`https://do/init?fid=${fid}`, { method: "POST", body: JSON.stringify(body) }));
+      }
+      if (p[1] === "admin" && p[2] === "plan" && req.method === "POST") { // owner-only: sets plan fields, never reads family data
+        const secret = env.ADMIN_PLAN_SECRET || "";
+        const got = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+        if (secret.length < 32 || !got || !(await sameSecret(got, secret))) return fail("Not found", 404);
+        const b = await req.json().catch(() => ({})); const fid = String(b.fid || "");
+        if (!/^[a-z0-9]{8,20}$/.test(fid)) return fail("fid looks wrong");
+        if (!["plus", "free", "trial", "forever"].includes(b.plan)) return fail("plan must be plus, free, trial or forever");
+        const until = parseUntil(b.until); if (Number.isNaN(until)) return fail("until must be a date like 2027-10-22");
+        const stub = env.FAMILY.get(env.FAMILY.idFromName(fid));
+        return stub.fetch(new Request(`https://do/plan?fid=${fid}`, { method: "POST", body: JSON.stringify({ plan: b.plan, until }) }));
       }
       if (p[1] === "vapid") return json({ publicKey: env.VAPID_PUBLIC || "" });
       if (p[1] === "pair" && req.method === "POST") {
@@ -98,7 +132,7 @@ export default {
         const fid = clip(p[2], 20);
         const stub = env.FAMILY.get(env.FAMILY.idFromName(fid));
         const rest = "/" + p.slice(3).join("/");
-        if (rest === "/tick" || rest === "/init" || rest === "/relink") return fail("Not found", 404); // internal only
+        if (rest === "/tick" || rest === "/init" || rest === "/relink" || rest === "/plan") return fail("Not found", 404); // internal only
         const u = new URL(`https://do${rest}`);
         u.search = url.search; u.searchParams.set("fid", fid);
         return stub.fetch(new Request(u, req));
@@ -143,10 +177,19 @@ export class Family extends DurableObject {
       meta: got.get("meta") || null, members: got.get("members") || {}, chat: got.get("chat") || [], feed: got.get("feed") || [],
       book: got.get("book") || [], sqpics: got.get("sqpics") || {}, games: got.get("games") || {}, earn: got.get("earn") || {}, trivia: got.get("trivia") || [], tree: got.get("tree") || [], daily: got.get("daily") || null, stories: got.get("stories") || { list: [], queue: [] }, recipes: got.get("recipes") || [], dinner: got.get("dinner") || null, prayers: got.get("prayers") || [], polls: got.get("polls") || [], hands: got.get("hands") || [], events: got.get("events") || [], notes: got.get("notes") || [],
     };
+    if (this.d.meta && !this.d.meta.plan) { // families from before Plus existed: Topher's is forever, test families start a trial now
+      this.d.meta.plan = FOREVER_FIDS.includes(this.d.meta.fid) ? "forever" : "trial";
+      if (this.d.meta.plan === "trial") this.d.meta.trialEnds = Date.now() + TRIAL_DAYS * 864e5;
+      this.ctx.waitUntil(this.save("meta"));
+    }
     const sm = Object.values(this.d.members).find(m => m.mom); const sn = (this.d.meta && this.d.meta.momName) || SN_DEFAULT;
     if (sm && sm.name !== sn) { sm.realName = sm.realName || sm.name; sm.name = sn; this.ctx.waitUntil(this.save("members")); }
     return this.d;
   }
+  plus() { return planOf(this.d.meta).tier === "plus"; }
+  memberCount() { return Object.values(this.d.members).filter(m => m.status === "member").length; }
+  planView() { const p = planOf(this.d.meta), n = this.memberCount();
+    return { ...p, members: n, cap: p.tier === "plus" ? null : FREE_CAP, full: p.tier !== "plus" && n >= FREE_CAP }; }
   async save(...keys) { const o = {}; for (const k of keys) o[k] = this.d[k]; await this.ctx.storage.put(o); }
   async putPhoto(b64, kind = "image") {
     if (!b64 || typeof b64 !== "string" || !b64.startsWith("data:" + kind + "/")) return null;
@@ -194,6 +237,7 @@ export class Family extends DurableObject {
     const myRooms = (r) => r === "all" || r.split("~").includes(me.id);
     return {
       meta: { name: d.meta.name, approval: d.meta.approval, fid: d.meta.fid, code: d.meta.code, momName: d.meta.momName || SN_DEFAULT },
+      plan: this.planView(),
       me: this.publicMember(me, true),
       today: (() => { const t = centralToday(), n = centralToday(1); const on = d => Object.values(this.d.members).filter(m => m.status === "member" && (b => b && b[0] === d[0] && b[1] === d[1])(parseBday(m.birthday))).map(m => m.id);
         return { birthdays: on(t), tomorrow: on(n) }; })(),
@@ -201,7 +245,7 @@ export class Family extends DurableObject {
       chat: d.chat.filter(c => myRooms(c.room)).slice(-300),
       feed: d.feed.slice(-80),
       book: d.book, trivia: d.trivia.slice(-200), sqpics: d.sqpics, tree: d.tree,
-      daily: d.daily && { date: d.daily.date, q: d.daily.q, cat: d.daily.cat, opts: d.daily.opts, about: d.daily.about, answers: d.daily.answers, first: d.daily.first,
+      daily: this.plus() && d.daily && { date: d.daily.date, q: d.daily.q, cat: d.daily.cat, opts: d.daily.opts, about: d.daily.about, answers: d.daily.answers, first: d.daily.first,
         a: d.daily.answers[me.id] ? d.daily.a : undefined },
       champion: d.meta.champion || null, month: d.meta.monthKey,
       grandma: this.grandmaNow(), stories: d.stories.list.slice(-60), recipes: d.recipes, dinner: this.dinnerNow(),
@@ -222,7 +266,8 @@ export class Family extends DurableObject {
     if (path === "/init" && req.method === "POST") {
       if (d.meta) return fail("Family already exists");
       const b = await req.json();
-      d.meta = { fid: url.searchParams.get("fid"), name: clip(b.familyName || "Our Family", 40), code: rid(6).toUpperCase(), approval: true, created: Date.now() };
+      d.meta = { fid: url.searchParams.get("fid"), name: clip(b.familyName || "Our Family", 40), code: rid(6).toUpperCase(), approval: true, created: Date.now(),
+        plan: "trial", trialEnds: Date.now() + TRIAL_DAYS * 864e5 };
       const m = this.newMember(b.me || {}, "member"); m.creator = true; m.approver = true;
       const token = await this.issueToken(m); d.members[m.id] = m;
       await this.save("meta", "members");
@@ -231,6 +276,15 @@ export class Family extends DurableObject {
     }
     if (!d.meta) return fail("We couldn't find that family. Check the link.", 404);
     if (!this.registered) { this.registered = true; const dir = this.env.DIR.get(this.env.DIR.idFromName("dir")); this.ctx.waitUntil(dir.fetch(new Request("https://dir/reg", { method: "POST", body: JSON.stringify({ fid: d.meta.fid }) })).catch(() => { this.registered = false; })); }
+    if (path === "/plan" && req.method === "POST") { // reached only through /api/admin/plan (secret checked there)
+      const b = await req.json(), now = Date.now(), m = d.meta;
+      if (b.plan === "forever") m.plan = "forever";
+      else if (b.plan === "plus") { m.plan = "plus"; m.plusUntil = b.until || Math.max(now, m.plusUntil || 0) + PLUS_YEAR; }
+      else if (b.plan === "trial") { m.plan = "trial"; m.plusUntil = 0; m.trialEnds = b.until || now + TRIAL_DAYS * 864e5; }
+      else { m.plan = "free"; m.plusUntil = 0; m.trialEnds = Math.min(m.trialEnds || now - 1, now - 1); }
+      await this.save("meta"); this.broadcast("members", null);
+      const pl = planOf(m); return json({ ok: true, fid: m.fid, plan: m.plan, tier: pl.tier, until: pl.until ? new Date(pl.until).toISOString() : null });
+    }
     if (path === "/tick") { await req.text().catch(() => ""); if (url.searchParams.get("slot") === "noon") await this.checkinAlerts(); else await this.tick(); return json({ ok: true }); }
 
     if (path === "/relink" && req.method === "POST") {
@@ -239,11 +293,12 @@ export class Family extends DurableObject {
       const token = await this.issueToken(m); await this.save("members");
       return json({ fid: d.meta.fid, memberId: m.id, token });
     }
-    if (path === "/info") return json({ name: d.meta.name, approval: d.meta.approval, count: Object.values(d.members).filter(m => m.status === "member").length });
+    if (path === "/info") return json({ name: d.meta.name, approval: d.meta.approval, count: this.memberCount(), full: this.planView().full });
 
     if (path === "/join" && req.method === "POST") {
       const b = await req.json();
       if (clip(b.code, 12).toUpperCase() !== d.meta.code) return fail("That invite code doesn't match. Ask for a new link.", 403);
+      if (this.planView().full) return needPlus(`${d.meta.name} already has ${FREE_CAP} people, the most free Family Pop holds. Ask whoever started it to turn on Family Pop Plus, then use this link again.`);
       const m = this.newMember(b.me || {}, d.meta.approval ? "pending" : "member");
       const token = await this.issueToken(m); d.members[m.id] = m; await this.save("members");
       if (m.status === "pending") { const ap = Object.values(d.members).filter(x => x.approver).map(x => x.id); this.broadcast("pending", { name: m.name, piece: m.piece }, ap);
@@ -283,6 +338,8 @@ export class Family extends DurableObject {
     const b = await req.json();
     const a = b.action;
     const isApprover = !!me.approver;
+    if (PLUS_ACTIONS.has(a) && !this.plus()) return needPlus();
+    if ((a === "chat" || a === "post") && (b.photo || b.audio || (b.photos || []).length) && !this.plus()) return needPlus("Photos and voice messages are part of Family Pop Plus.");
     const member = (id) => { const m = d.members[id]; if (!m) throw new Error("Unknown family member"); return m; };
 
     switch (a) {
@@ -294,6 +351,7 @@ export class Family extends DurableObject {
       case "approve": case "deny": {
         if (!isApprover) return fail("Only the people who approve new members can do that", 403);
         const m = member(b.memberId);
+        if (a === "approve" && m.status !== "member" && this.planView().full) return needPlus(`Free Family Pop holds ${FREE_CAP} people. Turn on Plus to let ${m.name} in. They'll stay on the waiting list until then.`);
         if (a === "approve") { m.status = "member"; this.post(`${m.piece} ${m.name} joined the family! Welcome!`); }
         else delete d.members[m.id];
         await this.save("members", "feed"); this.broadcast("members", null); this.broadcast("feed", null); return json({ ok: true });
@@ -571,7 +629,7 @@ export class Family extends DurableObject {
         const e = { id: rid(8), name, relation: RELATIONS.includes(b.relation) ? b.relation : "Other family", born: clip(b.born, 40), died: clip(b.died, 40), place: clip(b.place, 60),
           story: clip(b.story, 300), photo: await this.putPhoto(b.photo), by: me.id, ts: Date.now() };
         d.tree.push(e); if (d.tree.length > 500) d.tree.shift();
-        this.post(`🌳 ${me.piece} ${me.name} added ${name} (${e.relation}) to the family tree`);
+        this.post(`🌳 ${me.piece} ${me.name} added ${name} (${e.relation.replace(/^Mom's/, (d.meta.momName || SN_DEFAULT) + "'s")}) to the family tree`);
         await this.save("tree", "feed"); this.broadcast("tree", null); this.broadcast("feed", null); return json({ ok: true });
       }
       case "treeImport": { // load the family's researched tree in one go
@@ -697,6 +755,7 @@ export class Family extends DurableObject {
     }
   }
   async birthdays() {
+    if (!this.plus()) return; // birthday bonus is a Plus thing
     const [mo, da, yr] = centralToday(); let changed = false;
     for (const m of Object.values(this.d.members)) {
       if (m.status !== "member") continue;
@@ -713,7 +772,7 @@ export class Family extends DurableObject {
     const prev = this.d.meta.monthKey;
     if (prev) {
       const ms = Object.values(this.d.members).filter(m => m.status === "member" && (m.mpts || 0) > 0).sort((a, b) => b.mpts - a.mpts);
-      if (ms.length) {
+      if (ms.length && this.plus()) {
         const c = ms[0], label = new Date(prev + "-15").toLocaleString("en-US", { month: "long", year: "numeric" });
         this.d.meta.champion = { memberId: c.id, name: c.name, piece: c.piece, month: label, pts: c.mpts };
         c.bucks += 300; c.stats.trophies.push("🥇");
@@ -777,10 +836,12 @@ export class Family extends DurableObject {
     return out;
   }
   notify(toIds, exceptId, data) { // phone alerts; toIds null = the whole family
+    if (!this.plus()) return; // phone alerts are part of Plus
     const ms = Object.values(this.d.members).filter(m => m.status === "member" && m.id !== exceptId && (!toIds || toIds.includes(m.id)) && (m.push || []).length);
     if (ms.length) this.ctx.waitUntil(Promise.all(ms.map(m => this.pushTo(m, data))));
   }
   async tick() { // runs every morning from the scheduler
+    if (!this.plus()) { await this.monthly(); await this.tourneyRoll(); return; } // free families: just keep the month + tournament ticking
     const before = this.d.daily && this.d.daily.date;
     await this.birthdays(); await this.monthly(); await this.ensureDaily();
     const [mo, da, yr] = centralToday(); const dow = new Date(Date.UTC(yr, mo - 1, da)).getUTCDay();
@@ -803,6 +864,7 @@ export class Family extends DurableObject {
     await this.save("polls", "feed");
   }
   async checkinAlerts() { // early afternoon: anyone who turned on check-ins and hasn't tapped "I'm OK" today
+    if (!this.plus()) return;
     const td = centralDay(); let changed = false;
     for (const m of Object.values(this.d.members)) {
       if (m.status !== "member" || !m.checkin || m.checkDay === td || m.checkAlerted === td) continue;
